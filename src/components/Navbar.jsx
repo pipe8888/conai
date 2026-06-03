@@ -1,9 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
   const { count } = useCart()
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
+
+  async function handleLogout() {
+    await logout()
+    navigate('/')
+  }
 
   return (
     <nav style={styles.nav}>
@@ -17,9 +24,19 @@ function Navbar() {
         <li><Link to="/contacto" style={styles.link}>Contacto</Link></li>
       </ul>
 
-      <button onClick={() => navigate('/carrito')} style={styles.cartBtn}>
-        🛒 Carrito {count > 0 && <span style={styles.badge}>{count}</span>}
-      </button>
+      <div style={styles.right}>
+        {user ? (
+          <>
+            <span style={styles.userEmail}>{user.email.split('@')[0]}</span>
+            <button onClick={handleLogout} style={styles.logoutBtn}>Salir</button>
+          </>
+        ) : (
+          <Link to="/login" style={styles.loginBtn}>Iniciar sesión</Link>
+        )}
+        <button onClick={() => navigate('/carrito')} style={styles.cartBtn}>
+          🛒 {count > 0 && <span style={styles.badge}>{count}</span>}
+        </button>
+      </div>
     </nav>
   )
 }
@@ -56,6 +73,10 @@ const styles = {
     borderRadius: '99px', padding: '1px 7px',
     fontSize: '11px', fontWeight: 800,
   },
+  right: { display: 'flex', alignItems: 'center', gap: '10px' },
+  userEmail: { fontSize: '13px', color: '#a78bfa', fontWeight: 600 },
+  loginBtn: { fontSize: '13px', color: '#f1f0ff', textDecoration: 'none', padding: '8px 16px', border: '1px solid rgba(108,99,255,0.3)', borderRadius: '99px' },
+  logoutBtn: { fontSize: '12px', color: '#8b8a9e', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '99px', padding: '6px 14px', cursor: 'pointer' },
 }
 
 export default Navbar
