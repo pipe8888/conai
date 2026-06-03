@@ -2,6 +2,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 
+const ADMIN_EMAIL = 'pipeblue17@gmail.com'
+
 function Navbar() {
   const { count } = useCart()
   const { user, logout } = useAuth()
@@ -27,6 +29,9 @@ function Navbar() {
       <div style={styles.right}>
         {user ? (
           <>
+            {user.email === ADMIN_EMAIL && (
+              <Link to="/admin" style={styles.adminBtn}>Admin</Link>
+            )}
             <span style={styles.userEmail}>{user.email.split('@')[0]}</span>
             <button onClick={handleLogout} style={styles.logoutBtn}>Salir</button>
           </>
@@ -77,6 +82,7 @@ const styles = {
   userEmail: { fontSize: '13px', color: '#a78bfa', fontWeight: 600 },
   loginBtn: { fontSize: '13px', color: '#f1f0ff', textDecoration: 'none', padding: '8px 16px', border: '1px solid rgba(108,99,255,0.3)', borderRadius: '99px' },
   logoutBtn: { fontSize: '12px', color: '#8b8a9e', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '99px', padding: '6px 14px', cursor: 'pointer' },
+  adminBtn: { fontSize: '12px', color: '#22d3ee', textDecoration: 'none', border: '1px solid rgba(34,211,238,0.3)', borderRadius: '99px', padding: '6px 14px', fontWeight: 600 },
 }
 
 export default Navbar
