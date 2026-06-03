@@ -41,7 +41,7 @@ function Login() {
       <div style={s.card}>
 
         <Link to="/" style={s.logo}>
-          Dropify<span style={s.logoAi}>ai</span>
+          Con<span style={s.logoAi}>AI</span>
         </Link>
 
         <div style={s.tabs}>

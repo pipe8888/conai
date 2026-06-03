@@ -15,7 +15,7 @@ function Navbar() {
   return (
     <nav style={styles.nav}>
       <Link to="/" style={styles.logo}>
-        Dropify<span style={styles.logoAi}>ai</span>
+        Con<span style={styles.logoAi}>AI</span>
       </Link>
 
       <ul style={styles.links}>
