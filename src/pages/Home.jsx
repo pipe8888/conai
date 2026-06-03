@@ -83,7 +83,12 @@ function Home() {
         <div style={s.prodsGrid}>
           {featured.map(prod => (
             <Link key={prod.id} to={`/producto/${prod.id}`} style={s.prodCard}>
-              <div style={s.prodImg}>{prod.emoji}</div>
+              <div style={s.prodImg}>
+                {prod.image_url
+                  ? <img src={prod.image_url} alt={prod.name} style={s.prodImgPhoto} />
+                  : <span style={{ fontSize: '60px' }}>{prod.emoji}</span>
+                }
+              </div>
               <div style={s.prodInfo}>
                 <p style={s.prodCat}>{prod.category.toUpperCase()}</p>
                 <p style={s.prodName}>{prod.name}</p>
@@ -162,7 +167,8 @@ const s = {
   catCount: { fontSize: '12px', color: '#8b8a9e' },
   prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: '20px' },
   prodCard: { background: '#13131c', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '20px', overflow: 'hidden', textDecoration: 'none', display: 'block', transition: 'all 0.2s' },
-  prodImg: { height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '60px', background: 'linear-gradient(135deg,rgba(108,99,255,0.12),rgba(34,211,238,0.08))' },
+  prodImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '60px', background: 'linear-gradient(135deg,rgba(108,99,255,0.12),rgba(34,211,238,0.08))', overflow: 'hidden' },
+  prodImgPhoto: { width: '100%', height: '100%', objectFit: 'cover' },
   prodInfo: { padding: '16px' },
   prodCat: { fontSize: '10px', color: '#a78bfa', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '6px' },
   prodName: { fontSize: '15px', fontWeight: 700, color: '#f1f0ff', marginBottom: '6px', lineHeight: 1.3 },

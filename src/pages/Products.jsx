@@ -91,7 +91,12 @@ function Products() {
       <div style={s.grid}>
         {filtered.map(prod => (
           <Link key={prod.id} to={`/producto/${prod.id}`} style={s.card}>
-            <div style={s.cardImg}>{prod.emoji}</div>
+            <div style={s.cardImg}>
+              {prod.image_url
+                ? <img src={prod.image_url} alt={prod.name} style={s.cardImgPhoto} />
+                : <span style={{ fontSize: '56px' }}>{prod.emoji}</span>
+              }
+            </div>
             <div style={s.cardInfo}>
               <p style={s.cardCat}>{prod.category.toUpperCase()}</p>
               <p style={s.cardName}>{prod.name}</p>
@@ -138,7 +143,8 @@ const s = {
   counter: { fontSize: '13px', color: '#8b8a9e', marginBottom: '24px', textAlign: 'center' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: '20px' },
   card: { background: '#13131c', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '20px', overflow: 'hidden', textDecoration: 'none', display: 'block' },
-  cardImg: { height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg,rgba(108,99,255,0.12),rgba(34,211,238,0.08))' },
+  cardImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg,rgba(108,99,255,0.12),rgba(34,211,238,0.08))', overflow: 'hidden' },
+  cardImgPhoto: { width: '100%', height: '100%', objectFit: 'cover' },
   cardInfo: { padding: '16px' },
   cardCat: { fontSize: '10px', color: '#a78bfa', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '5px' },
   cardName: { fontSize: '14px', fontWeight: 700, color: '#f1f0ff', marginBottom: '5px', lineHeight: 1.3 },

@@ -62,7 +62,10 @@ function ProductDetail() {
 
         {/* IMAGEN */}
         <div style={s.imgBox}>
-          <div style={s.imgEmoji}>{prod.emoji}</div>
+          {prod.image_url
+            ? <img src={prod.image_url} alt={prod.name} style={s.imgPhoto} />
+            : <div style={s.imgEmoji}>{prod.emoji}</div>
+          }
           {prod.viral && <span style={s.viralBadge}>🔥 Viral</span>}
         </div>
 
@@ -142,7 +145,8 @@ const s = {
   breadSep: { fontSize: '13px', color: '#8b8a9e' },
   breadCurrent: { fontSize: '13px', color: '#a78bfa' },
   detail: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', marginBottom: '80px', alignItems: 'start' },
-  imgBox: { background: 'linear-gradient(135deg,rgba(108,99,255,0.15),rgba(34,211,238,0.08))', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '24px', padding: '60px', textAlign: 'center', position: 'relative' },
+  imgBox: { background: 'linear-gradient(135deg,rgba(108,99,255,0.15),rgba(34,211,238,0.08))', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '24px', overflow: 'hidden', textAlign: 'center', position: 'relative', minHeight: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  imgPhoto: { width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 },
   imgEmoji: { fontSize: '120px', lineHeight: 1 },
   viralBadge: { position: 'absolute', top: '16px', right: '16px', background: 'rgba(217,70,48,0.2)', color: '#ff6b6b', border: '1px solid rgba(217,70,48,0.3)', borderRadius: '99px', padding: '4px 12px', fontSize: '12px', fontWeight: 700 },
   info: { display: 'flex', flexDirection: 'column', gap: '20px' },
