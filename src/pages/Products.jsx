@@ -97,11 +97,13 @@ function Products() {
   useEffect(() => {
     let result = products
     if (searchQuery) {
-      const q = searchQuery.toLowerCase()
+      const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean)
       result = result.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        (p.category || '').toLowerCase().includes(q) ||
-        (p.description || '').toLowerCase().includes(q)
+        terms.some(t =>
+          p.name.toLowerCase().includes(t) ||
+          (p.category || '').toLowerCase().includes(t) ||
+          (p.description || '').toLowerCase().includes(t)
+        )
       )
     } else if (activeCategory) {
       result = result.filter(p => p.category === activeCategory)
