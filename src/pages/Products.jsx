@@ -98,8 +98,7 @@ function Products() {
     let result = products
     if (searchQuery) {
       result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    }
-    if (activeCategory) {
+    } else if (activeCategory) {
       result = result.filter(p => p.category === activeCategory)
     }
     setFiltered(result)
