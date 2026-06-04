@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
@@ -54,6 +54,63 @@ const SLIDES = [
   },
 ]
 
+// Efecto 18: title scrambles with random chars before revealing
+function useTextScramble(text, trigger) {
+  const [display, setDisplay] = useState(text)
+  useEffect(() => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'
+    let frame = 0
+    const total = text.length * 5
+    let raf
+    function tick() {
+      setDisplay(
+        text.split('').map((ch, i) => {
+          if (ch === ' ') return ' '
+          if (Math.floor(frame / 5) > i) return ch
+          return chars[Math.floor(Math.random() * chars.length)]
+        }).join('')
+      )
+      frame++
+      if (frame < total) raf = requestAnimationFrame(tick)
+      else setDisplay(text)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [text, trigger])
+  return display
+}
+
+// Efecto 14: types subtitle letter by letter with blinking cursor
+function useTypewriter(text, trigger) {
+  const [n, setN] = useState(0)
+  useEffect(() => {
+    setN(0)
+    let i = 0
+    const iv = setInterval(() => {
+      i++
+      setN(i)
+      if (i >= text.length) clearInterval(iv)
+    }, 40)
+    return () => clearInterval(iv)
+  }, [text, trigger])
+  return text.slice(0, n) + (n < text.length ? '|' : '')
+}
+
+// Efecto 16: trigger once when section enters viewport
+function useReveal() {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true) },
+      { threshold: 0.1 }
+    )
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
+  return [ref, visible]
+}
+
 function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
@@ -61,6 +118,14 @@ function Home() {
   const [paused, setPaused] = useState(false)
   const [time, setTime] = useState(2 * 3600 + 34 * 60 + 18)
   const navigate = useNavigate()
+
+  const [catsRef, catsVisible] = useReveal()
+  const [prodsRef, prodsVisible] = useReveal()
+  const [featRef, featVisible] = useReveal()
+
+  const cur = SLIDES[slide]
+  const scrambledTitle = useTextScramble(cur.title, slide)
+  const typedSub = useTypewriter(cur.sub, slide)
 
   useEffect(() => {
     async function fetchData() {
@@ -89,8 +154,6 @@ function Home() {
   const mm = String(Math.floor((time % 3600) / 60)).padStart(2, '0')
   const ss = String(time % 60).padStart(2, '0')
 
-  const cur = SLIDES[slide]
-
   return (
     <div>
 
@@ -100,7 +163,6 @@ function Home() {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* LEFT: texto */}
         <div style={s.heroLeft}>
           <span style={{
             ...s.slideBadge,
@@ -112,8 +174,8 @@ function Home() {
           </span>
 
           <h1 style={s.heroTitle}>
-            {cur.title}<br />
-            <span style={s.gradient}>{cur.sub}</span>
+            {scrambledTitle}<br />
+            <span style={s.gradient}>{typedSub}</span>
           </h1>
 
           <div style={s.priceRow}>
@@ -133,37 +195,25 @@ function Home() {
 
           <div style={s.heroBtns}>
             <Link to={cur.cta1To} style={s.btnPrimary}>{cur.cta1Label}</Link>
-            {cur.cta2Label && (
-              <Link to={cur.cta2To} style={s.btnOutline}>{cur.cta2Label}</Link>
-            )}
+            {cur.cta2Label && <Link to={cur.cta2To} style={s.btnOutline}>{cur.cta2Label}</Link>}
           </div>
         </div>
 
-        {/* RIGHT: visual */}
         <div style={s.heroRight}>
           <div style={s.emojiBox}>
             <span style={s.bigEmoji}>{cur.emoji}</span>
           </div>
         </div>
 
-        {/* FLECHAS */}
-        <button
-          style={{ ...s.arrow, left: '20px' }}
-          onClick={() => setSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}
-        >←</button>
-        <button
-          style={{ ...s.arrow, right: '20px' }}
-          onClick={() => setSlide(prev => (prev + 1) % SLIDES.length)}
-        >→</button>
+        <button style={{ ...s.arrow, left: '20px' }}
+          onClick={() => setSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}>←</button>
+        <button style={{ ...s.arrow, right: '20px' }}
+          onClick={() => setSlide(prev => (prev + 1) % SLIDES.length)}>→</button>
 
-        {/* DOTS */}
         <div style={s.dots}>
           {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setSlide(i)}
-              style={i === slide ? s.dotActive : s.dotInactive}
-            />
+            <button key={i} onClick={() => setSlide(i)}
+              style={i === slide ? s.dotActive : s.dotInactive} />
           ))}
         </div>
       </section>
@@ -173,13 +223,19 @@ function Home() {
         <p style={s.label}>Explora por categoría</p>
         <h2 style={s.title}>Todo con <span style={s.gradient}>Inteligencia Artificial</span></h2>
         <p style={s.sub}>Selecciona tu categoría y descubre los gadgets más innovadores.</p>
-        <div style={s.catsGrid}>
-          {categories.map(cat => (
+        <div ref={catsRef} style={s.catsGrid}>
+          {categories.map((cat, i) => (
             <div
               key={cat.id}
               onClick={() => navigate(`/productos?cat=${cat.slug}`)}
-              style={{ ...s.catCard, cursor: 'pointer' }}
               className="card-hover"
+              style={{
+                ...s.catCard,
+                cursor: 'pointer',
+                opacity: catsVisible ? 1 : 0,
+                transform: catsVisible ? 'translateY(0)' : 'translateY(28px)',
+                transition: `opacity 0.55s ease ${i * 0.07}s, transform 0.55s ease ${i * 0.07}s`,
+              }}
             >
               <div style={s.catIcon}>{cat.emoji}</div>
               <div style={s.catName}>{cat.name}</div>
@@ -194,9 +250,17 @@ function Home() {
         <p style={s.label}>Más vendidos</p>
         <h2 style={s.title}>Productos <span style={s.gradient}>Destacados</span></h2>
         <p style={s.sub}>Los gadgets IA con mayor demanda y mejores márgenes.</p>
-        <div style={s.prodsGrid}>
-          {featured.map(prod => (
-            <Link key={prod.id} to={`/producto/${prod.id}`} style={s.prodCard} className="card-hover">
+        <div ref={prodsRef} style={s.prodsGrid}>
+          {featured.map((prod, i) => (
+            <Link key={prod.id} to={`/producto/${prod.id}`}
+              className="card-hover"
+              style={{
+                ...s.prodCard,
+                opacity: prodsVisible ? 1 : 0,
+                transform: prodsVisible ? 'translateY(0)' : 'translateY(28px)',
+                transition: `opacity 0.55s ease ${i * 0.09}s, transform 0.55s ease ${i * 0.09}s`,
+              }}
+            >
               <div style={s.prodImg}>
                 {prod.image_url
                   ? <img src={prod.image_url} alt={prod.name} style={s.prodImgPhoto} />
@@ -224,14 +288,22 @@ function Home() {
       <section style={s.sectionGray}>
         <p style={s.label}>¿Por qué ConAI?</p>
         <h2 style={s.title}>Tu tienda IA de <span style={s.gradient}>confianza</span></h2>
-        <div style={s.featGrid}>
+        <div ref={featRef} style={s.featGrid}>
           {[
             { icon: '🤖', t: '100% Productos IA', d: 'Cada producto está seleccionado por su integración real con inteligencia artificial.' },
             { icon: '🚚', t: 'Envío Rápido', d: 'Despacho en 24-48h con proveedores verificados y seguimiento en tiempo real.' },
             { icon: '🔒', t: 'Compra Segura', d: 'Pago 100% seguro con encriptación SSL y garantía de devolución de 30 días.' },
             { icon: '🌟', t: 'Soporte 24/7', d: 'Nuestro equipo está disponible todo el día para ayudarte.' },
           ].map((f, i) => (
-            <div key={i} style={s.feat} className="card-hover">
+            <div key={i}
+              className="card-hover"
+              style={{
+                ...s.feat,
+                opacity: featVisible ? 1 : 0,
+                transform: featVisible ? 'translateY(0)' : 'translateY(28px)',
+                transition: `opacity 0.55s ease ${i * 0.1}s, transform 0.55s ease ${i * 0.1}s`,
+              }}
+            >
               <div style={s.featIcon}>{f.icon}</div>
               <p style={s.featTitle}>{f.t}</p>
               <p style={s.featDesc}>{f.d}</p>
@@ -275,7 +347,7 @@ const s = {
     zIndex: 1,
   },
   heroRight: {
-    flex: '0 0 320px',
+    flex: '0 0 300px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -297,11 +369,13 @@ const s = {
     letterSpacing: '-1.5px',
     color: '#0a0a0f',
     margin: 0,
+    fontFamily: 'monospace',
   },
   gradient: {
     background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
+    fontFamily: 'inherit',
   },
   priceRow: {
     display: 'flex',
@@ -340,10 +414,7 @@ const s = {
     padding: '10px 18px',
     alignSelf: 'flex-start',
   },
-  countdownLabel: {
-    fontSize: '13px',
-    color: '#6b7280',
-  },
+  countdownLabel: { fontSize: '13px', color: '#6b7280' },
   countdownTime: {
     fontSize: '22px',
     fontWeight: 800,
@@ -351,17 +422,8 @@ const s = {
     fontVariantNumeric: 'tabular-nums',
     letterSpacing: '0.04em',
   },
-  socialProof: {
-    fontSize: '14px',
-    color: '#374151',
-    fontWeight: 600,
-    margin: 0,
-  },
-  heroBtns: {
-    display: 'flex',
-    gap: '12px',
-    flexWrap: 'wrap',
-  },
+  socialProof: { fontSize: '14px', color: '#374151', fontWeight: 600, margin: 0 },
+  heroBtns: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
   btnPrimary: {
     background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
     color: '#fff',
@@ -396,10 +458,7 @@ const s = {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bigEmoji: {
-    fontSize: '110px',
-    lineHeight: 1,
-  },
+  bigEmoji: { fontSize: '110px', lineHeight: 1 },
   arrow: {
     position: 'absolute',
     top: '50%',
@@ -417,7 +476,6 @@ const s = {
     justifyContent: 'center',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     zIndex: 2,
-    lineHeight: '44px',
     padding: 0,
   },
   dots: {
@@ -430,24 +488,12 @@ const s = {
     zIndex: 2,
   },
   dotActive: {
-    width: '28px',
-    height: '8px',
-    borderRadius: '99px',
-    background: '#1A6FFF',
-    border: 'none',
-    cursor: 'pointer',
-    padding: 0,
-    transition: 'width 0.3s ease',
+    width: '28px', height: '8px', borderRadius: '99px',
+    background: '#1A6FFF', border: 'none', cursor: 'pointer', padding: 0,
   },
   dotInactive: {
-    width: '8px',
-    height: '8px',
-    borderRadius: '50%',
-    background: '#d1d5db',
-    border: 'none',
-    cursor: 'pointer',
-    padding: 0,
-    transition: 'width 0.3s ease',
+    width: '8px', height: '8px', borderRadius: '50%',
+    background: '#d1d5db', border: 'none', cursor: 'pointer', padding: 0,
   },
   section: { padding: '80px 5%', background: '#ffffff' },
   sectionGray: { padding: '80px 5%', background: '#f8f9fa' },
@@ -455,12 +501,20 @@ const s = {
   title: { fontSize: 'clamp(26px,4vw,42px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.2, marginBottom: '14px', color: '#0a0a0f' },
   sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '48px' },
   catsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: '14px' },
-  catCard: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', padding: '24px 18px', textAlign: 'center', textDecoration: 'none', display: 'block', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+  catCard: {
+    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
+    padding: '24px 18px', textAlign: 'center', textDecoration: 'none',
+    display: 'block', boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+  },
   catIcon: { fontSize: '32px', marginBottom: '12px' },
   catName: { fontSize: '14px', fontWeight: 600, color: '#0a0a0f', marginBottom: '4px' },
   catCount: { fontSize: '12px', color: '#9ca3af' },
   prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: '20px' },
-  prodCard: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '20px', overflow: 'hidden', textDecoration: 'none', display: 'block', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
+  prodCard: {
+    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '20px',
+    overflow: 'hidden', textDecoration: 'none', display: 'block',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  },
   prodImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '60px', background: '#f8f9fa', overflow: 'hidden' },
   prodImgPhoto: { width: '100%', height: '100%', objectFit: 'cover' },
   prodInfo: { padding: '16px' },
@@ -471,7 +525,10 @@ const s = {
   prodPrice: { fontSize: '18px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
   prodBadge: { fontSize: '10px', background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
   featGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '20px' },
-  feat: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', padding: '28px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+  feat: {
+    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
+    padding: '28px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+  },
   featIcon: { fontSize: '32px', marginBottom: '16px' },
   featTitle: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '8px' },
   featDesc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6 },
