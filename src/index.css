@@ -15,7 +15,7 @@ body {
   transition: background 0.15s ease !important;
 }
 .hamburger-btn:hover {
-  background: rgba(255,255,255,0.12) !important;
+  background: rgba(0,0,0,0.06) !important;
 }
 .bar-top, .bar-mid, .bar-bot {
   transition: transform 0.25s ease, opacity 0.2s ease;
@@ -51,9 +51,25 @@ body {
   background: rgba(0,0,0,0.05) !important;
 }
 
+.cat-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #111827;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+  border-radius: 2px;
+}
+
 .cat-link:hover {
-  background: rgba(255,255,255,0.1) !important;
-  color: #ffffff !important;
+  color: #111827 !important;
+}
+
+.cat-link:hover::after {
+  transform: scaleX(1);
 }
 
 .cat-row::-webkit-scrollbar {

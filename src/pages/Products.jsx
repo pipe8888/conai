@@ -85,6 +85,9 @@ function Products() {
         if (match) setModalCategory(match.slug)
       }
 
+      const qParam = searchParams.get('q')
+      if (qParam) setSearchQuery(qParam)
+
       setFiltered(allProds)
       setLoading(false)
     }
