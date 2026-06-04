@@ -50,8 +50,8 @@ function Navbar() {
 const styles = {
   nav: {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-    background: '#ffffff', backdropFilter: 'blur(12px)',
-    borderBottom: '1px solid rgba(108,99,255,0.2)',
+    background: '#ffffff',
+    borderBottom: '1px solid #e5e7eb',
     padding: '0 5%', height: '64px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   },
@@ -62,25 +62,25 @@ const styles = {
     display: 'flex', gap: '28px', listStyle: 'none',
   },
   link: {
-    color: '#8b8a9e', textDecoration: 'none', fontSize: '14px',
+    color: '#374151', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
   },
   cartBtn: {
-    background: 'linear-gradient(135deg,#6c63ff,#a78bfa)',
+    background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
     color: '#fff', border: 'none', padding: '8px 20px',
     borderRadius: '99px', fontSize: '13px', fontWeight: 600,
     cursor: 'pointer', position: 'relative', display: 'flex',
     alignItems: 'center', gap: '6px',
   },
   badge: {
-    background: '#22d3ee', color: '#0a0a0f',
+    background: '#ffffff', color: '#1A6FFF',
     borderRadius: '99px', padding: '1px 7px',
     fontSize: '11px', fontWeight: 800,
   },
   right: { display: 'flex', alignItems: 'center', gap: '10px' },
-  userEmail: { fontSize: '13px', color: '#a78bfa', fontWeight: 600 },
-  loginBtn: { fontSize: '13px', color: '#f1f0ff', textDecoration: 'none', padding: '8px 16px', border: '1px solid rgba(108,99,255,0.3)', borderRadius: '99px' },
-  logoutBtn: { fontSize: '12px', color: '#8b8a9e', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '99px', padding: '6px 14px', cursor: 'pointer' },
-  adminBtn: { fontSize: '12px', color: '#22d3ee', textDecoration: 'none', border: '1px solid rgba(34,211,238,0.3)', borderRadius: '99px', padding: '6px 14px', fontWeight: 600 },
+  userEmail: { fontSize: '13px', color: '#1A6FFF', fontWeight: 600 },
+  loginBtn: { fontSize: '13px', color: '#0a0a0f', textDecoration: 'none', padding: '8px 16px', border: '1px solid #e5e7eb', borderRadius: '99px', fontWeight: 500 },
+  logoutBtn: { fontSize: '12px', color: '#6b7280', background: 'transparent', border: '1px solid #e5e7eb', borderRadius: '99px', padding: '6px 14px', cursor: 'pointer' },
+  adminBtn: { fontSize: '12px', color: '#1A6FFF', textDecoration: 'none', border: '1px solid rgba(26,111,255,0.3)', borderRadius: '99px', padding: '6px 14px', fontWeight: 600 },
 }
 
 export default Navbar

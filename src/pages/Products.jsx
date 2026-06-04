@@ -121,7 +121,7 @@ function Products() {
       {!loading && filtered.length === 0 && (
         <div style={s.empty}>
           <p style={{ fontSize: '48px' }}>🔍</p>
-          <p style={{ color: '#8b8a9e', marginTop: '12px' }}>No se encontraron productos</p>
+          <p style={{ color: '#9ca3af', marginTop: '12px' }}>No se encontraron productos</p>
         </div>
       )}
 
@@ -130,33 +130,33 @@ function Products() {
 }
 
 const s = {
-  wrap: { padding: '40px 5% 80px' },
-  header: { textAlign: 'center', marginBottom: '40px' },
-  label: { fontSize: '12px', color: '#a78bfa', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' },
-  title: { fontSize: 'clamp(28px,4vw,48px)', fontWeight: 800, letterSpacing: '-1px', marginBottom: '12px' },
-  gradient: { background: 'linear-gradient(135deg,#6c63ff,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  sub: { fontSize: '16px', color: '#8b8a9e', marginBottom: '28px' },
-  search: { width: '100%', maxWidth: '480px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(108,99,255,0.3)', borderRadius: '99px', padding: '12px 24px', color: '#f1f0ff', fontSize: '15px', outline: 'none' },
+  wrap: { padding: '40px 5% 80px', background: '#f8f9fa', minHeight: '100vh' },
+  header: { textAlign: 'center', marginBottom: '40px', background: '#ffffff', borderRadius: '20px', padding: '48px 24px', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+  label: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' },
+  title: { fontSize: 'clamp(28px,4vw,48px)', fontWeight: 800, letterSpacing: '-1px', marginBottom: '12px', color: '#0a0a0f' },
+  gradient: { background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  sub: { fontSize: '16px', color: '#6b7280', marginBottom: '28px' },
+  search: { width: '100%', maxWidth: '480px', background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '99px', padding: '12px 24px', color: '#0a0a0f', fontSize: '15px', outline: 'none' },
   filters: { display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '16px', justifyContent: 'center' },
-  filter: { background: '#13131c', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '99px', padding: '8px 18px', color: '#8b8a9e', fontSize: '13px', cursor: 'pointer' },
-  filterActive: { background: 'linear-gradient(135deg,#6c63ff,#a78bfa)', border: '1px solid transparent', borderRadius: '99px', padding: '8px 18px', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' },
-  counter: { fontSize: '13px', color: '#8b8a9e', marginBottom: '24px', textAlign: 'center' },
+  filter: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '99px', padding: '8px 18px', color: '#6b7280', fontSize: '13px', cursor: 'pointer', fontWeight: 500 },
+  filterActive: { background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', border: '1px solid transparent', borderRadius: '99px', padding: '8px 18px', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' },
+  counter: { fontSize: '13px', color: '#9ca3af', marginBottom: '24px', textAlign: 'center' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: '20px' },
-  card: { background: '#13131c', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '20px', overflow: 'hidden', textDecoration: 'none', display: 'block' },
-  cardImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: 'linear-gradient(135deg,rgba(108,99,255,0.12),rgba(34,211,238,0.08))', overflow: 'hidden' },
+  card: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '20px', overflow: 'hidden', textDecoration: 'none', display: 'block', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
+  cardImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px', background: '#f8f9fa', overflow: 'hidden' },
   cardImgPhoto: { width: '100%', height: '100%', objectFit: 'cover' },
   cardInfo: { padding: '16px' },
-  cardCat: { fontSize: '10px', color: '#a78bfa', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '5px' },
-  cardName: { fontSize: '14px', fontWeight: 700, color: '#f1f0ff', marginBottom: '5px', lineHeight: 1.3 },
-  cardDesc: { fontSize: '12px', color: '#8b8a9e', lineHeight: 1.5, marginBottom: '12px' },
+  cardCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '5px' },
+  cardName: { fontSize: '14px', fontWeight: 700, color: '#0a0a0f', marginBottom: '5px', lineHeight: 1.3 },
+  cardDesc: { fontSize: '12px', color: '#6b7280', lineHeight: 1.5, marginBottom: '12px' },
   cardBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' },
-  cardPrice: { fontSize: '17px', fontWeight: 800, background: 'linear-gradient(135deg,#6c63ff,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  cardBadge: { fontSize: '10px', background: 'rgba(34,211,238,0.12)', color: '#22d3ee', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
+  cardPrice: { fontSize: '17px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  cardBadge: { fontSize: '10px', background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
   marginRow: { display: 'flex', alignItems: 'center', gap: '6px' },
-  marginLabel: { fontSize: '10px', color: '#8b8a9e', minWidth: '38px' },
-  marginBar: { flex: 1, height: '4px', borderRadius: '99px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
-  marginFill: { height: '100%', borderRadius: '99px', background: 'linear-gradient(135deg,#6c63ff,#22d3ee)' },
-  marginPct: { fontSize: '10px', color: '#8b8a9e', minWidth: '28px', textAlign: 'right' },
+  marginLabel: { fontSize: '10px', color: '#9ca3af', minWidth: '38px' },
+  marginBar: { flex: 1, height: '4px', borderRadius: '99px', background: '#e5e7eb', overflow: 'hidden' },
+  marginFill: { height: '100%', borderRadius: '99px', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)' },
+  marginPct: { fontSize: '10px', color: '#9ca3af', minWidth: '28px', textAlign: 'right' },
   empty: { textAlign: 'center', padding: '80px 0' },
 }
 
