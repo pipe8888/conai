@@ -3,12 +3,31 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
 
+const CATEGORY_IMGS = {
+  auricular: 'photo-1505740420928-5e560c06d30e',
+  audio:     'photo-1505740420928-5e560c06d30e',
+  salud:     'photo-1523275335684-37898b6baf30',
+  fitness:   'photo-1576243345690-4e4b79b05b30',
+  wearable:  'photo-1523275335684-37898b6baf30',
+  robot:     'photo-1485827404703-89b55fcc595e',
+  hogar:     'photo-1558618666-fcd25c85cd64',
+  product:   'photo-1496181133206-80ce9b88a853',
+}
+function getCategoryImg(cat) {
+  const key = (cat || '').toLowerCase()
+  for (const [k, v] of Object.entries(CATEGORY_IMGS)) {
+    if (key.includes(k)) return `https://images.unsplash.com/${v}?w=800&q=85`
+  }
+  return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=85'
+}
+
 function ProductDetail() {
   const { id } = useParams()
   const { addToCart } = useCart()
   const [prod, setProd] = useState(null)
   const [related, setRelated] = useState([])
   const [added, setAdded] = useState(false)
+  const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -21,7 +40,7 @@ function ProductDetail() {
           .select('*')
           .eq('category', data.category)
           .neq('id', id)
-          .limit(3)
+          .limit(4)
         setRelated(rel || [])
       }
       setLoading(false)
@@ -33,9 +52,9 @@ function ProductDetail() {
 
   if (!prod) return (
     <div style={s.notFound}>
-      <p style={{ fontSize: '64px' }}>🤖</p>
+      <p style={{ fontSize: '48px' }}>404</p>
       <p style={{ color: '#6b7280', margin: '16px 0' }}>Producto no encontrado</p>
-      <Link to="/productos" style={s.btnPrimary}>← Volver al catálogo</Link>
+      <Link to="/productos" style={s.btnBack}>← Volver al catálogo</Link>
     </div>
   )
 
@@ -45,138 +64,141 @@ function ProductDetail() {
     setTimeout(() => setAdded(false), 2000)
   }
 
+  const imgSrc = prod.image_url || getCategoryImg(prod.category)
+
   return (
     <div style={s.wrap}>
+      <div style={s.inner}>
 
-      {/* BREADCRUMB */}
-      <div style={s.breadcrumb}>
-        <Link to="/" style={s.breadLink}>Inicio</Link>
-        <span style={s.breadSep}> / </span>
-        <Link to="/productos" style={s.breadLink}>Productos</Link>
-        <span style={s.breadSep}> / </span>
-        <span style={s.breadCurrent}>{prod.name}</span>
-      </div>
-
-      {/* DETALLE */}
-      <div style={s.detail}>
-
-        {/* IMAGEN */}
-        <div style={s.imgBox}>
-          {prod.image_url
-            ? <img src={prod.image_url} alt={prod.name} style={s.imgPhoto} />
-            : <div style={s.imgEmoji}>{prod.emoji}</div>
-          }
-          {prod.viral && <span style={s.viralBadge}>🔥 Viral</span>}
+        <div style={s.breadcrumb}>
+          <Link to="/" style={s.breadLink}>Inicio</Link>
+          <span style={s.breadSep}> / </span>
+          <Link to="/productos" style={s.breadLink}>Productos</Link>
+          <span style={s.breadSep}> / </span>
+          <span style={s.breadCurrent}>{prod.name}</span>
         </div>
 
-        {/* INFO */}
-        <div style={s.info}>
-          <p style={s.cat}>{prod.category.toUpperCase()}</p>
-          <h1 style={s.name}>{prod.name}</h1>
-          <p style={s.desc}>{prod.description}</p>
+        <div style={s.split}>
 
-          {/* PRECIO */}
-          <div style={s.priceRow}>
-            <span style={s.price}>${prod.price}</span>
-            <span style={s.badge}>{prod.badge}</span>
-          </div>
-
-          {/* MARGEN */}
-          <div style={s.marginBox}>
-            <div style={s.marginHeader}>
-              <span style={s.marginLabel}>Margen potencial</span>
-              <span style={s.marginPct}>{prod.margin}%</span>
-            </div>
-            <div style={s.marginBar}>
-              <div style={{ ...s.marginFill, width: `${prod.margin}%` }} />
+          <div style={s.imgCol}>
+            <div style={s.imgBox}>
+              <img src={imgSrc} alt={prod.name} style={s.imgPhoto} />
+              {prod.viral && <span style={s.viralBadge}>🔥 Viral</span>}
             </div>
           </div>
 
-          {/* FEATURES */}
-          <div style={s.features}>
-            {[
-              '✅ Envío en 24-48 horas',
-              '✅ Garantía de 30 días',
-              '✅ Proveedor verificado',
-              '✅ Alto margen de ganancia',
-            ].map((f, i) => (
-              <p key={i} style={s.feature}>{f}</p>
-            ))}
-          </div>
+          <div style={s.infoCol}>
+            <p style={s.cat}>{(prod.category || '').toUpperCase()}</p>
+            <h1 style={s.name}>{prod.name}</h1>
+            <p style={s.price}>${prod.price}</p>
 
-          {/* BOTONES */}
-          <div style={s.btnRow}>
+            {prod.description && <p style={s.desc}>{prod.description}</p>}
+
+            <ul style={s.featureList}>
+              {['Envío en 24-48 horas', 'Garantía de 30 días', 'Proveedor verificado', 'Alto margen de ganancia'].map(f => (
+                <li key={f} style={s.featureItem}>• {f}</li>
+              ))}
+            </ul>
+
+            <div style={s.qtyRow}>
+              <span style={s.qtyLabel}>CANTIDAD</span>
+              <div style={s.qtyControl}>
+                <button onClick={() => setQty(q => Math.max(1, q - 1))} style={s.qtyBtn}>−</button>
+                <span style={s.qtyNum}>{qty}</span>
+                <button onClick={() => setQty(q => q + 1)} style={s.qtyBtn}>+</button>
+              </div>
+            </div>
+
             <button onClick={handleAdd} style={added ? s.btnAdded : s.btnPrimary}>
-              {added ? '✅ Agregado al carrito' : '🛒 Agregar al carrito'}
+              {added ? '✅ AGREGADO AL CARRITO' : 'AGREGAR AL CARRITO'}
             </button>
-            <Link to="/carrito" style={s.btnOutline}>Ver carrito</Link>
+            <Link to="/carrito" style={s.btnOutline}>Ver carrito →</Link>
+
+            {prod.margin && (
+              <div style={s.marginBox}>
+                <div style={s.marginHeader}>
+                  <span style={s.marginLabel}>Margen potencial</span>
+                  <span style={s.marginPct}>{prod.margin}%</span>
+                </div>
+                <div style={s.marginBar}>
+                  <div style={{ ...s.marginFill, width: `${prod.margin}%` }} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* RELACIONADOS */}
-      {related.length > 0 && (
-        <div style={s.related}>
-          <h2 style={s.relTitle}>Productos <span style={s.gradient}>relacionados</span></h2>
-          <div style={s.relGrid}>
-            {related.map(r => (
-              <Link key={r.id} to={`/producto/${r.id}`} style={s.relCard} className="card-hover">
-                <div style={s.relImg}>{r.emoji}</div>
-                <div style={s.relInfo}>
+        {related.length > 0 && (
+          <div style={s.related}>
+            <h2 style={s.relTitle}>También te puede interesar</h2>
+            <div style={s.relGrid}>
+              {related.map(r => (
+                <Link key={r.id} to={`/producto/${r.id}`} style={s.relCard} className="card-hover">
+                  <div style={s.relImgBox}>
+                    <img
+                      src={r.image_url || getCategoryImg(r.category)}
+                      alt={r.name}
+                      style={s.relImgPhoto}
+                    />
+                    <div className="prod-card-btn">Ver producto →</div>
+                  </div>
                   <p style={s.relName}>{r.name}</p>
                   <p style={s.relPrice}>${r.price}</p>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
+      </div>
     </div>
   )
 }
 
 const s = {
-  wrap: { padding: '40px 5% 80px', background: '#f8f9fa', minHeight: '100vh' },
+  wrap: { background: '#ffffff', minHeight: '100vh' },
+  inner: { maxWidth: '1200px', margin: '0 auto', padding: '32px 5% 80px' },
   loading: { textAlign: 'center', padding: '120px 5%', color: '#6b7280', fontSize: '16px' },
   notFound: { textAlign: 'center', padding: '120px 5%' },
-  breadcrumb: { display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '32px', flexWrap: 'wrap' },
-  breadLink: { fontSize: '13px', color: '#6b7280', textDecoration: 'none' },
-  breadSep: { fontSize: '13px', color: '#9ca3af' },
-  breadCurrent: { fontSize: '13px', color: '#1A6FFF', fontWeight: 500 },
-  detail: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', marginBottom: '80px', alignItems: 'start' },
-  imgBox: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '24px', overflow: 'hidden', textAlign: 'center', position: 'relative', minHeight: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
-  imgPhoto: { width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 },
-  imgEmoji: { fontSize: '120px', lineHeight: 1 },
-  viralBadge: { position: 'absolute', top: '16px', right: '16px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '99px', padding: '4px 12px', fontSize: '12px', fontWeight: 700 },
-  info: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  cat: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.1em' },
-  name: { fontSize: 'clamp(24px,3vw,40px)', fontWeight: 800, letterSpacing: '-1px', color: '#0a0a0f', lineHeight: 1.2 },
-  desc: { fontSize: '16px', color: '#6b7280', lineHeight: 1.7 },
-  priceRow: { display: 'flex', alignItems: 'center', gap: '16px' },
-  price: { fontSize: '36px', fontWeight: 800, color: '#e63946' },
-  badge: { background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '5px 14px', borderRadius: '99px', fontSize: '12px', fontWeight: 700 },
-  marginBox: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' },
+  btnBack: { background: '#0a0a0f', color: '#fff', padding: '12px 24px', borderRadius: '4px', textDecoration: 'none', fontSize: '14px', fontWeight: 600 },
+  breadcrumb: { display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '40px', flexWrap: 'wrap' },
+  breadLink: { fontSize: '13px', color: '#9ca3af', textDecoration: 'none' },
+  breadSep: { fontSize: '13px', color: '#d1d5db' },
+  breadCurrent: { fontSize: '13px', color: '#0a0a0f', fontWeight: 500 },
+  split: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'start', marginBottom: '80px' },
+  imgCol: {},
+  imgBox: { position: 'relative', aspectRatio: '4/5', background: '#f4f5f7', overflow: 'hidden' },
+  imgPhoto: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
+  viralBadge: { position: 'absolute', top: '16px', right: '16px', background: 'rgba(239,68,68,0.9)', color: '#fff', borderRadius: '4px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em' },
+  infoCol: { display: 'flex', flexDirection: 'column', gap: '20px', paddingTop: '8px' },
+  cat: { fontSize: '11px', color: '#9ca3af', fontWeight: 600, letterSpacing: '0.15em', margin: 0 },
+  name: { fontSize: 'clamp(24px, 3vw, 40px)', fontWeight: 800, letterSpacing: '-1px', color: '#0a0a0f', lineHeight: 1.1, margin: 0 },
+  price: { fontSize: '26px', fontWeight: 800, color: '#0a0a0f', margin: 0 },
+  desc: { fontSize: '15px', color: '#6b7280', lineHeight: 1.75, margin: 0 },
+  featureList: { listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', margin: 0, padding: 0 },
+  featureItem: { fontSize: '14px', color: '#374151' },
+  qtyRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '16px 0' },
+  qtyLabel: { fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', color: '#9ca3af' },
+  qtyControl: { display: 'flex', alignItems: 'center', border: '1px solid #d1d5db' },
+  qtyBtn: { width: '40px', height: '40px', background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#0a0a0f', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  qtyNum: { width: '48px', textAlign: 'center', fontSize: '14px', fontWeight: 600, color: '#0a0a0f', borderLeft: '1px solid #d1d5db', borderRight: '1px solid #d1d5db', height: '40px', lineHeight: '40px' },
+  btnPrimary: { width: '100%', background: '#0a0a0f', color: '#fff', border: 'none', padding: '17px', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', cursor: 'pointer', textAlign: 'center' },
+  btnAdded: { width: '100%', background: '#16a34a', color: '#fff', border: 'none', padding: '17px', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', cursor: 'pointer', textAlign: 'center' },
+  btnOutline: { width: '100%', background: 'transparent', color: '#0a0a0f', border: '1px solid #d1d5db', padding: '15px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'block', textAlign: 'center', letterSpacing: '0.04em' },
+  marginBox: { background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '14px' },
   marginHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' },
-  marginLabel: { fontSize: '13px', color: '#6b7280' },
-  marginPct: { fontSize: '13px', fontWeight: 700, color: '#1A6FFF' },
-  marginBar: { height: '6px', borderRadius: '99px', background: '#e5e7eb', overflow: 'hidden' },
+  marginLabel: { fontSize: '12px', color: '#9ca3af' },
+  marginPct: { fontSize: '12px', fontWeight: 700, color: '#1A6FFF' },
+  marginBar: { height: '4px', borderRadius: '99px', background: '#e5e7eb', overflow: 'hidden' },
   marginFill: { height: '100%', borderRadius: '99px', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)' },
-  features: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  feature: { fontSize: '14px', color: '#374151' },
-  btnRow: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
-  btnPrimary: { background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
-  btnAdded: { background: 'linear-gradient(135deg, #16a34a, #22c55e)', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' },
-  btnOutline: { background: 'transparent', color: '#0a0a0f', border: '1px solid #d1d5db', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
-  gradient: { background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  related: { borderTop: '1px solid #e5e7eb', paddingTop: '48px' },
-  relTitle: { fontSize: '28px', fontWeight: 800, marginBottom: '24px', color: '#0a0a0f' },
-  relGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '16px' },
-  relCard: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', overflow: 'hidden', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
-  relImg: { fontSize: '40px', minWidth: '56px', textAlign: 'center', background: '#f8f9fa', borderRadius: '12px', padding: '10px' },
-  relInfo: { flex: 1 },
+  related: { borderTop: '1px solid #e5e7eb', paddingTop: '56px' },
+  relTitle: { fontSize: '20px', fontWeight: 700, marginBottom: '28px', color: '#0a0a0f', letterSpacing: '-0.5px' },
+  relGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' },
+  relCard: { textDecoration: 'none', display: 'block' },
+  relImgBox: { aspectRatio: '4/5', overflow: 'hidden', background: '#f4f5f7', marginBottom: '12px', position: 'relative' },
+  relImgPhoto: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
   relName: { fontSize: '13px', fontWeight: 600, color: '#0a0a0f', marginBottom: '4px' },
-  relPrice: { fontSize: '15px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  relPrice: { fontSize: '14px', fontWeight: 800, color: '#0a0a0f' },
 }
 
 export default ProductDetail
