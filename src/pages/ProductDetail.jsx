@@ -70,6 +70,8 @@ function ProductDetail() {
     <div style={s.wrap}>
       <div style={s.inner}>
 
+        <Link to="/productos" style={s.backArrow}>← Volver</Link>
+
         <div style={s.breadcrumb}>
           <Link to="/" style={s.breadLink}>Inicio</Link>
           <span style={s.breadSep}> / </span>
@@ -161,6 +163,7 @@ const s = {
   loading: { textAlign: 'center', padding: '120px 5%', color: '#6b7280', fontSize: '16px' },
   notFound: { textAlign: 'center', padding: '120px 5%' },
   btnBack: { background: '#0a0a0f', color: '#fff', padding: '12px 24px', borderRadius: '4px', textDecoration: 'none', fontSize: '14px', fontWeight: 600 },
+  backArrow: { display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontWeight: 600, color: '#0a0a0f', textDecoration: 'none', marginBottom: '20px' },
   breadcrumb: { display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '40px', flexWrap: 'wrap' },
   breadLink: { fontSize: '13px', color: '#9ca3af', textDecoration: 'none' },
   breadSep: { fontSize: '13px', color: '#d1d5db' },
