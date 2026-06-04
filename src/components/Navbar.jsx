@@ -64,7 +64,7 @@ function Navbar() {
       <div style={s.progressBar(progress)} />
       <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
 
-        <button onClick={() => setMenuOpen(true)} style={s.hamburger} aria-label="Abrir menú">
+        <button onClick={() => setMenuOpen(true)} style={s.hamburger} className="hamburger-btn" aria-label="Abrir menú">
           <span style={s.bar} />
           <span style={s.bar} />
           <span style={s.bar} />
@@ -126,8 +126,8 @@ function Navbar() {
 
       {/* OVERLAY */}
       {menuOpen && (
-        <div style={s.overlay} onClick={() => setMenuOpen(false)}>
-          <div style={s.drawer} onClick={e => e.stopPropagation()}>
+        <div style={s.overlay} className="overlay-fade-in" onClick={() => setMenuOpen(false)}>
+          <div style={s.drawer} className="drawer-slide-in" onClick={e => e.stopPropagation()}>
 
             <button onClick={() => setMenuOpen(false)} style={s.closeBtn} aria-label="Cerrar menú">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

@@ -10,6 +10,30 @@ body {
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
+.hamburger-btn {
+  border-radius: 50% !important;
+  transition: background 0.15s ease !important;
+}
+.hamburger-btn:hover {
+  background: rgba(255,255,255,0.12) !important;
+}
+
+@keyframes drawerSlideIn {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+.drawer-slide-in {
+  animation: drawerSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.overlay-fade-in {
+  animation: overlayFadeIn 0.2s ease both;
+}
+
 .card-hover {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
