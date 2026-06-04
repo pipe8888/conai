@@ -50,7 +50,7 @@ function Navbar() {
 const styles = {
   nav: {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-    background: 'rgba(10,10,15,0.9)', backdropFilter: 'blur(12px)',
+    background: '#ffffff', backdropFilter: 'blur(12px)',
     borderBottom: '1px solid rgba(108,99,255,0.2)',
     padding: '0 5%', height: '64px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
