@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabase'
 import LogoSVG from './LogoSVG'
 
 const ADMIN_EMAIL = 'pipeblue17@gmail.com'
@@ -13,6 +14,8 @@ function Navbar() {
   const location = useLocation()
   const [visible, setVisible] = useState(true)
   const [progress, setProgress] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [categories, setCategories] = useState([])
   const lastY = useRef(0)
 
   useEffect(() => {
@@ -26,6 +29,25 @@ function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    supabase.from('categories').select('*').order('id').then(({ data }) => {
+      setCategories(data || [])
+    })
+  }, [])
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname, location.search])
 
   async function handleLogout() {
     await logout()
@@ -41,6 +63,13 @@ function Navbar() {
     <>
       <div style={s.progressBar(progress)} />
       <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+
+        <button onClick={() => setMenuOpen(true)} style={s.hamburger} aria-label="Abrir menú">
+          <span style={s.bar} />
+          <span style={s.bar} />
+          <span style={s.bar} />
+        </button>
+
         <Link to="/" style={s.logoLink}>
           <LogoSVG />
         </Link>
@@ -94,6 +123,48 @@ function Navbar() {
           </button>
         </div>
       </nav>
+
+      {/* OVERLAY */}
+      {menuOpen && (
+        <div style={s.overlay} onClick={() => setMenuOpen(false)}>
+          <div style={s.drawer} onClick={e => e.stopPropagation()}>
+
+            <button onClick={() => setMenuOpen(false)} style={s.closeBtn} aria-label="Cerrar menú">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <line x1="3" y1="3" x2="17" y2="17" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round"/>
+                <line x1="17" y1="3" x2="3" y2="17" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            <nav style={s.drawerNav}>
+              <div style={s.drawerSection}>
+                {[['/', 'Inicio'], ['/productos', 'Productos'], ['/contacto', 'Contacto']].map(([path, label]) => (
+                  <Link key={path} to={path} style={s.drawerLink}>{label}</Link>
+                ))}
+              </div>
+
+              {categories.length > 0 && (
+                <>
+                  <p style={s.drawerSectionLabel}>CATEGORÍAS</p>
+                  <div style={s.drawerSection}>
+                    {categories.map(cat => (
+                      <Link
+                        key={cat.id}
+                        to={`/productos?cat=${encodeURIComponent(cat.name)}`}
+                        style={s.drawerCatLink}
+                      >
+                        {cat.emoji && <span style={s.catEmoji}>{cat.emoji}</span>}
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+            </nav>
+
+          </div>
+        </div>
+      )}
     </>
   )
 }
@@ -116,6 +187,8 @@ const s = {
     padding: '0 5%', height: '64px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   },
+  hamburger: { background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: '5px', justifyContent: 'center' },
+  bar: { display: 'block', width: '22px', height: '1.8px', background: '#cbd5e1', borderRadius: '2px' },
   logoLink: { textDecoration: 'none', display: 'flex', alignItems: 'center' },
   links: { display: 'flex', gap: '32px', listStyle: 'none', margin: 0, padding: 0 },
   linkItem: { height: '64px', display: 'flex', alignItems: 'center', position: 'relative' },
@@ -127,6 +200,15 @@ const s = {
   badge: { position: 'absolute', top: '2px', right: '2px', background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', borderRadius: '99px', padding: '1px 5px', fontSize: '10px', fontWeight: 800, minWidth: '16px', textAlign: 'center' },
   adminBtn: { fontSize: '11px', color: '#66AAFF', textDecoration: 'none', border: '1px solid rgba(26,111,255,0.3)', borderRadius: '99px', padding: '4px 10px', fontWeight: 600 },
   userName: { fontSize: '12px', color: '#94a3b8', fontWeight: 500 },
+  overlay: { position: 'fixed', inset: 0, zIndex: 150, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' },
+  drawer: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '320px', background: '#06090f', borderRight: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', padding: '80px 40px 48px', overflowY: 'auto' },
+  closeBtn: { position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex' },
+  drawerNav: { display: 'flex', flexDirection: 'column', gap: '0' },
+  drawerSection: { display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '32px' },
+  drawerLink: { fontSize: '22px', fontWeight: 700, color: '#ffffff', textDecoration: 'none', padding: '8px 0', letterSpacing: '-0.5px' },
+  drawerSectionLabel: { fontSize: '10px', fontWeight: 700, letterSpacing: '0.18em', color: '#475569', marginBottom: '12px' },
+  drawerCatLink: { display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px', fontWeight: 500, color: '#94a3b8', textDecoration: 'none', padding: '9px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' },
+  catEmoji: { fontSize: '18px', width: '24px', textAlign: 'center' },
 }
 
 export default Navbar
