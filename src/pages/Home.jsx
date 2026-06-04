@@ -20,6 +20,8 @@ const SLIDES = [
     cta2To: '/productos',
     showCountdown: true,
     bg: '#ffffff',
+    accent: '#1A6FFF',
+    accentRgb: '26,111,255',
   },
   {
     badge: '✨ NUEVO EN 2026',
@@ -34,6 +36,8 @@ const SLIDES = [
     cta1To: '/productos',
     showCountdown: false,
     bg: '#f8fbff',
+    accent: '#00CFFF',
+    accentRgb: '0,207,255',
   },
   {
     badge: '⚡ TRENDING #1 EN 2026',
@@ -51,6 +55,8 @@ const SLIDES = [
     cta2To: '/productos',
     showCountdown: false,
     bg: '#fffdf8',
+    accent: '#7B5FFF',
+    accentRgb: '123,95,255',
   },
 ]
 
@@ -114,8 +120,12 @@ function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
   const [slide, setSlide] = useState(0)
+  const [prevSlide, setPrevSlide] = useState(null)
+  const [direction, setDirection] = useState('next')
+  const [dotProgress, setDotProgress] = useState(0)
   const [paused, setPaused] = useState(false)
   const [time, setTime] = useState(2 * 3600 + 34 * 60 + 18)
+  const slideRef = useRef(0)
   const navigate = useNavigate()
 
   const [catsRef, catsVisible] = useReveal()
@@ -125,6 +135,16 @@ function Home() {
   const cur = SLIDES[slide]
   const scrambledTitle = useTextScramble(cur.title, slide)
   const blurStyle = useBlurIn(slide)
+
+  function goTo(index, dir = 'next') {
+    if (index === slideRef.current) return
+    setDirection(dir)
+    setPrevSlide(slideRef.current)
+    setDotProgress(0)
+    slideRef.current = index
+    setSlide(index)
+    setTimeout(() => setPrevSlide(null), 550)
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -140,9 +160,15 @@ function Home() {
 
   useEffect(() => {
     if (paused) return
-    const t = setInterval(() => setSlide(prev => (prev + 1) % SLIDES.length), 5000)
-    return () => clearInterval(t)
-  }, [paused, slide])
+    setDotProgress(0)
+    const start = Date.now()
+    const DURATION = 5000
+    const prog = setInterval(() => {
+      setDotProgress(Math.min(((Date.now() - start) / DURATION) * 100, 100))
+    }, 30)
+    const auto = setTimeout(() => goTo((slideRef.current + 1) % SLIDES.length, 'next'), DURATION)
+    return () => { clearTimeout(auto); clearInterval(prog) }
+  }, [slide, paused])
 
   useEffect(() => {
     const t = setInterval(() => setTime(prev => prev > 0 ? prev - 1 : 0), 1000)
@@ -162,8 +188,8 @@ function Home() {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        <div style={s.blob} />
-        <div style={s.heroLeft}>
+        <div style={{ ...s.blob, background: `radial-gradient(ellipse, rgba(${cur.accentRgb},0.22) 0%, rgba(${cur.accentRgb},0.06) 45%, transparent 70%)` }} />
+        <div style={s.heroLeft} className={prevSlide !== null ? `slide-content-${direction}` : ''}>
           <span style={{
             ...s.slideBadge,
             background: cur.badgeBg,
@@ -199,21 +225,24 @@ function Home() {
           </div>
         </div>
 
-        <div style={s.heroRight}>
+        <div style={s.heroRight} className={prevSlide !== null ? `slide-image-${direction}` : ''}>
           <div style={s.emojiBox}>
             <span style={s.bigEmoji}>{cur.emoji}</span>
           </div>
         </div>
 
         <button style={{ ...s.arrow, left: '20px' }}
-          onClick={() => setSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}>←</button>
+          onClick={() => goTo((slide - 1 + SLIDES.length) % SLIDES.length, 'prev')}>←</button>
         <button style={{ ...s.arrow, right: '20px' }}
-          onClick={() => setSlide(prev => (prev + 1) % SLIDES.length)}>→</button>
+          onClick={() => goTo((slide + 1) % SLIDES.length, 'next')}>→</button>
 
         <div style={s.dots}>
           {SLIDES.map((_, i) => (
-            <button key={i} onClick={() => setSlide(i)}
-              style={i === slide ? s.dotActive : s.dotInactive} />
+            <button key={i} onClick={() => goTo(i, i > slide ? 'next' : 'prev')} style={s.dotWrap}>
+              <div style={{ ...s.dot, width: i === slide ? '40px' : '8px', background: i === slide ? cur.accent : '#d1d5db' }}>
+                {i === slide && <div style={s.dotFill(dotProgress)} />}
+              </div>
+            </button>
           ))}
         </div>
       </section>
@@ -500,14 +529,13 @@ const s = {
     gap: '8px',
     zIndex: 2,
   },
-  dotActive: {
-    width: '28px', height: '8px', borderRadius: '99px',
-    background: '#1A6FFF', border: 'none', cursor: 'pointer', padding: 0,
-  },
-  dotInactive: {
-    width: '8px', height: '8px', borderRadius: '50%',
-    background: '#d1d5db', border: 'none', cursor: 'pointer', padding: 0,
-  },
+  dotWrap: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' },
+  dot: { height: '8px', borderRadius: '99px', position: 'relative', overflow: 'hidden', transition: 'all 0.3s ease' },
+  dotFill: (pct) => ({
+    position: 'absolute', top: 0, left: 0, height: '100%',
+    width: `${pct}%`, background: 'rgba(0,0,0,0.18)',
+    borderRadius: '99px', transition: 'width 0.05s linear',
+  }),
   section: { padding: '80px 5%', background: '#ffffff' },
   sectionGray: { padding: '80px 5%', background: '#f8f9fa' },
   label: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' },

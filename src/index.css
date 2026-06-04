@@ -18,3 +18,33 @@ body {
   transform: translateY(-4px) !important;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1) !important;
 }
+
+.slide-content-next {
+  animation: slideContentNext 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide-content-prev {
+  animation: slideContentPrev 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes slideContentNext {
+  from { opacity: 0; transform: translateX(36px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideContentPrev {
+  from { opacity: 0; transform: translateX(-36px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.slide-image-next {
+  animation: slideImageNext 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide-image-prev {
+  animation: slideImagePrev 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes slideImageNext {
+  from { opacity: 0; transform: translateY(24px) scale(0.93); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes slideImagePrev {
+  from { opacity: 0; transform: translateY(-24px) scale(0.93); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
