@@ -129,9 +129,9 @@ function Navbar() {
             {/* header del drawer — mismo alto que el navbar */}
             <div style={s.drawerHeader}>
               <button onClick={() => setMenuOpen(false)} style={s.hamburger} className="hamburger-btn" aria-label="Cerrar menú">
-                <span style={s.bar} />
-                <span style={s.bar} />
-                <span style={s.bar} />
+                <span style={s.drawerBar} />
+                <span style={s.drawerBar} />
+                <span style={s.drawerBar} />
               </button>
             </div>
 
@@ -206,15 +206,16 @@ const s = {
   badge: { position: 'absolute', top: '2px', right: '2px', background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', borderRadius: '99px', padding: '1px 5px', fontSize: '10px', fontWeight: 800, minWidth: '16px', textAlign: 'center' },
   adminBtn: { fontSize: '11px', color: '#66AAFF', textDecoration: 'none', border: '1px solid rgba(26,111,255,0.3)', borderRadius: '99px', padding: '4px 10px', fontWeight: 600 },
   userName: { fontSize: '12px', color: '#94a3b8', fontWeight: 500 },
-  overlay: { position: 'fixed', inset: 0, zIndex: 150, background: 'rgba(0,0,0,0.5)' },
-  drawer: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '240px', background: '#0f0f0f', display: 'flex', flexDirection: 'column', overflowY: 'auto' },
+  overlay: { position: 'fixed', inset: 0, zIndex: 150, background: 'rgba(0,0,0,0.4)' },
+  drawer: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '240px', background: '#ffffff', display: 'flex', flexDirection: 'column', overflowY: 'auto' },
   drawerHeader: { height: '64px', display: 'flex', alignItems: 'center', padding: '0 12px', flexShrink: 0 },
+  drawerBar: { display: 'block', width: '22px', height: '1.8px', background: '#0a0a0f', borderRadius: '2px' },
   drawerBody: { display: 'flex', flexDirection: 'column', padding: '8px 0' },
-  drawerItem: { display: 'flex', alignItems: 'center', gap: '24px', padding: '0 12px', height: '40px', borderRadius: '10px', margin: '0 8px', fontSize: '14px', fontWeight: 400, color: '#e2e8f0', textDecoration: 'none' },
-  drawerItemActive: { background: 'rgba(255,255,255,0.1)', fontWeight: 600, color: '#ffffff' },
-  drawerIcon: { width: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaaaaa', flexShrink: 0 },
-  divider: { borderTop: '1px solid rgba(255,255,255,0.1)', margin: '12px 0' },
-  sectionLabel: { fontSize: '14px', fontWeight: 600, color: '#aaaaaa', padding: '8px 20px 4px', margin: 0 },
+  drawerItem: { display: 'flex', alignItems: 'center', gap: '24px', padding: '0 12px', height: '40px', borderRadius: '10px', margin: '0 8px', fontSize: '14px', fontWeight: 400, color: '#0f0f0f', textDecoration: 'none' },
+  drawerItemActive: { background: 'rgba(0,0,0,0.08)', fontWeight: 600, color: '#0f0f0f' },
+  drawerIcon: { width: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#606060', flexShrink: 0 },
+  divider: { borderTop: '1px solid rgba(0,0,0,0.1)', margin: '12px 0' },
+  sectionLabel: { fontSize: '14px', fontWeight: 600, color: '#606060', padding: '8px 20px 4px', margin: 0 },
 }
 
 export default Navbar
