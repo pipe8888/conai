@@ -22,6 +22,7 @@ const SLIDES = [
     bg: '#ffffff',
     accent: '#1A6FFF',
     accentRgb: '26,111,255',
+    accentGlow: 'rgba(26,111,255,0.3)',
   },
   {
     badge: '✨ NUEVO EN 2026',
@@ -38,6 +39,7 @@ const SLIDES = [
     bg: '#f8fbff',
     accent: '#00CFFF',
     accentRgb: '0,207,255',
+    accentGlow: 'rgba(0,207,255,0.3)',
   },
   {
     badge: '⚡ TRENDING #1 EN 2026',
@@ -57,6 +59,7 @@ const SLIDES = [
     bg: '#fffdf8',
     accent: '#7B5FFF',
     accentRgb: '123,95,255',
+    accentGlow: 'rgba(123,95,255,0.3)',
   },
 ]
 
@@ -126,6 +129,7 @@ function Home() {
   const [paused, setPaused] = useState(false)
   const [time, setTime] = useState(2 * 3600 + 34 * 60 + 18)
   const slideRef = useRef(0)
+  const animatingRef = useRef(false)
   const navigate = useNavigate()
 
   const [catsRef, catsVisible] = useReveal()
@@ -138,13 +142,17 @@ function Home() {
   const blurStyle = useBlurIn(slide)
 
   function goTo(index, dir = 'next') {
-    if (index === slideRef.current) return
+    if (animatingRef.current || index === slideRef.current) return
+    animatingRef.current = true
     setDirection(dir)
     setPrevSlide(slideRef.current)
     setDotProgress(0)
     slideRef.current = index
     setSlide(index)
-    setTimeout(() => setPrevSlide(null), 550)
+    setTimeout(() => {
+      setPrevSlide(null)
+      animatingRef.current = false
+    }, 700)
   }
 
   useEffect(() => {
@@ -185,10 +193,14 @@ function Home() {
 
       {/* HERO SLIDER */}
       <section
-        style={{ ...s.heroWrap, background: cur.bg }}
+        style={s.heroWrap}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
+        {prevSlide !== null && (
+          <div className={`slide-bg slide-bg-exit-${direction}`} style={{ background: SLIDES[prevSlide].bg }} />
+        )}
+        <div key={slide} className={prevSlide !== null ? `slide-bg slide-bg-enter-${direction}` : 'slide-bg'} style={{ background: cur.bg }} />
         <div style={{ ...s.blob, background: `radial-gradient(ellipse, rgba(${cur.accentRgb},0.22) 0%, rgba(${cur.accentRgb},0.06) 45%, transparent 70%)` }} />
         <div style={s.heroLeft} className={prevSlide !== null ? `slide-content-${direction}` : ''}>
           <span style={{
@@ -227,6 +239,7 @@ function Home() {
         </div>
 
         <div style={s.heroRight} className={prevSlide !== null ? `slide-image-${direction}` : ''}>
+          <div style={s.imageGlow(cur.accentGlow)} />
           <div style={s.emojiBox}>
             <span style={s.bigEmoji}>{cur.emoji}</span>
           </div>
@@ -545,6 +558,16 @@ const s = {
     textDecoration: 'none',
     display: 'inline-block',
   },
+  imageGlow: (glow) => ({
+    position: 'absolute',
+    width: '300px',
+    height: '300px',
+    borderRadius: '50%',
+    background: glow,
+    boxShadow: `0 0 100px 50px ${glow}`,
+    pointerEvents: 'none',
+    transition: 'all 0.6s ease',
+  }),
   emojiBox: {
     width: '260px',
     height: '260px',
@@ -554,6 +577,8 @@ const s = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+    zIndex: 1,
   },
   bigEmoji: { fontSize: '110px', lineHeight: 1 },
   arrow: {
