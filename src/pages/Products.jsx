@@ -90,7 +90,7 @@ function Products() {
       {/* GRID DE PRODUCTOS */}
       <div style={s.grid}>
         {filtered.map(prod => (
-          <Link key={prod.id} to={`/producto/${prod.id}`} style={s.card}>
+          <Link key={prod.id} to={`/producto/${prod.id}`} style={s.card} className="card-hover">
             <div style={s.cardImg}>
               {prod.image_url
                 ? <img src={prod.image_url} alt={prod.name} style={s.cardImgPhoto} />

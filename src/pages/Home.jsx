@@ -66,6 +66,7 @@ function Home() {
               key={cat.id}
               onClick={() => navigate(`/productos?cat=${cat.slug}`)}
               style={{ ...s.catCard, cursor: 'pointer' }}
+              className="card-hover"
             >
               <div style={s.catIcon}>{cat.emoji}</div>
               <div style={s.catName}>{cat.name}</div>
@@ -82,7 +83,7 @@ function Home() {
         <p style={s.sub}>Los gadgets IA con mayor demanda y mejores márgenes.</p>
         <div style={s.prodsGrid}>
           {featured.map(prod => (
-            <Link key={prod.id} to={`/producto/${prod.id}`} style={s.prodCard}>
+            <Link key={prod.id} to={`/producto/${prod.id}`} style={s.prodCard} className="card-hover">
               <div style={s.prodImg}>
                 {prod.image_url
                   ? <img src={prod.image_url} alt={prod.name} style={s.prodImgPhoto} />
@@ -117,7 +118,7 @@ function Home() {
             { icon: '🔒', t: 'Compra Segura', d: 'Pago 100% seguro con encriptación SSL y garantía de devolución de 30 días.' },
             { icon: '🌟', t: 'Soporte 24/7', d: 'Nuestro equipo está disponible todo el día para ayudarte.' },
           ].map((f, i) => (
-            <div key={i} style={s.feat}>
+            <div key={i} style={s.feat} className="card-hover">
               <div style={s.featIcon}>{f.icon}</div>
               <p style={s.featTitle}>{f.t}</p>
               <p style={s.featDesc}>{f.d}</p>

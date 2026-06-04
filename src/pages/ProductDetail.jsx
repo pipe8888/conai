@@ -34,7 +34,7 @@ function ProductDetail() {
   if (!prod) return (
     <div style={s.notFound}>
       <p style={{ fontSize: '64px' }}>🤖</p>
-      <p style={{ color: '#8b8a9e', margin: '16px 0' }}>Producto no encontrado</p>
+      <p style={{ color: '#6b7280', margin: '16px 0' }}>Producto no encontrado</p>
       <Link to="/productos" style={s.btnPrimary}>← Volver al catálogo</Link>
     </div>
   )
@@ -120,7 +120,7 @@ function ProductDetail() {
           <h2 style={s.relTitle}>Productos <span style={s.gradient}>relacionados</span></h2>
           <div style={s.relGrid}>
             {related.map(r => (
-              <Link key={r.id} to={`/producto/${r.id}`} style={s.relCard}>
+              <Link key={r.id} to={`/producto/${r.id}`} style={s.relCard} className="card-hover">
                 <div style={s.relImg}>{r.emoji}</div>
                 <div style={s.relInfo}>
                   <p style={s.relName}>{r.name}</p>
@@ -137,46 +137,46 @@ function ProductDetail() {
 }
 
 const s = {
-  wrap: { padding: '40px 5% 80px' },
-  loading: { textAlign: 'center', padding: '120px 5%', color: '#8b8a9e', fontSize: '16px' },
+  wrap: { padding: '40px 5% 80px', background: '#f8f9fa', minHeight: '100vh' },
+  loading: { textAlign: 'center', padding: '120px 5%', color: '#6b7280', fontSize: '16px' },
   notFound: { textAlign: 'center', padding: '120px 5%' },
   breadcrumb: { display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '32px', flexWrap: 'wrap' },
-  breadLink: { fontSize: '13px', color: '#8b8a9e', textDecoration: 'none' },
-  breadSep: { fontSize: '13px', color: '#8b8a9e' },
-  breadCurrent: { fontSize: '13px', color: '#a78bfa' },
+  breadLink: { fontSize: '13px', color: '#6b7280', textDecoration: 'none' },
+  breadSep: { fontSize: '13px', color: '#9ca3af' },
+  breadCurrent: { fontSize: '13px', color: '#1A6FFF', fontWeight: 500 },
   detail: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', marginBottom: '80px', alignItems: 'start' },
-  imgBox: { background: 'linear-gradient(135deg,rgba(108,99,255,0.15),rgba(34,211,238,0.08))', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '24px', overflow: 'hidden', textAlign: 'center', position: 'relative', minHeight: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  imgBox: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '24px', overflow: 'hidden', textAlign: 'center', position: 'relative', minHeight: '360px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
   imgPhoto: { width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 },
   imgEmoji: { fontSize: '120px', lineHeight: 1 },
-  viralBadge: { position: 'absolute', top: '16px', right: '16px', background: 'rgba(217,70,48,0.2)', color: '#ff6b6b', border: '1px solid rgba(217,70,48,0.3)', borderRadius: '99px', padding: '4px 12px', fontSize: '12px', fontWeight: 700 },
+  viralBadge: { position: 'absolute', top: '16px', right: '16px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '99px', padding: '4px 12px', fontSize: '12px', fontWeight: 700 },
   info: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  cat: { fontSize: '12px', color: '#a78bfa', fontWeight: 600, letterSpacing: '0.1em' },
-  name: { fontSize: 'clamp(24px,3vw,40px)', fontWeight: 800, letterSpacing: '-1px', color: '#f1f0ff', lineHeight: 1.2 },
-  desc: { fontSize: '16px', color: '#8b8a9e', lineHeight: 1.7 },
+  cat: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.1em' },
+  name: { fontSize: 'clamp(24px,3vw,40px)', fontWeight: 800, letterSpacing: '-1px', color: '#0a0a0f', lineHeight: 1.2 },
+  desc: { fontSize: '16px', color: '#6b7280', lineHeight: 1.7 },
   priceRow: { display: 'flex', alignItems: 'center', gap: '16px' },
-  price: { fontSize: '36px', fontWeight: 800, background: 'linear-gradient(135deg,#6c63ff,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  badge: { background: 'rgba(34,211,238,0.12)', color: '#22d3ee', padding: '5px 14px', borderRadius: '99px', fontSize: '12px', fontWeight: 700 },
-  marginBox: { background: '#13131c', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '12px', padding: '16px' },
+  price: { fontSize: '36px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  badge: { background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '5px 14px', borderRadius: '99px', fontSize: '12px', fontWeight: 700 },
+  marginBox: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' },
   marginHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' },
-  marginLabel: { fontSize: '13px', color: '#8b8a9e' },
-  marginPct: { fontSize: '13px', fontWeight: 700, color: '#a78bfa' },
-  marginBar: { height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
-  marginFill: { height: '100%', borderRadius: '99px', background: 'linear-gradient(135deg,#6c63ff,#22d3ee)' },
+  marginLabel: { fontSize: '13px', color: '#6b7280' },
+  marginPct: { fontSize: '13px', fontWeight: 700, color: '#1A6FFF' },
+  marginBar: { height: '6px', borderRadius: '99px', background: '#e5e7eb', overflow: 'hidden' },
+  marginFill: { height: '100%', borderRadius: '99px', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)' },
   features: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  feature: { fontSize: '14px', color: '#8b8a9e' },
+  feature: { fontSize: '14px', color: '#374151' },
   btnRow: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
-  btnPrimary: { background: 'linear-gradient(135deg,#6c63ff,#a78bfa)', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
-  btnAdded: { background: 'linear-gradient(135deg,#1D9E75,#22d3ee)', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' },
-  btnOutline: { background: 'transparent', color: '#f1f0ff', border: '1px solid rgba(108,99,255,0.3)', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
-  gradient: { background: 'linear-gradient(135deg,#6c63ff,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  related: { borderTop: '1px solid rgba(108,99,255,0.2)', paddingTop: '48px' },
-  relTitle: { fontSize: '28px', fontWeight: 800, marginBottom: '24px' },
+  btnPrimary: { background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
+  btnAdded: { background: 'linear-gradient(135deg, #16a34a, #22c55e)', color: '#fff', border: 'none', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' },
+  btnOutline: { background: 'transparent', color: '#0a0a0f', border: '1px solid #d1d5db', padding: '14px 28px', borderRadius: '99px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
+  gradient: { background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  related: { borderTop: '1px solid #e5e7eb', paddingTop: '48px' },
+  relTitle: { fontSize: '28px', fontWeight: 800, marginBottom: '24px', color: '#0a0a0f' },
   relGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: '16px' },
-  relCard: { background: '#13131c', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '16px', overflow: 'hidden', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '16px', padding: '16px' },
-  relImg: { fontSize: '40px', minWidth: '56px', textAlign: 'center' },
+  relCard: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', overflow: 'hidden', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' },
+  relImg: { fontSize: '40px', minWidth: '56px', textAlign: 'center', background: '#f8f9fa', borderRadius: '12px', padding: '10px' },
   relInfo: { flex: 1 },
-  relName: { fontSize: '13px', fontWeight: 600, color: '#f1f0ff', marginBottom: '4px' },
-  relPrice: { fontSize: '15px', fontWeight: 800, background: 'linear-gradient(135deg,#6c63ff,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  relName: { fontSize: '13px', fontWeight: 600, color: '#0a0a0f', marginBottom: '4px' },
+  relPrice: { fontSize: '15px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
 }
 
 export default ProductDetail

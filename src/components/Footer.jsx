@@ -5,7 +5,7 @@ function Footer() {
     <footer style={styles.footer}>
       <div style={styles.grid}>
         <div>
-          <p style={styles.logo}>Dropifyai</p>
+          <p style={styles.logo}>Con<span style={styles.logoBlue}>ai</span></p>
           <p style={styles.desc}>La tienda de gadgets IA más innovadora de Latinoamérica.</p>
         </div>
         <div>
@@ -29,7 +29,7 @@ function Footer() {
         </div>
       </div>
       <div style={styles.bottom}>
-        <p style={styles.copy}>© 2026 Dropifyai. Todos los derechos reservados.</p>
+        <p style={styles.copy}>© 2026 ConAI. Todos los derechos reservados.</p>
         <p style={styles.copy}>Hecho con ❤️ en Latinoamérica</p>
       </div>
     </footer>
@@ -38,8 +38,8 @@ function Footer() {
 
 const styles = {
   footer: {
-    background: '#111118',
-    borderTop: '1px solid rgba(108,99,255,0.2)',
+    background: '#f8f9fa',
+    borderTop: '1px solid #e5e7eb',
     padding: '48px 5% 28px',
     marginTop: '80px',
   },
@@ -50,24 +50,26 @@ const styles = {
     marginBottom: '40px',
   },
   logo: {
-    fontSize: '20px', fontWeight: 700,
-    background: 'linear-gradient(135deg,#6c63ff,#22d3ee)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+    fontSize: '20px', fontWeight: 800, color: '#0a0a0f',
     marginBottom: '10px',
   },
-  desc: { fontSize: '13px', color: '#8b8a9e', lineHeight: 1.6 },
-  colTitle: { fontSize: '13px', fontWeight: 700, marginBottom: '14px', color: '#f1f0ff' },
+  logoBlue: {
+    background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
+    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+  },
+  desc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6 },
+  colTitle: { fontSize: '13px', fontWeight: 700, marginBottom: '14px', color: '#0a0a0f' },
   colLink: {
-    display: 'block', fontSize: '13px', color: '#8b8a9e',
+    display: 'block', fontSize: '13px', color: '#6b7280',
     textDecoration: 'none', marginBottom: '8px',
   },
   bottom: {
-    borderTop: '1px solid rgba(108,99,255,0.2)',
+    borderTop: '1px solid #e5e7eb',
     paddingTop: '20px',
     display: 'flex', justifyContent: 'space-between',
     flexWrap: 'wrap', gap: '10px',
   },
-  copy: { fontSize: '12px', color: '#8b8a9e' },
+  copy: { fontSize: '12px', color: '#9ca3af' },
 }
 
 export default Footer
