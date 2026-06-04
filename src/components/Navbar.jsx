@@ -73,24 +73,10 @@ function Navbar() {
           <Link to="/" style={s.logoLink}><LogoSVG /></Link>
         </div>
 
-        {/* CENTRO: barra de búsqueda o categorías */}
+        {/* CENTRO: categorías por defecto, búsqueda al abrir menú */}
         <div style={s.center}>
           {menuOpen ? (
-            <div style={s.catRow} className="overlay-fade-in">
-              {categories.map(cat => (
-                <Link
-                  key={cat.id}
-                  to={`/productos?cat=${encodeURIComponent(cat.slug)}`}
-                  className="cat-link"
-                  style={s.catLink}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {cat.name.replace(/ IA$/i, '')}
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <form onSubmit={submitSearch} style={s.searchForm}>
+            <form onSubmit={submitSearch} style={s.searchForm} className="overlay-fade-in">
               <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
                 <circle cx="8" cy="8" r="5.5" stroke="#818cf8" strokeWidth="1.8" strokeLinecap="round"/>
                 <line x1="12.5" y1="12.5" x2="16" y2="16" stroke="#818cf8" strokeWidth="1.8" strokeLinecap="round"/>
@@ -101,8 +87,22 @@ function Navbar() {
                 value={searchVal}
                 onChange={e => setSearchVal(e.target.value)}
                 placeholder="Buscar productos..."
+                autoFocus
               />
             </form>
+          ) : (
+            <div style={s.catRow} className="overlay-fade-in">
+              {categories.map(cat => (
+                <Link
+                  key={cat.id}
+                  to={`/productos?cat=${encodeURIComponent(cat.slug)}`}
+                  className="cat-link"
+                  style={s.catLink}
+                >
+                  {cat.name.replace(/ IA$/i, '')}
+                </Link>
+              ))}
+            </div>
           )}
         </div>
 
