@@ -7,12 +7,6 @@ import LogoSVG from './LogoSVG'
 
 const ADMIN_EMAIL = 'pipeblue17@gmail.com'
 
-const NAV_LINKS = [
-  { path: '/',          label: 'Inicio',    icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> },
-  { path: '/productos', label: 'Productos', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="7" height="7"/><rect x="15" y="3" width="7" height="7"/><rect x="15" y="14" width="7" height="7"/><rect x="2" y="14" width="7" height="7"/></svg> },
-  { path: '/contacto',  label: 'Contacto',  icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> },
-]
-
 function Navbar() {
   const { count } = useCart()
   const { user, logout } = useAuth()
@@ -43,11 +37,6 @@ function Navbar() {
   }, [])
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
-
-  useEffect(() => {
     setMenuOpen(false)
   }, [location.pathname, location.search])
 
@@ -56,41 +45,55 @@ function Navbar() {
     navigate('/')
   }
 
-  const isActive = (path) => {
-    if (path === '/productos') return location.pathname.startsWith('/producto')
-    return location.pathname === path
-  }
-
   return (
     <>
       <div style={s.progressBar(progress)} />
-      <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease', zIndex: menuOpen ? 160 : 100 }}>
+      <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
 
-        <button onClick={() => setMenuOpen(o => !o)} style={s.hamburger} className="hamburger-btn" aria-label="Abrir/cerrar menú">
-          <span style={s.bar} />
-          <span style={s.bar} />
-          <span style={s.bar} />
-        </button>
-
-        <Link to="/" style={s.logoLink}><LogoSVG /></Link>
-
-        <ul style={s.links}>
-          {NAV_LINKS.map(({ path, label }) => (
-            <li key={path} style={s.linkItem}>
-              <Link to={path} style={s.link}>{label}</Link>
-              {isActive(path) && <span style={s.activeLine} />}
-            </li>
-          ))}
-        </ul>
-
-        <div style={s.right}>
+        {/* IZQUIERDA: hamburger + lupa */}
+        <div style={s.left}>
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={s.hamburger}
+            className="hamburger-btn"
+            aria-label="Ver categorías"
+          >
+            <span style={s.bar} />
+            <span style={s.bar} />
+            <span style={s.bar} />
+          </button>
           <button onClick={() => navigate('/productos')} style={s.iconBtn} title="Buscar">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <circle cx="8" cy="8" r="5.5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
               <line x1="12.5" y1="12.5" x2="16" y2="16" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
           </button>
+        </div>
 
+        {/* CENTRO: logo o categorías */}
+        <div style={s.center}>
+          {menuOpen ? (
+            <div style={s.catRow} className="overlay-fade-in">
+              {categories.map(cat => (
+                <Link
+                  key={cat.id}
+                  to={`/productos?cat=${encodeURIComponent(cat.slug)}`}
+                  className="cat-link"
+                  style={s.catLink}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span>{cat.emoji}</span>
+                  <span>{cat.name}</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <Link to="/" style={s.logoLink}><LogoSVG /></Link>
+          )}
+        </div>
+
+        {/* DERECHA: usuario + carrito */}
+        <div style={s.right}>
           {user ? (
             <>
               {user.email === ADMIN_EMAIL && <Link to="/admin" style={s.adminBtn}>Admin</Link>}
@@ -120,58 +123,8 @@ function Navbar() {
             {count > 0 && <span style={s.badge}>{count}</span>}
           </button>
         </div>
+
       </nav>
-
-      {menuOpen && (
-        <div style={s.overlay} className="overlay-fade-in" onClick={() => setMenuOpen(false)}>
-          <div style={s.drawer} className="drawer-slide-in" onClick={e => e.stopPropagation()}>
-
-            {/* header del drawer — mismo alto que el navbar */}
-            <div style={s.drawerHeader}>
-              <button onClick={() => setMenuOpen(false)} style={s.hamburger} className="hamburger-btn" aria-label="Cerrar menú">
-                <span style={s.drawerBar} />
-                <span style={s.drawerBar} />
-                <span style={s.drawerBar} />
-              </button>
-            </div>
-
-            {/* links principales */}
-            <div style={s.drawerBody}>
-              {NAV_LINKS.map(({ path, label, icon }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className="drawer-item"
-                  style={{ ...s.drawerItem, ...(isActive(path) ? s.drawerItemActive : {}) }}
-                >
-                  <span style={{ ...s.drawerIcon, ...(isActive(path) ? { color: '#fff' } : {}) }}>{icon}</span>
-                  <span>{label}</span>
-                </Link>
-              ))}
-
-              {categories.length > 0 && (
-                <>
-                  <div style={s.divider} />
-                  <p style={s.sectionLabel}>Categorías</p>
-                  {categories.map(cat => (
-                    <Link
-                      key={cat.id}
-                      to={`/productos?cat=${encodeURIComponent(cat.slug)}`}
-                      className="drawer-item"
-                      style={s.drawerItem}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <span style={s.drawerIcon}>{cat.emoji || '📦'}</span>
-                      <span>{cat.name}</span>
-                    </Link>
-                  ))}
-                </>
-              )}
-            </div>
-
-          </div>
-        </div>
-      )}
     </>
   )
 }
@@ -194,29 +147,19 @@ const s = {
     padding: '0 5%', height: '64px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   },
+  left: { display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 },
+  center: { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', padding: '0 12px' },
+  right: { display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 },
+  logoLink: { textDecoration: 'none', display: 'flex', alignItems: 'center' },
+  catRow: { display: 'flex', alignItems: 'center', gap: '2px', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' },
+  catLink: { display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: '99px', fontSize: '13px', color: '#cbd5e1', textDecoration: 'none', whiteSpace: 'nowrap', fontWeight: 400 },
   hamburger: { background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: '5px', justifyContent: 'center' },
   bar: { display: 'block', width: '22px', height: '1.8px', background: '#cbd5e1', borderRadius: '2px' },
-  logoLink: { textDecoration: 'none', display: 'flex', alignItems: 'center' },
-  links: { display: 'flex', gap: '32px', listStyle: 'none', margin: 0, padding: 0 },
-  linkItem: { height: '64px', display: 'flex', alignItems: 'center', position: 'relative' },
-  link: { color: '#cbd5e1', textDecoration: 'none', fontSize: '14px', fontWeight: 500 },
-  activeLine: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, #1A6FFF, #66AAFF)', borderRadius: '2px 2px 0 0' },
-  right: { display: 'flex', alignItems: 'center', gap: '4px' },
   iconBtn: { background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   cartBtn: { background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' },
   badge: { position: 'absolute', top: '2px', right: '2px', background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', borderRadius: '99px', padding: '1px 5px', fontSize: '10px', fontWeight: 800, minWidth: '16px', textAlign: 'center' },
   adminBtn: { fontSize: '11px', color: '#66AAFF', textDecoration: 'none', border: '1px solid rgba(26,111,255,0.3)', borderRadius: '99px', padding: '4px 10px', fontWeight: 600 },
   userName: { fontSize: '12px', color: '#94a3b8', fontWeight: 500 },
-  overlay: { position: 'fixed', inset: 0, zIndex: 150, background: 'rgba(0,0,0,0.4)' },
-  drawer: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '240px', background: '#ffffff', display: 'flex', flexDirection: 'column', overflowY: 'auto' },
-  drawerHeader: { height: '64px', display: 'flex', alignItems: 'center', padding: '0 12px', flexShrink: 0 },
-  drawerBar: { display: 'block', width: '22px', height: '1.8px', background: '#0a0a0f', borderRadius: '2px' },
-  drawerBody: { display: 'flex', flexDirection: 'column', padding: '8px 0' },
-  drawerItem: { display: 'flex', alignItems: 'center', gap: '24px', padding: '0 12px', height: '40px', borderRadius: '10px', margin: '0 8px', fontSize: '14px', fontWeight: 400, color: '#0f0f0f', textDecoration: 'none' },
-  drawerItemActive: { background: 'rgba(0,0,0,0.08)', fontWeight: 600, color: '#0f0f0f' },
-  drawerIcon: { width: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#606060', flexShrink: 0 },
-  divider: { borderTop: '1px solid rgba(0,0,0,0.1)', margin: '12px 0' },
-  sectionLabel: { fontSize: '14px', fontWeight: 600, color: '#606060', padding: '8px 20px 4px', margin: 0 },
 }
 
 export default Navbar
