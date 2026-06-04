@@ -80,7 +80,10 @@ function Products() {
       setCategories(cats || [])
 
       const catParam = searchParams.get('cat')
-      if (catParam) setModalCategory(catParam)
+      if (catParam) {
+        const match = (cats || []).find(c => c.name === catParam || c.slug === catParam)
+        if (match) setModalCategory(match.slug)
+      }
 
       setFiltered(allProds)
       setLoading(false)
@@ -131,10 +134,10 @@ function Products() {
     setTimeout(() => setAddedId(null), 1800)
   }
 
-  function openCategory(catName) {
-    setModalCategory(catName)
+  function openCategory(cat) {
+    setModalCategory(cat.slug)
     setDropdownOpen(false)
-    setSearchParams({ cat: catName })
+    setSearchParams({ cat: cat.slug })
   }
 
   function closeModal() {
@@ -178,7 +181,7 @@ function Products() {
             style={modalCategory ? s.chipActive : s.chip}
             onClick={() => setDropdownOpen(o => !o)}
           >
-            {modalCategory ? `${modalCategory}` : 'Categoría'} ▾
+            {modalCategory ? categories.find(c => c.slug === modalCategory)?.name : 'Categoría'} ▾
           </button>
           {dropdownOpen && (
             <div style={s.dropdown} className="drawer-slide-in">
@@ -189,7 +192,7 @@ function Products() {
                     ...s.dropdownItem,
                     ...(modalCategory === cat.name ? s.dropdownItemActive : {}),
                   }}
-                  onClick={() => openCategory(cat.name)}
+                  onClick={() => openCategory(cat)}
                 >
                   <span>{cat.emoji}</span>
                   <span>{cat.name}</span>
@@ -201,7 +204,7 @@ function Products() {
 
         {modalCategory && (
           <button style={s.clearChip} onClick={closeModal}>
-            ✕ {modalCategory}
+            ✕ {categories.find(c => c.slug === modalCategory)?.name}
           </button>
         )}
       </div>
@@ -247,7 +250,7 @@ function Products() {
                 <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="#0a0a0f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
-            <p style={s.modalTitle}>{modalCategory}</p>
+            <p style={s.modalTitle}>{categories.find(c => c.slug === modalCategory)?.name}</p>
             <span style={s.modalCount}>{modalProducts.length} productos</span>
           </div>
 

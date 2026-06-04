@@ -156,7 +156,7 @@ function Navbar() {
                   {categories.map(cat => (
                     <Link
                       key={cat.id}
-                      to={`/productos?cat=${encodeURIComponent(cat.name)}`}
+                      to={`/productos?cat=${encodeURIComponent(cat.slug)}`}
                       className="drawer-item"
                       style={s.drawerItem}
                       onClick={() => setMenuOpen(false)}
