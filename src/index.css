@@ -47,6 +47,10 @@ body {
   animation: overlayFadeIn 0.2s ease both;
 }
 
+.drawer-item:hover {
+  background: rgba(255,255,255,0.1) !important;
+}
+
 .card-hover {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
