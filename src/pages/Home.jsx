@@ -80,20 +80,19 @@ function useTextScramble(text, trigger) {
   return display
 }
 
-// Efecto 14: types subtitle letter by letter with blinking cursor
-function useTypewriter(text, trigger) {
-  const [n, setN] = useState(0)
+// Efecto 14: subtitle fades in from blurry to sharp on each slide change
+function useBlurIn(trigger) {
+  const [ready, setReady] = useState(false)
   useEffect(() => {
-    setN(0)
-    let i = 0
-    const iv = setInterval(() => {
-      i++
-      setN(i)
-      if (i >= text.length) clearInterval(iv)
-    }, 40)
-    return () => clearInterval(iv)
-  }, [text, trigger])
-  return text.slice(0, n) + (n < text.length ? '|' : '')
+    setReady(false)
+    const t = setTimeout(() => setReady(true), 80)
+    return () => clearTimeout(t)
+  }, [trigger])
+  return {
+    opacity: ready ? 1 : 0,
+    filter: ready ? 'blur(0px)' : 'blur(18px)',
+    transition: 'opacity 0.65s ease, filter 0.65s ease',
+  }
 }
 
 // Efecto 16: trigger once when section enters viewport
@@ -125,7 +124,7 @@ function Home() {
 
   const cur = SLIDES[slide]
   const scrambledTitle = useTextScramble(cur.title, slide)
-  const typedSub = useTypewriter(cur.sub, slide)
+  const blurStyle = useBlurIn(slide)
 
   useEffect(() => {
     async function fetchData() {
@@ -175,7 +174,7 @@ function Home() {
 
           <h1 style={s.heroTitle}>
             {scrambledTitle}<br />
-            <span style={s.gradient}>{typedSub}</span>
+            <span style={{ ...s.gradient, ...blurStyle }}>{cur.sub}</span>
           </h1>
 
           <div style={s.priceRow}>
