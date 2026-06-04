@@ -69,20 +69,33 @@ function Navbar() {
           </button>
         </div>
 
-        {/* CENTRO: categorías siempre visibles */}
+        {/* CENTRO: categorías por defecto, búsqueda al click lupa */}
         <div style={s.center}>
-          <div style={s.catRow}>
-            {categories.map(cat => (
-              <Link
-                key={cat.id}
-                to={`/productos?cat=${encodeURIComponent(cat.slug)}`}
-                className="cat-link"
-                style={s.catLink}
-              >
-                {cat.name.replace(/ IA$/i, '')}
-              </Link>
-            ))}
-          </div>
+          {searchOpen ? (
+            <form onSubmit={submitSearch} style={s.searchForm} className="overlay-fade-in">
+              <input
+                style={s.searchInput}
+                type="text"
+                value={searchVal}
+                onChange={e => setSearchVal(e.target.value)}
+                placeholder="Buscar productos..."
+                autoFocus
+              />
+            </form>
+          ) : (
+            <div style={s.catRow} className="overlay-fade-in">
+              {categories.map(cat => (
+                <Link
+                  key={cat.id}
+                  to={`/productos?cat=${encodeURIComponent(cat.slug)}`}
+                  className="cat-link"
+                  style={s.catLink}
+                >
+                  {cat.name.replace(/ IA$/i, '')}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* DERECHA: usuario + carrito */}
@@ -118,20 +131,6 @@ function Navbar() {
         </div>
 
       </nav>
-
-      {/* BARRA DE BÚSQUEDA: desliza debajo del navbar */}
-      <div style={s.searchBar(searchOpen)}>
-        <form onSubmit={submitSearch} style={s.searchForm}>
-          <input
-            style={s.searchInput}
-            type="text"
-            value={searchVal}
-            onChange={e => setSearchVal(e.target.value)}
-            placeholder="Buscar productos..."
-            autoFocus={searchOpen}
-          />
-        </form>
-      </div>
     </>
   )
 }
@@ -155,15 +154,6 @@ const s = {
   center: { flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
   right: { display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 },
   logoLink: { textDecoration: 'none', display: 'flex', alignItems: 'center' },
-  searchBar: (open) => ({
-    position: 'fixed', top: '64px', left: 0, right: 0, zIndex: 99,
-    background: '#ffffff', borderBottom: open ? '1px solid #e5e7eb' : 'none',
-    padding: open ? '10px 5%' : '0 5%',
-    height: open ? '60px' : '0px',
-    overflow: 'hidden',
-    display: 'flex', alignItems: 'center',
-    transition: 'height 0.25s ease, padding 0.25s ease',
-  }),
   searchForm: {
     display: 'flex', alignItems: 'center', gap: '10px',
     width: '100%', maxWidth: '520px',
