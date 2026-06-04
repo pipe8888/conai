@@ -23,18 +23,50 @@ function getCategoryImg(cat) {
   return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80'
 }
 
+function ProductCard({ prod, onAdd, addedId }) {
+  const imgSrc = prod.image_url || getCategoryImg(prod.category)
+  const isAdded = addedId === prod.id
+  return (
+    <div style={s.card} className="product-card">
+      <Link to={`/producto/${prod.id}`} style={s.cardImgWrap}>
+        <img src={imgSrc} alt={prod.name} style={s.cardImg} />
+        {prod.viral && <span style={s.viralTag}>🔥 Viral</span>}
+      </Link>
+      <div style={s.cardBody}>
+        <Link to={`/producto/${prod.id}`} style={{ textDecoration: 'none' }}>
+          <p style={s.cardName}>{prod.name}</p>
+        </Link>
+        <p style={s.cardPrice}>${prod.price} USD</p>
+        <p style={s.cardBy}>Por {prod.category || 'ConAI'}</p>
+        <div style={s.cardActions}>
+          <button
+            style={isAdded ? s.btnAddedFull : s.btnImport}
+            onClick={(e) => onAdd(e, prod)}
+          >
+            {isAdded ? '✓ Agregado' : 'Agregar al carrito'}
+          </button>
+          <Link to={`/producto/${prod.id}`} style={s.btnView}>
+            Ver producto
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Products() {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [filtered, setFiltered] = useState([])
-  const [activeCategory, setActiveCategory] = useState('todos')
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [modalCategory, setModalCategory] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
   const { addToCart } = useCart()
+  const dropdownRef = useRef(null)
   const sentinelRef = useRef(null)
 
   useEffect(() => {
@@ -48,12 +80,9 @@ function Products() {
       setCategories(cats || [])
 
       const catParam = searchParams.get('cat')
-      if (catParam) {
-        setActiveCategory(catParam)
-        setFiltered(allProds.filter(p => p.category === catParam))
-      } else {
-        setFiltered(allProds)
-      }
+      if (catParam) setModalCategory(catParam)
+
+      setFiltered(allProds)
       setLoading(false)
     }
     fetchData()
@@ -61,30 +90,38 @@ function Products() {
 
   useEffect(() => {
     let result = products
-    if (activeCategory !== 'todos') {
-      result = result.filter(p => p.category === activeCategory)
-    }
     if (searchQuery) {
       result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     }
     setFiltered(result)
     setVisibleCount(PAGE_SIZE)
-  }, [activeCategory, searchQuery, products])
+  }, [searchQuery, products])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
     if (!sentinel) return
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisibleCount(n => n + PAGE_SIZE)
-        }
-      },
+      ([entry]) => { if (entry.isIntersecting) setVisibleCount(n => n + PAGE_SIZE) },
       { threshold: 0.1 }
     )
     observer.observe(sentinel)
     return () => observer.disconnect()
   }, [filtered])
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = modalCategory ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [modalCategory])
 
   function handleAdd(e, prod) {
     e.preventDefault()
@@ -93,6 +130,21 @@ function Products() {
     setAddedId(prod.id)
     setTimeout(() => setAddedId(null), 1800)
   }
+
+  function openCategory(catName) {
+    setModalCategory(catName)
+    setDropdownOpen(false)
+    setSearchParams({ cat: catName })
+  }
+
+  function closeModal() {
+    setModalCategory(null)
+    setSearchParams({})
+  }
+
+  const modalProducts = modalCategory
+    ? products.filter(p => p.category === modalCategory)
+    : []
 
   return (
     <div style={s.wrap}>
@@ -119,23 +171,39 @@ function Products() {
         </div>
       </div>
 
-      {/* FILTROS */}
+      {/* FILTRO CATEGORÍA */}
       <div style={s.filterRow}>
-        <button
-          style={activeCategory === 'todos' ? s.chipActive : s.chip}
-          onClick={() => setActiveCategory('todos')}
-        >
-          Categoría {activeCategory !== 'todos' ? `· ${activeCategory}` : '▾'}
-        </button>
-        {categories.map(cat => (
+        <div ref={dropdownRef} style={{ position: 'relative' }}>
           <button
-            key={cat.id}
-            style={activeCategory === cat.name ? s.chipActive : s.chip}
-            onClick={() => setActiveCategory(activeCategory === cat.name ? 'todos' : cat.name)}
+            style={modalCategory ? s.chipActive : s.chip}
+            onClick={() => setDropdownOpen(o => !o)}
           >
-            {cat.emoji} {cat.name}
+            {modalCategory ? `${modalCategory}` : 'Categoría'} ▾
           </button>
-        ))}
+          {dropdownOpen && (
+            <div style={s.dropdown} className="drawer-slide-in">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  style={{
+                    ...s.dropdownItem,
+                    ...(modalCategory === cat.name ? s.dropdownItemActive : {}),
+                  }}
+                  onClick={() => openCategory(cat.name)}
+                >
+                  <span>{cat.emoji}</span>
+                  <span>{cat.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {modalCategory && (
+          <button style={s.clearChip} onClick={closeModal}>
+            ✕ {modalCategory}
+          </button>
+        )}
       </div>
 
       {/* CONTADOR */}
@@ -143,47 +211,17 @@ function Products() {
         <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
       )}
 
-      {/* GRID */}
+      {/* GRID PRINCIPAL */}
       {loading ? (
         <p style={s.counter}>Cargando...</p>
       ) : (
         <div style={s.grid}>
-          {filtered.slice(0, visibleCount).map(prod => {
-            const imgSrc = prod.image_url || getCategoryImg(prod.category)
-            const isAdded = addedId === prod.id
-            return (
-              <div key={prod.id} style={s.card} className="product-card">
-                <Link to={`/producto/${prod.id}`} style={s.cardImgWrap}>
-                  <img src={imgSrc} alt={prod.name} style={s.cardImg} />
-                  {prod.viral && <span style={s.viralTag}>🔥 Viral</span>}
-                </Link>
-
-                <div style={s.cardBody}>
-                  <Link to={`/producto/${prod.id}`} style={{ textDecoration: 'none' }}>
-                    <p style={s.cardName}>{prod.name}</p>
-                  </Link>
-                  <p style={s.cardPrice}>${prod.price} USD</p>
-                  <p style={s.cardBy}>Por {prod.category || 'ConAI'}</p>
-
-                  <div style={s.cardActions}>
-                    <button
-                      style={isAdded ? s.btnAddedFull : s.btnImport}
-                      onClick={(e) => handleAdd(e, prod)}
-                    >
-                      {isAdded ? '✓ Agregado' : 'Agregar al carrito'}
-                    </button>
-                    <Link to={`/producto/${prod.id}`} style={s.btnView}>
-                      Ver producto
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+          {filtered.slice(0, visibleCount).map(prod => (
+            <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} />
+          ))}
         </div>
       )}
 
-      {/* SENTINEL para infinite scroll */}
       {!loading && visibleCount < filtered.length && (
         <div ref={sentinelRef} style={s.sentinel}>
           <span style={s.sentinelDot} />
@@ -196,6 +234,38 @@ function Products() {
         <div style={s.empty}>
           <p style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</p>
           <p style={{ color: '#9ca3af', fontSize: '14px' }}>No se encontraron productos</p>
+        </div>
+      )}
+
+      {/* MODAL DE CATEGORÍA */}
+      {modalCategory && (
+        <div style={s.modal} className="overlay-fade-in">
+
+          <div style={s.modalHeader}>
+            <button onClick={closeModal} style={s.backBtn} aria-label="Volver">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="#0a0a0f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <p style={s.modalTitle}>{modalCategory}</p>
+            <span style={s.modalCount}>{modalProducts.length} productos</span>
+          </div>
+
+          <div style={s.modalBody}>
+            {modalProducts.length === 0 ? (
+              <div style={s.empty}>
+                <p style={{ fontSize: '40px', marginBottom: '12px' }}>📦</p>
+                <p style={{ color: '#9ca3af', fontSize: '14px' }}>Sin productos en esta categoría</p>
+              </div>
+            ) : (
+              <div style={s.grid}>
+                {modalProducts.map(prod => (
+                  <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} />
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
       )}
 
@@ -212,33 +282,43 @@ const s = {
   searchInput: { width: '100%', height: '40px', paddingLeft: '40px', paddingRight: '16px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none' },
   sortBtn: { width: '40px', height: '40px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 },
 
-  filterRow: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' },
-  chip: { height: '32px', padding: '0 14px', border: '1px solid #d1d5db', borderRadius: '4px', background: '#fff', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 400, whiteSpace: 'nowrap' },
-  chipActive: { height: '32px', padding: '0 14px', border: '1px solid #0a0a0f', borderRadius: '4px', background: '#0a0a0f', fontSize: '13px', color: '#fff', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' },
+  filterRow: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px', alignItems: 'center' },
+  chip: { height: '32px', padding: '0 14px', border: '1px solid #d1d5db', borderRadius: '4px', background: '#fff', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 400 },
+  chipActive: { height: '32px', padding: '0 14px', border: '1px solid #0a0a0f', borderRadius: '4px', background: '#0a0a0f', fontSize: '13px', color: '#fff', cursor: 'pointer', fontWeight: 500 },
+  clearChip: { height: '28px', padding: '0 12px', border: '1px solid #d1d5db', borderRadius: '99px', background: '#f3f4f6', fontSize: '12px', color: '#6b7280', cursor: 'pointer' },
+
+  dropdown: { position: 'absolute', top: '38px', left: 0, zIndex: 300, background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: '200px', padding: '6px', display: 'flex', flexDirection: 'column', gap: '2px' },
+  dropdownItem: { display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', borderRadius: '6px', border: 'none', background: 'transparent', fontSize: '13px', color: '#374151', cursor: 'pointer', textAlign: 'left' },
+  dropdownItemActive: { background: '#f3f4f6', fontWeight: 600, color: '#0a0a0f' },
 
   counter: { fontSize: '13px', color: '#6b7280', marginBottom: '16px' },
 
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '12px' },
 
   card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: '4px', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
-
   cardImgWrap: { display: 'block', position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', background: '#f3f4f6', textDecoration: 'none' },
   cardImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.3s ease' },
   viralTag: { position: 'absolute', top: '8px', left: '8px', background: 'rgba(239,68,68,0.88)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '3px' },
-
   cardBody: { padding: '12px', display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 },
   cardName: { fontSize: '13px', color: '#374151', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 },
   cardPrice: { fontSize: '14px', fontWeight: 700, color: '#111827', margin: 0 },
   cardBy: { fontSize: '12px', color: '#9ca3af', margin: 0 },
-
   cardActions: { display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' },
   btnImport: { height: '34px', background: 'transparent', border: '1px solid #374151', borderRadius: '4px', fontSize: '13px', fontWeight: 500, color: '#111827', cursor: 'pointer' },
   btnAddedFull: { height: '34px', background: '#16a34a', border: '1px solid #16a34a', borderRadius: '4px', fontSize: '13px', fontWeight: 500, color: '#fff', cursor: 'pointer' },
   btnView: { height: '34px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '4px', fontSize: '13px', fontWeight: 400, color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' },
 
-  empty: { textAlign: 'center', padding: '80px 0' },
   sentinel: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', padding: '32px 0 16px' },
   sentinelDot: { width: '6px', height: '6px', borderRadius: '50%', background: '#d1d5db', animation: 'pulse 1.2s ease-in-out infinite' },
+
+  empty: { textAlign: 'center', padding: '80px 0' },
+
+  modal: { position: 'fixed', inset: 0, zIndex: 250, background: '#f9fafb', overflowY: 'auto' },
+  modalHeader: { position: 'sticky', top: 0, zIndex: 10, background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 5%', height: '64px', display: 'flex', alignItems: 'center', gap: '16px' },
+  backBtn: { background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 },
+  modalTitle: { fontSize: '16px', fontWeight: 700, color: '#0a0a0f', margin: 0, flex: 1 },
+  modalCount: { fontSize: '13px', color: '#9ca3af' },
+  modalBody: { padding: '24px 5% 80px' },
 }
 
 export default Products

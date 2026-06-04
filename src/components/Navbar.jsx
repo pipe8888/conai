@@ -159,6 +159,7 @@ function Navbar() {
                       to={`/productos?cat=${encodeURIComponent(cat.name)}`}
                       className="drawer-item"
                       style={s.drawerItem}
+                      onClick={() => setMenuOpen(false)}
                     >
                       <span style={s.drawerIcon}>{cat.emoji || '📦'}</span>
                       <span>{cat.name}</span>
