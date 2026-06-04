@@ -97,7 +97,12 @@ function Products() {
   useEffect(() => {
     let result = products
     if (searchQuery) {
-      result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      const q = searchQuery.toLowerCase()
+      result = result.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.category || '').toLowerCase().includes(q) ||
+        (p.description || '').toLowerCase().includes(q)
+      )
     } else if (activeCategory) {
       result = result.filter(p => p.category === activeCategory)
     }
