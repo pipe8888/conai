@@ -14,7 +14,7 @@ function Navbar() {
   const location = useLocation()
   const [visible, setVisible] = useState(true)
   const [progress, setProgress] = useState(0)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [searchVal, setSearchVal] = useState('')
   const [categories, setCategories] = useState([])
   const lastY = useRef(0)
@@ -38,7 +38,7 @@ function Navbar() {
   }, [])
 
   useEffect(() => {
-    setMenuOpen(false)
+    setSearchOpen(false)
   }, [location.pathname, location.search])
 
   function submitSearch(e) {
@@ -58,29 +58,21 @@ function Navbar() {
       <div style={s.progressBar(progress)} />
       <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
 
-        {/* IZQUIERDA: hamburger + logo */}
+        {/* IZQUIERDA: logo + lupa */}
         <div style={s.left}>
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            style={s.hamburger}
-            className="hamburger-btn"
-            aria-label="Ver categorías"
-          >
-            <span style={s.bar} />
-            <span style={s.bar} />
-            <span style={s.bar} />
-          </button>
           <Link to="/" style={s.logoLink}><LogoSVG /></Link>
+          <button onClick={() => setSearchOpen(o => !o)} style={s.lupaBtn} aria-label="Buscar">
+            <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+              <circle cx="8" cy="8" r="5.5" stroke={searchOpen ? '#6366f1' : '#6b7280'} strokeWidth="1.8" strokeLinecap="round"/>
+              <line x1="12.5" y1="12.5" x2="16" y2="16" stroke={searchOpen ? '#6366f1' : '#6b7280'} strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </button>
         </div>
 
-        {/* CENTRO: categorías por defecto, búsqueda al abrir menú */}
+        {/* CENTRO: categorías por defecto, búsqueda al click lupa */}
         <div style={s.center}>
-          {menuOpen ? (
+          {searchOpen ? (
             <form onSubmit={submitSearch} style={s.searchForm} className="overlay-fade-in">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
-                <circle cx="8" cy="8" r="5.5" stroke="#818cf8" strokeWidth="1.8" strokeLinecap="round"/>
-                <line x1="12.5" y1="12.5" x2="16" y2="16" stroke="#818cf8" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
               <input
                 style={s.searchInput}
                 type="text"
@@ -184,8 +176,7 @@ const s = {
     fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
     letterSpacing: '0.01em', color: '#374151', textDecoration: 'none', whiteSpace: 'nowrap',
   },
-  hamburger: { background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: '5px', justifyContent: 'center' },
-  bar: { display: 'block', width: '22px', height: '1.8px', background: '#374151', borderRadius: '2px' },
+  lupaBtn: { background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s ease' },
   iconBtn: { background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   cartBtn: { background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' },
   badge: { position: 'absolute', top: '2px', right: '2px', background: 'linear-gradient(135deg, #818cf8, #6366f1)', color: '#fff', borderRadius: '99px', padding: '1px 5px', fontSize: '10px', fontWeight: 800, minWidth: '16px', textAlign: 'center' },
