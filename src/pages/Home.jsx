@@ -117,12 +117,10 @@ function Home() {
 
       {/* HERO */}
       <section style={s.heroWrap}>
-        <div style={{ ...s.blob, background: `radial-gradient(ellipse, rgba(${HERO.accentRgb},0.18) 0%, rgba(${HERO.accentRgb},0.05) 45%, transparent 70%)` }} />
-
-        <div style={s.heroLeft} className="slide-content-next">
-          <span style={{ ...s.slideBadge, background: HERO.badgeBg, color: HERO.badgeColor, border: `1px solid ${HERO.badgeBorder}` }}>
-            {HERO.badge}
-          </span>
+        <img src="https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1600&q=85" alt="Auriculares IA" style={s.heroBg} />
+        <div style={s.heroOverlay} />
+        <div style={s.heroContent} className="slide-content-next">
+          <span style={s.slideBadge}>{HERO.badge}</span>
           <h1 style={s.heroTitle}>
             {scrambledTitle}<br />
             <span style={{ ...s.gradient, ...blurStyle }}>{HERO.sub}</span>
@@ -144,14 +142,6 @@ function Home() {
             {['🚚 Envío gratis', '↩️ 30 días devolución', '🔒 Pago seguro'].map(t => (
               <span key={t} style={s.trustItem}>{t}</span>
             ))}
-          </div>
-        </div>
-
-        <div style={s.heroRight} className="slide-image-next">
-          <div style={s.imageGlow(HERO.accentGlow)} />
-          <div style={{ position: 'relative' }}>
-            <img src={HERO.img} alt={HERO.title} style={s.heroImg} />
-            <div style={s.discountPill}>{HERO.discount}</div>
           </div>
         </div>
       </section>
@@ -323,39 +313,36 @@ function Home() {
 const s = {
   heroWrap: {
     position: 'relative',
-    minHeight: '580px',
-    display: 'flex',
-    alignItems: 'center',
-    padding: '72px 8% 80px',
-    gap: '64px',
-    overflow: 'hidden',
-    background: 'linear-gradient(160deg, #eef5ff 0%, #ffffff 60%)',
-  },
-  heroLeft: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '22px',
-    zIndex: 1,
-  },
-  heroRight: {
-    flex: '0 0 300px',
+    height: '620px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 1,
+    overflow: 'hidden',
   },
-  blob: {
+  heroBg: {
     position: 'absolute',
-    right: '4%',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    width: '500px',
-    height: '500px',
-    background: 'radial-gradient(ellipse, rgba(26,111,255,0.22) 0%, rgba(26,111,255,0.06) 45%, transparent 70%)',
-    borderRadius: '50%',
-    pointerEvents: 'none',
-    zIndex: 0,
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: 'center 30%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.62) 100%)',
+  },
+  heroContent: {
+    position: 'relative',
+    zIndex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    gap: '20px',
+    padding: '0 24px',
+    maxWidth: '680px',
+    width: '100%',
   },
   slideBadge: {
     display: 'inline-flex',
@@ -365,14 +352,16 @@ const s = {
     padding: '6px 16px',
     fontSize: '13px',
     fontWeight: 700,
-    alignSelf: 'flex-start',
+    background: 'rgba(239,68,68,0.18)',
+    color: '#fca5a5',
+    border: '1px solid rgba(239,68,68,0.35)',
   },
   heroTitle: {
-    fontSize: 'clamp(32px,5vw,60px)',
+    fontSize: 'clamp(36px,5.5vw,68px)',
     fontWeight: 800,
     lineHeight: 1.1,
-    letterSpacing: '-1.5px',
-    color: '#0a0a0f',
+    letterSpacing: '-2px',
+    color: '#ffffff',
     margin: 0,
     fontFamily: 'monospace',
   },
@@ -389,7 +378,7 @@ const s = {
   },
   priceOld: {
     fontSize: '20px',
-    color: '#9ca3af',
+    color: 'rgba(255,255,255,0.5)',
     textDecoration: 'line-through',
     fontWeight: 500,
   },
@@ -413,13 +402,13 @@ const s = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '10px',
-    background: '#fff3f3',
-    border: '1px solid rgba(239,68,68,0.2)',
+    background: 'rgba(255,255,255,0.1)',
+    border: '1px solid rgba(255,255,255,0.2)',
     borderRadius: '12px',
     padding: '10px 18px',
-    alignSelf: 'flex-start',
+    backdropFilter: 'blur(8px)',
   },
-  countdownLabel: { fontSize: '13px', color: '#6b7280' },
+  countdownLabel: { fontSize: '13px', color: 'rgba(255,255,255,0.75)' },
   countdownTime: {
     fontSize: '22px',
     fontWeight: 800,
@@ -442,9 +431,9 @@ const s = {
     display: 'inline-block',
   },
   btnOutline: {
-    background: 'transparent',
-    color: '#0a0a0f',
-    border: '1px solid #d1d5db',
+    background: 'rgba(255,255,255,0.12)',
+    color: '#ffffff',
+    border: '1px solid rgba(255,255,255,0.4)',
     padding: '14px 32px',
     borderRadius: '99px',
     fontSize: '15px',
@@ -452,6 +441,7 @@ const s = {
     cursor: 'pointer',
     textDecoration: 'none',
     display: 'inline-block',
+    backdropFilter: 'blur(8px)',
   },
   imageGlow: (glow) => ({
     position: 'absolute',
@@ -498,7 +488,7 @@ const s = {
   },
   trustItem: {
     fontSize: '12px',
-    color: '#6b7280',
+    color: 'rgba(255,255,255,0.65)',
     fontWeight: 500,
   },
   arrow: {
