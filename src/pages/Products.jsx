@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
@@ -63,7 +63,7 @@ function Products() {
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [modalCategory, setModalCategory] = useState(null)
+  const [activeCategory, setActiveCategory] = useState(null)
   const [searchParams, setSearchParams] = useSearchParams()
   const { addToCart } = useCart()
   const dropdownRef = useRef(null)
@@ -82,7 +82,7 @@ function Products() {
       const catParam = searchParams.get('cat')
       if (catParam) {
         const match = (cats || []).find(c => c.name === catParam || c.slug === catParam)
-        if (match) setModalCategory(match.slug)
+        if (match) setActiveCategory(match.slug)
       }
 
       const qParam = searchParams.get('q')
@@ -99,9 +99,19 @@ function Products() {
     if (searchQuery) {
       result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     }
+    if (activeCategory) {
+      result = result.filter(p => p.category === activeCategory)
+    }
     setFiltered(result)
     setVisibleCount(PAGE_SIZE)
-  }, [searchQuery, products])
+  }, [searchQuery, activeCategory, products])
+
+  useEffect(() => {
+    const params = {}
+    if (searchQuery) params.q = searchQuery
+    if (activeCategory) params.cat = activeCategory
+    setSearchParams(params, { replace: true })
+  }, [searchQuery, activeCategory])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -124,11 +134,6 @@ function Products() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  useEffect(() => {
-    document.body.style.overflow = modalCategory ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [modalCategory])
-
   function handleAdd(e, prod) {
     e.preventDefault()
     e.stopPropagation()
@@ -137,20 +142,18 @@ function Products() {
     setTimeout(() => setAddedId(null), 1800)
   }
 
-  function openCategory(cat) {
-    setModalCategory(cat.slug)
+  function selectCategory(cat) {
+    setActiveCategory(cat.slug)
     setDropdownOpen(false)
-    setSearchParams({ cat: cat.slug })
   }
 
-  function closeModal() {
-    setModalCategory(null)
-    setSearchParams({})
+  function clearCategory() {
+    setActiveCategory(null)
   }
 
-  const modalProducts = modalCategory
-    ? products.filter(p => p.category === modalCategory)
-    : []
+  const activeCategoryName = activeCategory
+    ? categories.find(c => c.slug === activeCategory)?.name?.replace(/ IA$/i, '')
+    : null
 
   return (
     <div style={s.wrap}>
@@ -169,11 +172,9 @@ function Products() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
-        </div>
-        <div style={s.sortBtn}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M2 4h12M4 8h8M6 12h4" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
+          {searchQuery && (
+            <button style={s.clearSearch} onClick={() => setSearchQuery('')} aria-label="Limpiar">✕</button>
+          )}
         </div>
       </div>
 
@@ -181,10 +182,10 @@ function Products() {
       <div style={s.filterRow}>
         <div ref={dropdownRef} style={{ position: 'relative' }}>
           <button
-            style={modalCategory ? s.chipActive : s.chip}
+            style={activeCategory ? s.chipActive : s.chip}
             onClick={() => setDropdownOpen(o => !o)}
           >
-            {modalCategory ? categories.find(c => c.slug === modalCategory)?.name : 'Categoría'} ▾
+            {activeCategoryName || 'Categoría'} ▾
           </button>
           {dropdownOpen && (
             <div style={s.dropdown} className="drawer-slide-in">
@@ -193,21 +194,21 @@ function Products() {
                   key={cat.id}
                   style={{
                     ...s.dropdownItem,
-                    ...(modalCategory === cat.name ? s.dropdownItemActive : {}),
+                    ...(activeCategory === cat.slug ? s.dropdownItemActive : {}),
                   }}
-                  onClick={() => openCategory(cat)}
+                  onClick={() => selectCategory(cat)}
                 >
                   <span>{cat.emoji}</span>
-                  <span>{cat.name}</span>
+                  <span>{cat.name.replace(/ IA$/i, '')}</span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {modalCategory && (
-          <button style={s.clearChip} onClick={closeModal}>
-            ✕ {categories.find(c => c.slug === modalCategory)?.name}
+        {activeCategory && (
+          <button style={s.clearChip} onClick={clearCategory}>
+            ✕ {activeCategoryName}
           </button>
         )}
       </div>
@@ -217,7 +218,7 @@ function Products() {
         <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
       )}
 
-      {/* GRID PRINCIPAL */}
+      {/* GRID */}
       {loading ? (
         <p style={s.counter}>Cargando...</p>
       ) : (
@@ -243,38 +244,6 @@ function Products() {
         </div>
       )}
 
-      {/* MODAL DE CATEGORÍA */}
-      {modalCategory && (
-        <div style={s.modal} className="overlay-fade-in">
-
-          <div style={s.modalHeader}>
-            <button onClick={closeModal} style={s.backBtn} aria-label="Volver">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="#0a0a0f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            <p style={s.modalTitle}>{categories.find(c => c.slug === modalCategory)?.name}</p>
-            <span style={s.modalCount}>{modalProducts.length} productos</span>
-          </div>
-
-          <div style={s.modalBody}>
-            {modalProducts.length === 0 ? (
-              <div style={s.empty}>
-                <p style={{ fontSize: '40px', marginBottom: '12px' }}>📦</p>
-                <p style={{ color: '#9ca3af', fontSize: '14px' }}>Sin productos en esta categoría</p>
-              </div>
-            ) : (
-              <div style={s.grid}>
-                {modalProducts.map(prod => (
-                  <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} />
-                ))}
-              </div>
-            )}
-          </div>
-
-        </div>
-      )}
-
     </div>
   )
 }
@@ -285,8 +254,8 @@ const s = {
   searchRow: { display: 'flex', gap: '10px', marginBottom: '14px' },
   searchBox: { flex: 1, position: 'relative', display: 'flex', alignItems: 'center' },
   searchIcon: { position: 'absolute', left: '14px', pointerEvents: 'none' },
-  searchInput: { width: '100%', height: '40px', paddingLeft: '40px', paddingRight: '16px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none' },
-  sortBtn: { width: '40px', height: '40px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 },
+  searchInput: { width: '100%', height: '40px', paddingLeft: '40px', paddingRight: '36px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none' },
+  clearSearch: { position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#9ca3af', padding: '4px', lineHeight: 1 },
 
   filterRow: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px', alignItems: 'center' },
   chip: { height: '32px', padding: '0 14px', border: '1px solid #d1d5db', borderRadius: '4px', background: '#fff', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 400 },
@@ -319,12 +288,6 @@ const s = {
 
   empty: { textAlign: 'center', padding: '80px 0' },
 
-  modal: { position: 'fixed', inset: 0, zIndex: 250, background: '#f9fafb', overflowY: 'auto' },
-  modalHeader: { position: 'sticky', top: 0, zIndex: 10, background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 5%', height: '64px', display: 'flex', alignItems: 'center', gap: '16px' },
-  backBtn: { background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', flexShrink: 0 },
-  modalTitle: { fontSize: '16px', fontWeight: 700, color: '#0a0a0f', margin: 0, flex: 1 },
-  modalCount: { fontSize: '13px', color: '#9ca3af' },
-  modalBody: { padding: '24px 5% 80px' },
 }
 
 export default Products
