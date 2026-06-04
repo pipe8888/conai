@@ -129,14 +129,7 @@ function Navbar() {
         <div style={s.overlay} className="overlay-fade-in" onClick={() => setMenuOpen(false)}>
           <div style={s.drawer} className="drawer-slide-in" onClick={e => e.stopPropagation()}>
 
-            <button onClick={() => setMenuOpen(false)} style={s.closeBtn} aria-label="Cerrar menú">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <line x1="3" y1="3" x2="17" y2="17" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round"/>
-                <line x1="17" y1="3" x2="3" y2="17" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-
-            <nav style={s.drawerNav}>
+<nav style={s.drawerNav}>
               <div style={s.drawerSection}>
                 {[['/', 'Inicio'], ['/productos', 'Productos'], ['/contacto', 'Contacto']].map(([path, label]) => (
                   <Link key={path} to={path} style={s.drawerLink}>{label}</Link>
