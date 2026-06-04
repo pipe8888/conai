@@ -64,7 +64,7 @@ function Navbar() {
       <div style={s.progressBar(progress)} />
       <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease', zIndex: menuOpen ? 160 : 100 }}>
 
-        <button onClick={() => setMenuOpen(true)} style={s.hamburger} className="hamburger-btn" aria-label="Abrir menú">
+        <button onClick={() => setMenuOpen(o => !o)} style={s.hamburger} className="hamburger-btn" aria-label="Abrir/cerrar menú">
           <span style={s.bar} />
           <span style={s.bar} />
           <span style={s.bar} />
