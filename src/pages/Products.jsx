@@ -62,13 +62,17 @@ function Products() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('cat') || null)
   const { addToCart } = useCart()
   const dropdownRef = useRef(null)
   const sentinelRef = useRef(null)
 
-  // URL es la única fuente de verdad
-  const searchQuery = searchParams.get('q') || ''
-  const activeCategory = searchParams.get('cat') || null
+  // Sincronizar estado desde URL (para cuando el navbar cambia la ruta)
+  useEffect(() => {
+    setSearchQuery(searchParams.get('q') || '')
+    setActiveCategory(searchParams.get('cat') || null)
+  }, [searchParams])
 
   useEffect(() => {
     async function fetchData() {
@@ -134,6 +138,7 @@ function Products() {
   }
 
   function handleSearch(val) {
+    setSearchQuery(val)
     setSearchParams(prev => {
       const p = new URLSearchParams(prev)
       if (val) p.set('q', val)
@@ -143,11 +148,13 @@ function Products() {
   }
 
   function selectCategory(cat) {
+    setActiveCategory(cat.slug)
     setSearchParams({ cat: cat.slug }, { replace: true })
     setDropdownOpen(false)
   }
 
   function clearCategory() {
+    setActiveCategory(null)
     setSearchParams(prev => {
       const p = new URLSearchParams(prev)
       p.delete('cat')
@@ -217,6 +224,13 @@ function Products() {
         )}
       </div>
 
+      {/* TÍTULO CATEGORÍA ACTIVA */}
+      {activeCategoryName && (
+        <div style={s.catHeader}>
+          <h2 style={s.catTitle}>{activeCategoryName}</h2>
+        </div>
+      )}
+
       {/* CONTADOR */}
       {!loading && (
         <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
@@ -270,6 +284,8 @@ const s = {
   dropdownItem: { display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', borderRadius: '6px', border: 'none', background: 'transparent', fontSize: '13px', color: '#374151', cursor: 'pointer', textAlign: 'left' },
   dropdownItemActive: { background: '#f3f4f6', fontWeight: 600, color: '#0a0a0f' },
 
+  catHeader: { marginBottom: '8px' },
+  catTitle: { fontSize: '22px', fontWeight: 700, color: '#0a0a0f', letterSpacing: '-0.5px' },
   counter: { fontSize: '13px', color: '#6b7280', marginBottom: '16px' },
 
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '12px' },
