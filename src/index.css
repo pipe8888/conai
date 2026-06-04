@@ -17,6 +17,19 @@ body {
 .hamburger-btn:hover {
   background: rgba(255,255,255,0.12) !important;
 }
+.bar-top, .bar-mid, .bar-bot {
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+.is-open .bar-top {
+  transform: translateY(6.8px) rotate(45deg);
+}
+.is-open .bar-mid {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.is-open .bar-bot {
+  transform: translateY(-6.8px) rotate(-45deg);
+}
 
 @keyframes drawerSlideIn {
   from { transform: translateX(-100%); }

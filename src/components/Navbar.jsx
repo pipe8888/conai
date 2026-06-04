@@ -62,12 +62,12 @@ function Navbar() {
   return (
     <>
       <div style={s.progressBar(progress)} />
-      <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+      <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease', zIndex: menuOpen ? 160 : 100 }}>
 
-        <button onClick={() => setMenuOpen(true)} style={s.hamburger} className="hamburger-btn" aria-label="Abrir menú">
-          <span style={s.bar} />
-          <span style={s.bar} />
-          <span style={s.bar} />
+        <button onClick={() => setMenuOpen(o => !o)} style={s.hamburger} className={`hamburger-btn${menuOpen ? ' is-open' : ''}`} aria-label="Abrir menú">
+          <span style={s.bar} className="bar-top" />
+          <span style={s.bar} className="bar-mid" />
+          <span style={s.bar} className="bar-bot" />
         </button>
 
         <Link to="/" style={s.logoLink}>
