@@ -8,7 +8,7 @@ const PAGE_SIZE = 6
 const CATEGORY_IMGS = {
   auricular: 'photo-1505740420928-5e560c06d30e',
   audio:     'photo-1505740420928-5e560c06d30e',
-  salud:     'photo-1523275335684-37898b6baf30',
+  salud:     'photo-1559757148-5c350d0d3c56',
   fitness:   'photo-1576243345690-4e4b79b05b30',
   wearable:  'photo-1523275335684-37898b6baf30',
   robot:     'photo-1485827404703-89b55fcc595e',
