@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { useSearchParams, Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
 
@@ -57,17 +57,18 @@ function ProductCard({ prod, onAdd, addedId }) {
 function Products() {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
-  const [filtered, setFiltered] = useState([])
-  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [activeCategory, setActiveCategory] = useState(null)
   const [searchParams, setSearchParams] = useSearchParams()
   const { addToCart } = useCart()
   const dropdownRef = useRef(null)
   const sentinelRef = useRef(null)
+
+  // URL es la única fuente de verdad
+  const searchQuery = searchParams.get('q') || ''
+  const activeCategory = searchParams.get('cat') || null
 
   useEffect(() => {
     async function fetchData() {
@@ -75,48 +76,32 @@ function Products() {
         supabase.from('products').select('*').order('id'),
         supabase.from('categories').select('*').order('id'),
       ])
-      const allProds = prods || []
-      setProducts(allProds)
+      setProducts(prods || [])
       setCategories(cats || [])
-
-      const catParam = searchParams.get('cat')
-      if (catParam) {
-        const match = (cats || []).find(c => c.name === catParam || c.slug === catParam)
-        if (match) setActiveCategory(match.slug)
-      }
-
-      const qParam = searchParams.get('q')
-      if (qParam) setSearchQuery(qParam)
-
-      setFiltered(allProds)
       setLoading(false)
     }
     fetchData()
   }, [])
 
-  useEffect(() => {
-    let result = products
+  const filtered = useMemo(() => {
     if (searchQuery) {
       const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean)
-      result = result.filter(p =>
+      return products.filter(p =>
         terms.some(t =>
           p.name.toLowerCase().includes(t) ||
           (p.category || '').toLowerCase().includes(t) ||
           (p.description || '').toLowerCase().includes(t)
         )
       )
-    } else if (activeCategory) {
-      result = result.filter(p => p.category === activeCategory)
     }
-    setFiltered(result)
-    setVisibleCount(PAGE_SIZE)
+    if (activeCategory) {
+      return products.filter(p => p.category === activeCategory)
+    }
+    return products
   }, [searchQuery, activeCategory, products])
 
   useEffect(() => {
-    const params = {}
-    if (searchQuery) params.q = searchQuery
-    if (activeCategory) params.cat = activeCategory
-    setSearchParams(params, { replace: true })
+    setVisibleCount(PAGE_SIZE)
   }, [searchQuery, activeCategory])
 
   useEffect(() => {
@@ -148,13 +133,26 @@ function Products() {
     setTimeout(() => setAddedId(null), 1800)
   }
 
+  function handleSearch(val) {
+    setSearchParams(prev => {
+      const p = new URLSearchParams(prev)
+      if (val) p.set('q', val)
+      else p.delete('q')
+      return p
+    }, { replace: true })
+  }
+
   function selectCategory(cat) {
-    setActiveCategory(cat.slug)
+    setSearchParams({ cat: cat.slug }, { replace: true })
     setDropdownOpen(false)
   }
 
   function clearCategory() {
-    setActiveCategory(null)
+    setSearchParams(prev => {
+      const p = new URLSearchParams(prev)
+      p.delete('cat')
+      return p
+    }, { replace: true })
   }
 
   const activeCategoryName = activeCategory
@@ -176,10 +174,10 @@ function Products() {
             type="text"
             placeholder="Buscar productos..."
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
           />
           {searchQuery && (
-            <button style={s.clearSearch} onClick={() => setSearchQuery('')} aria-label="Limpiar">✕</button>
+            <button style={s.clearSearch} onClick={() => handleSearch('')} aria-label="Limpiar">✕</button>
           )}
         </div>
       </div>
@@ -293,7 +291,6 @@ const s = {
   sentinelDot: { width: '6px', height: '6px', borderRadius: '50%', background: '#d1d5db', animation: 'pulse 1.2s ease-in-out infinite' },
 
   empty: { textAlign: 'center', padding: '80px 0' },
-
 }
 
 export default Products
