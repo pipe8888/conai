@@ -85,7 +85,7 @@ function Navbar() {
                   style={s.catLink}
                   onClick={() => setMenuOpen(false)}
                 >
-                  {cat.name}
+                  {cat.name.replace(/ IA$/i, '')}
                 </Link>
               ))}
             </div>
@@ -100,7 +100,7 @@ function Navbar() {
                 type="text"
                 value={searchVal}
                 onChange={e => setSearchVal(e.target.value)}
-                placeholder="Buscar productos con IA..."
+                placeholder="Buscar productos..."
               />
             </form>
           )}
