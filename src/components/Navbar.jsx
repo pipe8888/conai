@@ -64,10 +64,10 @@ function Navbar() {
       <div style={s.progressBar(progress)} />
       <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease', zIndex: menuOpen ? 160 : 100 }}>
 
-        <button onClick={() => setMenuOpen(o => !o)} style={s.hamburger} className={`hamburger-btn${menuOpen ? ' is-open' : ''}`} aria-label="Abrir menú">
-          <span style={s.bar} className="bar-top" />
-          <span style={s.bar} className="bar-mid" />
-          <span style={s.bar} className="bar-bot" />
+        <button onClick={() => setMenuOpen(true)} style={s.hamburger} className="hamburger-btn" aria-label="Abrir menú">
+          <span style={s.bar} />
+          <span style={s.bar} />
+          <span style={s.bar} />
         </button>
 
         <Link to="/" style={s.logoLink}>
@@ -129,7 +129,13 @@ function Navbar() {
         <div style={s.overlay} className="overlay-fade-in" onClick={() => setMenuOpen(false)}>
           <div style={s.drawer} className="drawer-slide-in" onClick={e => e.stopPropagation()}>
 
-<nav style={s.drawerNav}>
+            <button onClick={() => setMenuOpen(false)} style={s.drawerHamburger} className="hamburger-btn" aria-label="Cerrar menú">
+              <span style={s.bar} />
+              <span style={s.bar} />
+              <span style={s.bar} />
+            </button>
+
+            <nav style={s.drawerNav}>
               <div style={s.drawerSection}>
                 {[['/', 'Inicio'], ['/productos', 'Productos'], ['/contacto', 'Contacto']].map(([path, label]) => (
                   <Link key={path} to={path} style={s.drawerLink}>{label}</Link>
@@ -194,8 +200,8 @@ const s = {
   adminBtn: { fontSize: '11px', color: '#66AAFF', textDecoration: 'none', border: '1px solid rgba(26,111,255,0.3)', borderRadius: '99px', padding: '4px 10px', fontWeight: 600 },
   userName: { fontSize: '12px', color: '#94a3b8', fontWeight: 500 },
   overlay: { position: 'fixed', inset: 0, zIndex: 150, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' },
-  drawer: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '320px', background: '#06090f', borderRight: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', padding: '80px 40px 48px', overflowY: 'auto' },
-  closeBtn: { position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex' },
+  drawer: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '320px', background: '#06090f', borderRight: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', padding: '12px 40px 48px', overflowY: 'auto' },
+  drawerHamburger: { background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: '5px', justifyContent: 'center', marginBottom: '32px', alignSelf: 'flex-start' },
   drawerNav: { display: 'flex', flexDirection: 'column', gap: '0' },
   drawerSection: { display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '32px' },
   drawerLink: { fontSize: '22px', fontWeight: 700, color: '#ffffff', textDecoration: 'none', padding: '8px 0', letterSpacing: '-0.5px' },
