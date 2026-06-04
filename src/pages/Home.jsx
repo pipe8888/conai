@@ -2,66 +2,24 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
-const SLIDES = [
-  {
-    badge: '🔥 OFERTA DEL DÍA',
-    badgeBg: 'rgba(239,68,68,0.1)',
-    badgeColor: '#ef4444',
-    badgeBorder: 'rgba(239,68,68,0.25)',
-    title: 'Auriculares IA',
-    sub: 'que leen tu mente',
-    img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=520&q=85',
-    originalPrice: '$89',
-    price: '$49',
-    discount: '-45%',
-    cta1Label: '🛒 Consíguelo ya',
-    cta1To: '/productos',
-    cta2Label: 'Ver detalles',
-    cta2To: '/productos',
-    showCountdown: true,
-    bg: '#ffffff',
-    accent: '#1A6FFF',
-    accentRgb: '26,111,255',
-    accentGlow: 'rgba(26,111,255,0.3)',
-  },
-  {
-    badge: '✨ NUEVO EN 2026',
-    badgeBg: 'rgba(26,111,255,0.08)',
-    badgeColor: '#1A6FFF',
-    badgeBorder: 'rgba(26,111,255,0.2)',
-    title: 'Gadgets de Salud IA',
-    sub: 'que cuidan tu cuerpo 24/7',
-    img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=520&q=85',
-    price: 'Desde $29',
-    cta1Label: 'Ver toda la categoría →',
-    cta1To: '/productos',
-    showCountdown: false,
-    bg: '#f8fbff',
-    accent: '#00CFFF',
-    accentRgb: '0,207,255',
-    accentGlow: 'rgba(0,207,255,0.3)',
-  },
-  {
-    badge: '⚡ TRENDING #1 EN 2026',
-    badgeBg: 'rgba(245,158,11,0.1)',
-    badgeColor: '#d97706',
-    badgeBorder: 'rgba(245,158,11,0.25)',
-    title: 'El gadget que todos',
-    sub: 'están comprando',
-    img: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=520&q=85',
-    social: '⭐ +500 vendidos esta semana',
-    price: '$67',
-    cta1Label: 'Comprar ahora →',
-    cta1To: '/productos',
-    cta2Label: '¿Qué es esto?',
-    cta2To: '/productos',
-    showCountdown: false,
-    bg: '#fffdf8',
-    accent: '#7B5FFF',
-    accentRgb: '123,95,255',
-    accentGlow: 'rgba(123,95,255,0.3)',
-  },
-]
+const HERO = {
+  badge: '🔥 OFERTA DEL DÍA',
+  badgeBg: 'rgba(239,68,68,0.1)',
+  badgeColor: '#ef4444',
+  badgeBorder: 'rgba(239,68,68,0.25)',
+  title: 'Auriculares IA',
+  sub: 'que leen tu mente',
+  img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=700&q=85',
+  originalPrice: '$89',
+  price: '$49',
+  discount: '-45%',
+  cta1Label: '🛒 Consíguelo ya',
+  cta1To: '/productos',
+  cta2Label: 'Ver detalles',
+  cta2To: '/productos',
+  accentRgb: '26,111,255',
+  accentGlow: 'rgba(26,111,255,0.3)',
+}
 
 // Efecto 18: title scrambles with random chars before revealing
 function useTextScramble(text, trigger) {
@@ -122,14 +80,7 @@ function useReveal() {
 function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
-  const [slide, setSlide] = useState(0)
-  const [prevSlide, setPrevSlide] = useState(null)
-  const [direction, setDirection] = useState('next')
-  const [dotProgress, setDotProgress] = useState(0)
-  const [paused, setPaused] = useState(false)
   const [time, setTime] = useState(2 * 3600 + 34 * 60 + 18)
-  const slideRef = useRef(0)
-  const animatingRef = useRef(false)
   const navigate = useNavigate()
 
   const [catsRef, catsVisible] = useReveal()
@@ -137,23 +88,8 @@ function Home() {
   const [featRef, featVisible] = useReveal()
   const [bentoRef, bentoVisible] = useReveal()
 
-  const cur = SLIDES[slide]
-  const scrambledTitle = useTextScramble(cur.title, slide)
-  const blurStyle = useBlurIn(slide)
-
-  function goTo(index, dir = 'next') {
-    if (animatingRef.current || index === slideRef.current) return
-    animatingRef.current = true
-    setDirection(dir)
-    setPrevSlide(slideRef.current)
-    setDotProgress(0)
-    slideRef.current = index
-    setSlide(index)
-    setTimeout(() => {
-      setPrevSlide(null)
-      animatingRef.current = false
-    }, 700)
-  }
+  const scrambledTitle = useTextScramble(HERO.title, 0)
+  const blurStyle = useBlurIn(0)
 
   useEffect(() => {
     async function fetchData() {
@@ -168,18 +104,6 @@ function Home() {
   }, [])
 
   useEffect(() => {
-    if (paused) return
-    setDotProgress(0)
-    const start = Date.now()
-    const DURATION = 5000
-    const prog = setInterval(() => {
-      setDotProgress(Math.min(((Date.now() - start) / DURATION) * 100, 100))
-    }, 30)
-    const auto = setTimeout(() => goTo((slideRef.current + 1) % SLIDES.length, 'next'), DURATION)
-    return () => { clearTimeout(auto); clearInterval(prog) }
-  }, [slide, paused])
-
-  useEffect(() => {
     const t = setInterval(() => setTime(prev => prev > 0 ? prev - 1 : 0), 1000)
     return () => clearInterval(t)
   }, [])
@@ -191,71 +115,44 @@ function Home() {
   return (
     <div>
 
-      {/* HERO SLIDER */}
-      <section
-        style={s.heroWrap}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-      >
-        {prevSlide !== null && (
-          <div className={`slide-bg slide-bg-exit-${direction}`} style={{ background: SLIDES[prevSlide].bg }} />
-        )}
-        <div key={slide} className={prevSlide !== null ? `slide-bg slide-bg-enter-${direction}` : 'slide-bg'} style={{ background: cur.bg }} />
-        <div style={{ ...s.blob, background: `radial-gradient(ellipse, rgba(${cur.accentRgb},0.22) 0%, rgba(${cur.accentRgb},0.06) 45%, transparent 70%)` }} />
-        <div style={s.heroLeft} className={prevSlide !== null ? `slide-content-${direction}` : ''}>
-          <span style={{
-            ...s.slideBadge,
-            background: cur.badgeBg,
-            color: cur.badgeColor,
-            border: `1px solid ${cur.badgeBorder}`,
-          }}>
-            {cur.badge}
-          </span>
+      {/* HERO */}
+      <section style={s.heroWrap}>
+        <div style={{ ...s.blob, background: `radial-gradient(ellipse, rgba(${HERO.accentRgb},0.18) 0%, rgba(${HERO.accentRgb},0.05) 45%, transparent 70%)` }} />
 
+        <div style={s.heroLeft} className="slide-content-next">
+          <span style={{ ...s.slideBadge, background: HERO.badgeBg, color: HERO.badgeColor, border: `1px solid ${HERO.badgeBorder}` }}>
+            {HERO.badge}
+          </span>
           <h1 style={s.heroTitle}>
             {scrambledTitle}<br />
-            <span style={{ ...s.gradient, ...blurStyle }}>{cur.sub}</span>
+            <span style={{ ...s.gradient, ...blurStyle }}>{HERO.sub}</span>
           </h1>
-
           <div style={s.priceRow}>
-            {cur.originalPrice && <span style={s.priceOld}>{cur.originalPrice}</span>}
-            <span style={s.priceBig}>{cur.price}</span>
-            {cur.discount && <span style={s.discountBadge}>{cur.discount}</span>}
+            <span style={s.priceOld}>{HERO.originalPrice}</span>
+            <span style={s.priceBig}>{HERO.price}</span>
+            <span style={s.discountBadge}>{HERO.discount}</span>
           </div>
-
-          {cur.showCountdown && (
-            <div style={s.countdown}>
-              <span style={s.countdownLabel}>⏱ Termina en:</span>
-              <span style={s.countdownTime}>{hh}:{mm}:{ss}</span>
-            </div>
-          )}
-
-          {cur.social && <p style={s.socialProof}>{cur.social}</p>}
-
+          <div style={s.countdown}>
+            <span style={s.countdownLabel}>⏱ Termina en:</span>
+            <span style={s.countdownTime}>{hh}:{mm}:{ss}</span>
+          </div>
           <div style={s.heroBtns}>
-            <Link to={cur.cta1To} style={s.btnPrimary}>{cur.cta1Label}</Link>
-            {cur.cta2Label && <Link to={cur.cta2To} style={s.btnOutline}>{cur.cta2Label}</Link>}
+            <Link to={HERO.cta1To} style={s.btnPrimary}>{HERO.cta1Label}</Link>
+            <Link to={HERO.cta2To} style={s.btnOutline}>{HERO.cta2Label}</Link>
+          </div>
+          <div style={s.trustBar}>
+            {['🚚 Envío gratis', '↩️ 30 días devolución', '🔒 Pago seguro'].map(t => (
+              <span key={t} style={s.trustItem}>{t}</span>
+            ))}
           </div>
         </div>
 
-        <div style={s.heroRight} className={prevSlide !== null ? `slide-image-${direction}` : ''}>
-          <div style={s.imageGlow(cur.accentGlow)} />
-          <img src={cur.img} alt={cur.title} style={s.heroImg} />
-        </div>
-
-        <button style={{ ...s.arrow, left: '20px' }}
-          onClick={() => goTo((slide - 1 + SLIDES.length) % SLIDES.length, 'prev')}>←</button>
-        <button style={{ ...s.arrow, right: '20px' }}
-          onClick={() => goTo((slide + 1) % SLIDES.length, 'next')}>→</button>
-
-        <div style={s.dots}>
-          {SLIDES.map((_, i) => (
-            <button key={i} onClick={() => goTo(i, i > slide ? 'next' : 'prev')} style={s.dotWrap}>
-              <div style={{ ...s.dot, width: i === slide ? '40px' : '8px', background: i === slide ? cur.accent : '#d1d5db' }}>
-                {i === slide && <div style={s.dotFill(dotProgress)} />}
-              </div>
-            </button>
-          ))}
+        <div style={s.heroRight} className="slide-image-next">
+          <div style={s.imageGlow(HERO.accentGlow)} />
+          <div style={{ position: 'relative' }}>
+            <img src={HERO.img} alt={HERO.title} style={s.heroImg} />
+            <div style={s.discountPill}>{HERO.discount}</div>
+          </div>
         </div>
       </section>
 
@@ -426,13 +323,13 @@ function Home() {
 const s = {
   heroWrap: {
     position: 'relative',
-    minHeight: '520px',
+    minHeight: '580px',
     display: 'flex',
     alignItems: 'center',
-    padding: '60px 8% 90px',
-    gap: '48px',
+    padding: '72px 8% 80px',
+    gap: '64px',
     overflow: 'hidden',
-    transition: 'background 0.4s ease',
+    background: 'linear-gradient(160deg, #eef5ff 0%, #ffffff 60%)',
   },
   heroLeft: {
     flex: 1,
@@ -567,13 +464,42 @@ const s = {
     transition: 'all 0.6s ease',
   }),
   heroImg: {
-    width: '300px',
-    height: '300px',
-    borderRadius: '32px',
+    width: '380px',
+    height: '380px',
+    borderRadius: '36px',
     objectFit: 'cover',
     position: 'relative',
     zIndex: 1,
-    boxShadow: '0 24px 64px rgba(0,0,0,0.15)',
+    boxShadow: '0 32px 80px rgba(26,111,255,0.18), 0 8px 24px rgba(0,0,0,0.12)',
+    display: 'block',
+  },
+  discountPill: {
+    position: 'absolute',
+    top: '-14px',
+    right: '-14px',
+    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+    color: '#fff',
+    fontSize: '15px',
+    fontWeight: 800,
+    width: '68px',
+    height: '68px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+    boxShadow: '0 4px 20px rgba(239,68,68,0.45)',
+    letterSpacing: '-0.5px',
+  },
+  trustBar: {
+    display: 'flex',
+    gap: '20px',
+    flexWrap: 'wrap',
+  },
+  trustItem: {
+    fontSize: '12px',
+    color: '#6b7280',
+    fontWeight: 500,
   },
   arrow: {
     position: 'absolute',
