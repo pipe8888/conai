@@ -162,6 +162,8 @@ function Home() {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
+        <div style={s.dotsPattern} />
+        <div style={s.blob} />
         <div style={s.heroLeft}>
           <span style={{
             ...s.slideBadge,
@@ -350,6 +352,28 @@ const s = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 1,
+  },
+  dotsPattern: {
+    position: 'absolute',
+    inset: 0,
+    backgroundImage: 'radial-gradient(circle, #c8d6e5 1px, transparent 1px)',
+    backgroundSize: '24px 24px',
+    opacity: 0.45,
+    pointerEvents: 'none',
+    zIndex: 0,
+  },
+  blob: {
+    position: 'absolute',
+    right: '6%',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '420px',
+    height: '420px',
+    background: 'radial-gradient(ellipse, rgba(26,111,255,0.13) 0%, transparent 65%)',
+    borderRadius: '50%',
+    pointerEvents: 'none',
+    zIndex: 0,
   },
   slideBadge: {
     display: 'inline-flex',
