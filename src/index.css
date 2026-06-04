@@ -60,6 +60,14 @@ body {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1) !important;
 }
 
+.product-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.product-card:hover img {
+  transform: scale(1.04);
+}
+
 .prod-card-btn {
   position: absolute;
   bottom: 0; left: 0; right: 0;
