@@ -3,7 +3,7 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 6
 
 const CATEGORY_IMGS = {
   auricular: 'photo-1505740420928-5e560c06d30e',
