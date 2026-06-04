@@ -21,6 +21,24 @@ const HERO = {
   accentGlow: 'rgba(26,111,255,0.3)',
 }
 
+const CATEGORY_IMGS = {
+  auricular: 'photo-1505740420928-5e560c06d30e',
+  audio:     'photo-1505740420928-5e560c06d30e',
+  salud:     'photo-1523275335684-37898b6baf30',
+  fitness:   'photo-1576243345690-4e4b79b05b30',
+  wearable:  'photo-1523275335684-37898b6baf30',
+  robot:     'photo-1485827404703-89b55fcc595e',
+  hogar:     'photo-1558618666-fcd25c85cd64',
+  product:   'photo-1496181133206-80ce9b88a853',
+}
+function getCategoryImg(cat) {
+  const key = (cat || '').toLowerCase()
+  for (const [k, v] of Object.entries(CATEGORY_IMGS)) {
+    if (key.includes(k)) return `https://images.unsplash.com/${v}?w=600&q=85`
+  }
+  return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=85'
+}
+
 // Efecto 18: title scrambles with random chars before revealing
 function useTextScramble(text, trigger) {
   const [display, setDisplay] = useState(text)
@@ -243,11 +261,13 @@ function Home() {
                 transition: `opacity 0.55s ease ${i * 0.09}s, transform 0.55s ease ${i * 0.09}s`,
               }}
             >
-              <div style={s.prodImg}>
-                {prod.image_url
-                  ? <img src={prod.image_url} alt={prod.name} style={s.prodImgPhoto} />
-                  : <span style={{ fontSize: '60px' }}>{prod.emoji}</span>
-                }
+              <div className="card-hover" style={s.prodImg}>
+                <img
+                  src={prod.image_url || getCategoryImg(prod.category)}
+                  alt={prod.name}
+                  style={s.prodImgPhoto}
+                />
+                <div className="prod-card-btn">Ver producto →</div>
               </div>
               <div style={s.prodInfo}>
                 <p style={s.prodCat}>{prod.category.toUpperCase()}</p>
@@ -540,14 +560,14 @@ const s = {
   catIcon: { fontSize: '32px', marginBottom: '12px' },
   catName: { fontSize: '14px', fontWeight: 600, color: '#0a0a0f', marginBottom: '4px' },
   catCount: { fontSize: '12px', color: '#9ca3af' },
-  prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: '20px' },
+  prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '16px' },
   prodCard: {
-    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '20px',
+    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
     overflow: 'hidden', textDecoration: 'none', display: 'block',
     boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
   },
-  prodImg: { height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '60px', background: '#f8f9fa', overflow: 'hidden' },
-  prodImgPhoto: { width: '100%', height: '100%', objectFit: 'cover' },
+  prodImg: { aspectRatio: '4/5', position: 'relative', overflow: 'hidden', background: '#f0f2f5' },
+  prodImgPhoto: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
   prodInfo: { padding: '16px' },
   prodCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '6px' },
   prodName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '6px', lineHeight: 1.3 },
