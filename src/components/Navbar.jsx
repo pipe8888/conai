@@ -12,6 +12,7 @@ function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
   const [visible, setVisible] = useState(true)
+  const [progress, setProgress] = useState(0)
   const lastY = useRef(0)
 
   useEffect(() => {
@@ -19,6 +20,8 @@ function Navbar() {
       const y = window.scrollY
       setVisible(y < lastY.current || y < 10)
       lastY.current = y
+      const total = document.documentElement.scrollHeight - window.innerHeight
+      setProgress(total > 0 ? (y / total) * 100 : 0)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -35,64 +38,75 @@ function Navbar() {
   }
 
   return (
-    <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
-      <Link to="/" style={s.logoLink}>
-        <LogoSVG />
-      </Link>
+    <>
+      <div style={s.progressBar(progress)} />
+      <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+        <Link to="/" style={s.logoLink}>
+          <LogoSVG />
+        </Link>
 
-      <ul style={s.links}>
-        {[['/', 'Inicio'], ['/productos', 'Productos'], ['/contacto', 'Contacto']].map(([path, label]) => (
-          <li key={path} style={s.linkItem}>
-            <Link to={path} style={s.link}>{label}</Link>
-            {isActive(path) && <span style={s.activeLine} />}
-          </li>
-        ))}
-      </ul>
+        <ul style={s.links}>
+          {[['/', 'Inicio'], ['/productos', 'Productos'], ['/contacto', 'Contacto']].map(([path, label]) => (
+            <li key={path} style={s.linkItem}>
+              <Link to={path} style={s.link}>{label}</Link>
+              {isActive(path) && <span style={s.activeLine} />}
+            </li>
+          ))}
+        </ul>
 
-      <div style={s.right}>
-        <button onClick={() => navigate('/productos')} style={s.iconBtn} title="Buscar">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <circle cx="8" cy="8" r="5.5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="12.5" y1="12.5" x2="16" y2="16" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </button>
+        <div style={s.right}>
+          <button onClick={() => navigate('/productos')} style={s.iconBtn} title="Buscar">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="8" cy="8" r="5.5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
+              <line x1="12.5" y1="12.5" x2="16" y2="16" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
 
-        {user ? (
-          <>
-            {user.email === ADMIN_EMAIL && (
-              <Link to="/admin" style={s.adminBtn}>Admin</Link>
-            )}
-            <span style={s.userName}>{user.email.split('@')[0]}</span>
-            <button onClick={handleLogout} style={s.iconBtn} title="Cerrar sesión">
+          {user ? (
+            <>
+              {user.email === ADMIN_EMAIL && (
+                <Link to="/admin" style={s.adminBtn}>Admin</Link>
+              )}
+              <span style={s.userName}>{user.email.split('@')[0]}</span>
+              <button onClick={handleLogout} style={s.iconBtn} title="Cerrar sesión">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <circle cx="9" cy="6.5" r="3.5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M2 17c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </>
+          ) : (
+            <Link to="/login" style={{ ...s.iconBtn, textDecoration: 'none' }} title="Iniciar sesión">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <circle cx="9" cy="6.5" r="3.5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
                 <path d="M2 17c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
-            </button>
-          </>
-        ) : (
-          <Link to="/login" style={{ ...s.iconBtn, textDecoration: 'none' }} title="Iniciar sesión">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="9" cy="6.5" r="3.5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M2 17c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </Link>
-        )}
+            </Link>
+          )}
 
-        <button onClick={() => navigate('/carrito')} style={s.cartBtn} title="Carrito">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M2 2h2.5l2.1 9.4a1 1 0 0 0 1 .8h7.2a1 1 0 0 0 .97-.76L17 7H5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="8.5" cy="16.5" r="1.2" stroke="#94a3b8" strokeWidth="1.5"/>
-            <circle cx="14" cy="16.5" r="1.2" stroke="#94a3b8" strokeWidth="1.5"/>
-          </svg>
-          {count > 0 && <span style={s.badge}>{count}</span>}
-        </button>
-      </div>
-    </nav>
+          <button onClick={() => navigate('/carrito')} style={s.cartBtn} title="Carrito">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M2 2h2.5l2.1 9.4a1 1 0 0 0 1 .8h7.2a1 1 0 0 0 .97-.76L17 7H5" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="8.5" cy="16.5" r="1.2" stroke="#94a3b8" strokeWidth="1.5"/>
+              <circle cx="14" cy="16.5" r="1.2" stroke="#94a3b8" strokeWidth="1.5"/>
+            </svg>
+            {count > 0 && <span style={s.badge}>{count}</span>}
+          </button>
+        </div>
+      </nav>
+    </>
   )
 }
 
 const s = {
+  progressBar: (pct) => ({
+    position: 'fixed', top: 0, left: 0, zIndex: 200,
+    height: '3px', width: `${pct}%`,
+    background: 'linear-gradient(90deg, #1A6FFF, #66AAFF)',
+    boxShadow: '0 0 8px rgba(26,111,255,0.6)',
+    transition: 'width 0.1s linear',
+    pointerEvents: 'none',
+  }),
   nav: {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
     background: 'rgba(6,9,15,0.80)',
