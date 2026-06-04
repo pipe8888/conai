@@ -103,22 +103,22 @@ function Login() {
 }
 
 const s = {
-  wrap: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' },
-  card: { background: '#13131c', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '24px', padding: '48px', width: '100%', maxWidth: '420px' },
-  logo: { display: 'block', textAlign: 'center', fontSize: '26px', fontWeight: 700, textDecoration: 'none', background: 'linear-gradient(135deg,#6c63ff,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '32px' },
-  logoAi: { fontWeight: 300 },
-  tabs: { display: 'flex', background: 'rgba(255,255,255,0.04)', borderRadius: '99px', padding: '4px', marginBottom: '32px' },
-  tab: { flex: 1, background: 'transparent', border: 'none', color: '#8b8a9e', padding: '10px', borderRadius: '99px', fontSize: '14px', cursor: 'pointer', fontWeight: 500 },
-  tabActive: { flex: 1, background: 'linear-gradient(135deg,#6c63ff,#a78bfa)', border: 'none', color: '#fff', padding: '10px', borderRadius: '99px', fontSize: '14px', cursor: 'pointer', fontWeight: 700 },
+  wrap: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', background: '#f8f9fa' },
+  card: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '24px', padding: '48px', width: '100%', maxWidth: '420px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
+  logo: { display: 'block', textAlign: 'center', fontSize: '26px', fontWeight: 700, textDecoration: 'none', color: '#0a0a0f', marginBottom: '32px' },
+  logoAi: { fontWeight: 300, background: 'linear-gradient(135deg,#1A6FFF,#66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  tabs: { display: 'flex', background: '#f3f4f6', borderRadius: '99px', padding: '4px', marginBottom: '32px' },
+  tab: { flex: 1, background: 'transparent', border: 'none', color: '#6b7280', padding: '10px', borderRadius: '99px', fontSize: '14px', cursor: 'pointer', fontWeight: 500 },
+  tabActive: { flex: 1, background: 'linear-gradient(135deg,#1A6FFF,#4F94FF)', border: 'none', color: '#fff', padding: '10px', borderRadius: '99px', fontSize: '14px', cursor: 'pointer', fontWeight: 700 },
   form: { display: 'flex', flexDirection: 'column', gap: '20px' },
   field: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  label: { fontSize: '13px', color: '#8b8a9e', fontWeight: 500 },
-  input: { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '12px', padding: '12px 16px', color: '#f1f0ff', fontSize: '15px', outline: 'none' },
-  error: { fontSize: '13px', color: '#ff6b6b', background: 'rgba(255,107,107,0.08)', border: '1px solid rgba(255,107,107,0.2)', borderRadius: '8px', padding: '10px 14px', margin: 0 },
-  successMsg: { fontSize: '13px', color: '#22d3ee', background: 'rgba(34,211,238,0.08)', border: '1px solid rgba(34,211,238,0.2)', borderRadius: '8px', padding: '10px 14px', margin: 0 },
-  btn: { background: 'linear-gradient(135deg,#6c63ff,#a78bfa)', color: '#fff', border: 'none', padding: '14px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', marginTop: '4px' },
+  label: { fontSize: '13px', color: '#374151', fontWeight: 500 },
+  input: { background: '#f8f9fa', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 16px', color: '#0a0a0f', fontSize: '15px', outline: 'none' },
+  error: { fontSize: '13px', color: '#e63946', background: 'rgba(230,57,70,0.06)', border: '1px solid rgba(230,57,70,0.2)', borderRadius: '8px', padding: '10px 14px', margin: 0 },
+  successMsg: { fontSize: '13px', color: '#16a34a', background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.2)', borderRadius: '8px', padding: '10px 14px', margin: 0 },
+  btn: { background: 'linear-gradient(135deg,#1A6FFF,#4F94FF)', color: '#fff', border: 'none', padding: '14px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', marginTop: '4px' },
   back: { textAlign: 'center', marginTop: '24px', margin: '24px 0 0' },
-  backLink: { fontSize: '13px', color: '#8b8a9e', textDecoration: 'none' },
+  backLink: { fontSize: '13px', color: '#6b7280', textDecoration: 'none' },
 }
 
 export default Login
