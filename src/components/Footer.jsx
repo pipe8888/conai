@@ -38,8 +38,8 @@ function Footer() {
 
 const styles = {
   footer: {
-    background: '#f8f9fa',
-    borderTop: '1px solid #e5e7eb',
+    background: '#0a1628',
+    borderTop: 'none',
     padding: '48px 5% 28px',
     marginTop: '80px',
   },
@@ -50,26 +50,26 @@ const styles = {
     marginBottom: '40px',
   },
   logo: {
-    fontSize: '20px', fontWeight: 800, color: '#0a0a0f',
+    fontSize: '20px', fontWeight: 800, color: '#ffffff',
     marginBottom: '10px',
   },
   logoBlue: {
     background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
   },
-  desc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6 },
-  colTitle: { fontSize: '13px', fontWeight: 700, marginBottom: '14px', color: '#0a0a0f' },
+  desc: { fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 },
+  colTitle: { fontSize: '13px', fontWeight: 700, marginBottom: '14px', color: '#ffffff' },
   colLink: {
-    display: 'block', fontSize: '13px', color: '#6b7280',
+    display: 'block', fontSize: '13px', color: '#94a3b8',
     textDecoration: 'none', marginBottom: '8px',
   },
   bottom: {
-    borderTop: '1px solid #e5e7eb',
+    borderTop: '1px solid #1e3a5f',
     paddingTop: '20px',
     display: 'flex', justifyContent: 'space-between',
     flexWrap: 'wrap', gap: '10px',
   },
-  copy: { fontSize: '12px', color: '#9ca3af' },
+  copy: { fontSize: '12px', color: '#64748b' },
 }
 
 export default Footer
