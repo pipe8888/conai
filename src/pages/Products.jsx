@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
+
+const PAGE_SIZE = 12
 
 const CATEGORY_IMGS = {
   auricular: 'photo-1505740420928-5e560c06d30e',
@@ -29,9 +31,11 @@ function Products() {
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { addToCart } = useCart()
+  const sentinelRef = useRef(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -64,7 +68,23 @@ function Products() {
       result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     }
     setFiltered(result)
+    setVisibleCount(PAGE_SIZE)
   }, [activeCategory, searchQuery, products])
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisibleCount(n => n + PAGE_SIZE)
+        }
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [filtered])
 
   function handleAdd(e, prod) {
     e.preventDefault()
@@ -128,7 +148,7 @@ function Products() {
         <p style={s.counter}>Cargando...</p>
       ) : (
         <div style={s.grid}>
-          {filtered.map(prod => {
+          {filtered.slice(0, visibleCount).map(prod => {
             const imgSrc = prod.image_url || getCategoryImg(prod.category)
             const isAdded = addedId === prod.id
             return (
@@ -160,6 +180,15 @@ function Products() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* SENTINEL para infinite scroll */}
+      {!loading && visibleCount < filtered.length && (
+        <div ref={sentinelRef} style={s.sentinel}>
+          <span style={s.sentinelDot} />
+          <span style={{ ...s.sentinelDot, animationDelay: '0.2s' }} />
+          <span style={{ ...s.sentinelDot, animationDelay: '0.4s' }} />
         </div>
       )}
 
@@ -208,6 +237,8 @@ const s = {
   btnView: { height: '34px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '4px', fontSize: '13px', fontWeight: 400, color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' },
 
   empty: { textAlign: 'center', padding: '80px 0' },
+  sentinel: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', padding: '32px 0 16px' },
+  sentinelDot: { width: '6px', height: '6px', borderRadius: '50%', background: '#d1d5db', animation: 'pulse 1.2s ease-in-out infinite' },
 }
 
 export default Products
