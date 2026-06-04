@@ -2,9 +2,64 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
+const SLIDES = [
+  {
+    badge: '🔥 OFERTA DEL DÍA',
+    badgeBg: 'rgba(239,68,68,0.1)',
+    badgeColor: '#ef4444',
+    badgeBorder: 'rgba(239,68,68,0.25)',
+    title: 'Auriculares IA',
+    sub: 'que leen tu mente',
+    emoji: '🎧',
+    originalPrice: '$89',
+    price: '$49',
+    discount: '-45%',
+    cta1Label: '🛒 Consíguelo ya',
+    cta1To: '/productos',
+    cta2Label: 'Ver detalles',
+    cta2To: '/productos',
+    showCountdown: true,
+    bg: '#ffffff',
+  },
+  {
+    badge: '✨ NUEVO EN 2026',
+    badgeBg: 'rgba(26,111,255,0.08)',
+    badgeColor: '#1A6FFF',
+    badgeBorder: 'rgba(26,111,255,0.2)',
+    title: 'Gadgets de Salud IA',
+    sub: 'que cuidan tu cuerpo 24/7',
+    emoji: '💪',
+    price: 'Desde $29',
+    cta1Label: 'Ver toda la categoría →',
+    cta1To: '/productos',
+    showCountdown: false,
+    bg: '#f8fbff',
+  },
+  {
+    badge: '⚡ TRENDING #1 EN 2026',
+    badgeBg: 'rgba(245,158,11,0.1)',
+    badgeColor: '#d97706',
+    badgeBorder: 'rgba(245,158,11,0.25)',
+    title: 'El gadget que todos',
+    sub: 'están comprando',
+    emoji: '🤖',
+    social: '⭐ +500 vendidos esta semana',
+    price: '$67',
+    cta1Label: 'Comprar ahora →',
+    cta1To: '/productos',
+    cta2Label: '¿Qué es esto?',
+    cta2To: '/productos',
+    showCountdown: false,
+    bg: '#fffdf8',
+  },
+]
+
 function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
+  const [slide, setSlide] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [time, setTime] = useState(2 * 3600 + 34 * 60 + 18)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -19,38 +74,96 @@ function Home() {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    if (paused) return
+    const t = setInterval(() => setSlide(prev => (prev + 1) % SLIDES.length), 5000)
+    return () => clearInterval(t)
+  }, [paused, slide])
+
+  useEffect(() => {
+    const t = setInterval(() => setTime(prev => prev > 0 ? prev - 1 : 0), 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  const hh = String(Math.floor(time / 3600)).padStart(2, '0')
+  const mm = String(Math.floor((time % 3600) / 60)).padStart(2, '0')
+  const ss = String(time % 60).padStart(2, '0')
+
+  const cur = SLIDES[slide]
+
   return (
     <div>
 
-      {/* HERO */}
-      <section style={s.hero}>
-        <div style={s.heroBadge}>
-          <span style={s.dot}></span> Tecnología del futuro, disponible hoy
-        </div>
-        <h1 style={s.heroTitle}>
-          El futuro es<br />
-          <span style={s.gradient}>inteligente.</span><br />
-          Vívelo ahora.
-        </h1>
-        <p style={s.heroSub}>
-          Descubre los gadgets con Inteligencia Artificial más innovadores de 2026.
-          Salud, belleza, hogar y más — todo en un solo lugar.
-        </p>
-        <div style={s.heroBtns}>
-          <Link to="/productos" style={s.btnPrimary}>Explorar Productos →</Link>
-          <Link to="/productos" style={s.btnOutline}>Ver Categorías</Link>
-        </div>
-        <div style={s.heroStats}>
-          {[
-            { n: '30+', l: 'Productos IA' },
-            { n: '6', l: 'Categorías' },
-            { n: '+80%', l: 'Margen promedio' },
-            { n: '2026', l: 'Tendencia #1' },
-          ].map((s2, i) => (
-            <div key={i} style={s.stat}>
-              <div style={s.statN}>{s2.n}</div>
-              <div style={s.statL}>{s2.l}</div>
+      {/* HERO SLIDER */}
+      <section
+        style={{ ...s.heroWrap, background: cur.bg }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        {/* LEFT: texto */}
+        <div style={s.heroLeft}>
+          <span style={{
+            ...s.slideBadge,
+            background: cur.badgeBg,
+            color: cur.badgeColor,
+            border: `1px solid ${cur.badgeBorder}`,
+          }}>
+            {cur.badge}
+          </span>
+
+          <h1 style={s.heroTitle}>
+            {cur.title}<br />
+            <span style={s.gradient}>{cur.sub}</span>
+          </h1>
+
+          <div style={s.priceRow}>
+            {cur.originalPrice && <span style={s.priceOld}>{cur.originalPrice}</span>}
+            <span style={s.priceBig}>{cur.price}</span>
+            {cur.discount && <span style={s.discountBadge}>{cur.discount}</span>}
+          </div>
+
+          {cur.showCountdown && (
+            <div style={s.countdown}>
+              <span style={s.countdownLabel}>⏱ Termina en:</span>
+              <span style={s.countdownTime}>{hh}:{mm}:{ss}</span>
             </div>
+          )}
+
+          {cur.social && <p style={s.socialProof}>{cur.social}</p>}
+
+          <div style={s.heroBtns}>
+            <Link to={cur.cta1To} style={s.btnPrimary}>{cur.cta1Label}</Link>
+            {cur.cta2Label && (
+              <Link to={cur.cta2To} style={s.btnOutline}>{cur.cta2Label}</Link>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT: visual */}
+        <div style={s.heroRight}>
+          <div style={s.emojiBox}>
+            <span style={s.bigEmoji}>{cur.emoji}</span>
+          </div>
+        </div>
+
+        {/* FLECHAS */}
+        <button
+          style={{ ...s.arrow, left: '20px' }}
+          onClick={() => setSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}
+        >←</button>
+        <button
+          style={{ ...s.arrow, right: '20px' }}
+          onClick={() => setSlide(prev => (prev + 1) % SLIDES.length)}
+        >→</button>
+
+        {/* DOTS */}
+        <div style={s.dots}>
+          {SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setSlide(i)}
+              style={i === slide ? s.dotActive : s.dotInactive}
+            />
           ))}
         </div>
       </section>
@@ -144,19 +257,198 @@ function Home() {
 }
 
 const s = {
-  hero: { minHeight: '90vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '100px 5% 60px', background: '#ffffff' },
-  heroBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(26,111,255,0.08)', border: '1px solid rgba(26,111,255,0.2)', borderRadius: '99px', padding: '6px 16px', fontSize: '13px', color: '#1A6FFF', marginBottom: '28px' },
-  dot: { width: '6px', height: '6px', borderRadius: '50%', background: '#1A6FFF', display: 'inline-block' },
-  heroTitle: { fontSize: 'clamp(36px,6vw,72px)', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-1.5px', marginBottom: '20px', color: '#0a0a0f' },
-  gradient: { background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  heroSub: { fontSize: '18px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '36px' },
-  heroBtns: { display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '56px' },
-  btnPrimary: { background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
-  btnOutline: { background: 'transparent', color: '#0a0a0f', border: '1px solid #d1d5db', padding: '14px 32px', borderRadius: '99px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', textDecoration: 'none', display: 'inline-block' },
-  heroStats: { display: 'flex', gap: '40px', flexWrap: 'wrap', justifyContent: 'center' },
-  stat: { textAlign: 'center' },
-  statN: { fontSize: '28px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  statL: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' },
+  heroWrap: {
+    position: 'relative',
+    minHeight: '520px',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '60px 8% 90px',
+    gap: '48px',
+    overflow: 'hidden',
+    transition: 'background 0.4s ease',
+  },
+  heroLeft: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '22px',
+    zIndex: 1,
+  },
+  heroRight: {
+    flex: '0 0 320px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  slideBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    borderRadius: '99px',
+    padding: '6px 16px',
+    fontSize: '13px',
+    fontWeight: 700,
+    alignSelf: 'flex-start',
+  },
+  heroTitle: {
+    fontSize: 'clamp(32px,5vw,60px)',
+    fontWeight: 800,
+    lineHeight: 1.1,
+    letterSpacing: '-1.5px',
+    color: '#0a0a0f',
+    margin: 0,
+  },
+  gradient: {
+    background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+  },
+  priceRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  priceOld: {
+    fontSize: '20px',
+    color: '#9ca3af',
+    textDecoration: 'line-through',
+    fontWeight: 500,
+  },
+  priceBig: {
+    fontSize: '44px',
+    fontWeight: 800,
+    background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    lineHeight: 1,
+  },
+  discountBadge: {
+    background: '#ef4444',
+    color: '#fff',
+    fontSize: '13px',
+    fontWeight: 800,
+    padding: '5px 14px',
+    borderRadius: '99px',
+  },
+  countdown: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '10px',
+    background: '#fff3f3',
+    border: '1px solid rgba(239,68,68,0.2)',
+    borderRadius: '12px',
+    padding: '10px 18px',
+    alignSelf: 'flex-start',
+  },
+  countdownLabel: {
+    fontSize: '13px',
+    color: '#6b7280',
+  },
+  countdownTime: {
+    fontSize: '22px',
+    fontWeight: 800,
+    color: '#ef4444',
+    fontVariantNumeric: 'tabular-nums',
+    letterSpacing: '0.04em',
+  },
+  socialProof: {
+    fontSize: '14px',
+    color: '#374151',
+    fontWeight: 600,
+    margin: 0,
+  },
+  heroBtns: {
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  btnPrimary: {
+    background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
+    color: '#fff',
+    border: 'none',
+    padding: '14px 32px',
+    borderRadius: '99px',
+    fontSize: '15px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    textDecoration: 'none',
+    display: 'inline-block',
+  },
+  btnOutline: {
+    background: 'transparent',
+    color: '#0a0a0f',
+    border: '1px solid #d1d5db',
+    padding: '14px 32px',
+    borderRadius: '99px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    textDecoration: 'none',
+    display: 'inline-block',
+  },
+  emojiBox: {
+    width: '260px',
+    height: '260px',
+    background: 'rgba(26,111,255,0.06)',
+    border: '2px solid rgba(26,111,255,0.12)',
+    borderRadius: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bigEmoji: {
+    fontSize: '110px',
+    lineHeight: 1,
+  },
+  arrow: {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: '#ffffff',
+    border: '1px solid #e5e7eb',
+    borderRadius: '50%',
+    width: '44px',
+    height: '44px',
+    fontSize: '18px',
+    cursor: 'pointer',
+    color: '#374151',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    zIndex: 2,
+    lineHeight: '44px',
+    padding: 0,
+  },
+  dots: {
+    position: 'absolute',
+    bottom: '28px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    display: 'flex',
+    gap: '8px',
+    zIndex: 2,
+  },
+  dotActive: {
+    width: '28px',
+    height: '8px',
+    borderRadius: '99px',
+    background: '#1A6FFF',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 0,
+    transition: 'width 0.3s ease',
+  },
+  dotInactive: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    background: '#d1d5db',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 0,
+    transition: 'width 0.3s ease',
+  },
   section: { padding: '80px 5%', background: '#ffffff' },
   sectionGray: { padding: '80px 5%', background: '#f8f9fa' },
   label: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' },
