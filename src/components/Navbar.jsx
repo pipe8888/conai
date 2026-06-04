@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
+import LogoSVG from './LogoSVG'
 
 const ADMIN_EMAIL = 'pipeblue17@gmail.com'
 
@@ -16,8 +17,8 @@ function Navbar() {
 
   return (
     <nav style={styles.nav}>
-      <Link to="/" style={styles.logo}>
-        Con<span style={styles.logoAi}>AI</span>
+      <Link to="/" style={styles.logoLink}>
+        <LogoSVG />
       </Link>
 
       <ul style={styles.links}>
@@ -54,12 +55,9 @@ const styles = {
     padding: '0 5%', height: '64px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   },
-  logo: {
-    fontSize: '22px', fontWeight: 700, textDecoration: 'none',
-    background: 'linear-gradient(135deg,#6c63ff,#22d3ee)',
-    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+  logoLink: {
+    textDecoration: 'none', display: 'flex', alignItems: 'center',
   },
-  logoAi: { fontWeight: 300 },
   links: {
     display: 'flex', gap: '28px', listStyle: 'none',
   },
