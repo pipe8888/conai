@@ -1,55 +1,54 @@
 function LogoSVG() {
   return (
-    <svg height="50" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+    <svg width="92" height="44" viewBox="0 0 92 44" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
       <defs>
-        <radialGradient id="logo-glowBg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#1A6FFF" stopOpacity="0.15"/>
-          <stop offset="100%" stopColor="#1A6FFF" stopOpacity="0"/>
-        </radialGradient>
-        <radialGradient id="logo-dotGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#5599FF"/>
-          <stop offset="100%" stopColor="#1A6FFF" stopOpacity="0.6"/>
-        </radialGradient>
-        <linearGradient id="logo-aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#66AAFF"/>
-          <stop offset="100%" stopColor="#1A6FFF"/>
+        <linearGradient id="lg-ai" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#1A6FFF"/>
+          <stop offset="100%" stopColor="#88CCFF"/>
         </linearGradient>
-        <mask id="logo-textGaps" maskUnits="userSpaceOnUse">
-          <rect x="0" y="0" width="680" height="280" fill="white"/>
-          <rect x="219.14" y="75.8" width="241.73" height="113.6" fill="black" rx="2"/>
-        </mask>
+        <radialGradient id="lg-sphere" cx="45%" cy="40%" r="60%">
+          <stop offset="0%" stopColor="#1a2a4a"/>
+          <stop offset="100%" stopColor="#080e1f"/>
+        </radialGradient>
       </defs>
 
-      <ellipse cx="340" cy="140" rx="130" ry="130" fill="url(#logo-glowBg)"/>
-      <circle cx="340" cy="140" r="90" fill="none" stroke="#1A6FFF" strokeWidth="1.5" opacity="0.15"/>
+      {/* Node lines */}
+      <line x1="22" y1="8"  x2="22" y2="3"  stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
+      <line x1="22" y1="36" x2="22" y2="41" stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
+      <line x1="8"  y1="22" x2="3"  y2="22" stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
+      <line x1="36" y1="22" x2="41" y2="22" stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
+      <line x1="31" y1="13" x2="35" y2="9"  stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
+      <line x1="13" y1="13" x2="9"  y2="9"  stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
+      <line x1="31" y1="31" x2="35" y2="35" stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
+      <line x1="13" y1="31" x2="9"  y2="35" stroke="#2a4a8a" strokeWidth="0.7" opacity="0.7"/>
 
-      <circle cx="340" cy="140" r="90" fill="none" stroke="#AADDFF" strokeWidth="6" strokeLinecap="round" strokeDasharray="60 505" opacity="0.25">
-        <animateTransform attributeName="transform" type="rotate" from="0 340 140" to="360 340 140" dur="2.5s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="340" cy="140" r="90" fill="none" stroke="#66AAFF" strokeWidth="3.5" strokeLinecap="round" strokeDasharray="50 515" opacity="0.6">
-        <animateTransform attributeName="transform" type="rotate" from="0 340 140" to="360 340 140" dur="2.5s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="340" cy="140" r="90" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="30 535" opacity="0.95">
-        <animateTransform attributeName="transform" type="rotate" from="0 340 140" to="360 340 140" dur="2.5s" repeatCount="indefinite"/>
-      </circle>
-
-      <line x1="270" y1="95" x2="230" y2="68" mask="url(#logo-textGaps)" stroke="#1A6FFF" strokeWidth="1" opacity="0.3"/>
-      <line x1="410" y1="95" x2="450" y2="68" mask="url(#logo-textGaps)" stroke="#1A6FFF" strokeWidth="1" opacity="0.3"/>
-      <line x1="270" y1="185" x2="230" y2="212" mask="url(#logo-textGaps)" stroke="#1A6FFF" strokeWidth="1" opacity="0.3"/>
-      <line x1="410" y1="185" x2="450" y2="212" mask="url(#logo-textGaps)" stroke="#1A6FFF" strokeWidth="1" opacity="0.3"/>
-      <line x1="340" y1="50" x2="340" y2="20" stroke="#1A6FFF" strokeWidth="1" opacity="0.3"/>
-      <line x1="340" y1="230" x2="340" y2="260" stroke="#1A6FFF" strokeWidth="1" opacity="0.3"/>
-
-      {[[230,68],[450,68],[230,212],[450,212],[340,20],[340,260]].map(([cx,cy], i) => (
-        <g key={i}>
-          <circle cx={cx} cy={cy} r="5" fill="url(#logo-dotGlow)"/>
-          <circle cx={cx} cy={cy} r="2.5" fill="#88BBFF"/>
-        </g>
+      {/* Node dots */}
+      {[[22,3],[22,41],[3,22],[41,22],[35,9],[9,9],[35,35],[9,35]].map(([cx,cy],i) => (
+        <circle key={i} cx={cx} cy={cy} r="1.5" fill="#3a7bd5"/>
       ))}
 
-      <text x="340" y="165" textAnchor="middle">
-        <tspan fill="#0a0a0f" fontFamily="'Segoe UI', sans-serif" fontSize="88" fontWeight="500">Con</tspan>
-        <tspan fill="url(#logo-aiGrad)" fontFamily="'Segoe UI', sans-serif" fontSize="88" fontWeight="500">ai</tspan>
+      {/* Sphere */}
+      <circle cx="22" cy="22" r="14" fill="url(#lg-sphere)"/>
+      <circle cx="22" cy="22" r="14" fill="none" stroke="#1e3a6e" strokeWidth="0.8" opacity="0.6"/>
+
+      {/* Rotating arcs — 3 layers */}
+      <circle cx="22" cy="22" r="14" fill="none" stroke="#AADDFF" strokeWidth="4" strokeLinecap="round" strokeDasharray="18 70" opacity="0.15">
+        <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="22" cy="22" r="14" fill="none" stroke="#66AAFF" strokeWidth="2" strokeLinecap="round" strokeDasharray="13 75" opacity="0.55">
+        <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="22" cy="22" r="14" fill="none" stroke="#FFFFFF" strokeWidth="1" strokeLinecap="round" strokeDasharray="6 82" opacity="0.95">
+        <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="3s" repeatCount="indefinite"/>
+      </circle>
+
+      {/* C */}
+      <text x="22" y="29" textAnchor="middle" fontSize="20" fontWeight="500" fill="#ffffff" fontFamily="'Segoe UI', sans-serif">C</text>
+
+      {/* onai */}
+      <text x="44" y="29" fontFamily="'Segoe UI', sans-serif" fontSize="18" fontWeight="500">
+        <tspan fill="#ffffff">on</tspan>
+        <tspan fill="url(#lg-ai)">ai</tspan>
       </text>
     </svg>
   )
