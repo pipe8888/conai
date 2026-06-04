@@ -162,7 +162,6 @@ function Home() {
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        <div style={s.dotsPattern} />
         <div style={s.blob} />
         <div style={s.heroLeft}>
           <span style={{
@@ -353,15 +352,6 @@ const s = {
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
-  },
-  dotsPattern: {
-    position: 'absolute',
-    inset: 0,
-    backgroundImage: 'radial-gradient(circle, #94a3b8 1.5px, transparent 1.5px)',
-    backgroundSize: '22px 22px',
-    opacity: 0.35,
-    pointerEvents: 'none',
-    zIndex: 0,
   },
   blob: {
     position: 'absolute',
