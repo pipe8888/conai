@@ -10,7 +10,7 @@ const SLIDES = [
     badgeBorder: 'rgba(239,68,68,0.25)',
     title: 'Auriculares IA',
     sub: 'que leen tu mente',
-    emoji: '🎧',
+    img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=520&q=85',
     originalPrice: '$89',
     price: '$49',
     discount: '-45%',
@@ -31,7 +31,7 @@ const SLIDES = [
     badgeBorder: 'rgba(26,111,255,0.2)',
     title: 'Gadgets de Salud IA',
     sub: 'que cuidan tu cuerpo 24/7',
-    emoji: '💪',
+    img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=520&q=85',
     price: 'Desde $29',
     cta1Label: 'Ver toda la categoría →',
     cta1To: '/productos',
@@ -48,7 +48,7 @@ const SLIDES = [
     badgeBorder: 'rgba(245,158,11,0.25)',
     title: 'El gadget que todos',
     sub: 'están comprando',
-    emoji: '🤖',
+    img: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=520&q=85',
     social: '⭐ +500 vendidos esta semana',
     price: '$67',
     cta1Label: 'Comprar ahora →',
@@ -240,9 +240,7 @@ function Home() {
 
         <div style={s.heroRight} className={prevSlide !== null ? `slide-image-${direction}` : ''}>
           <div style={s.imageGlow(cur.accentGlow)} />
-          <div style={s.emojiBox}>
-            <span style={s.bigEmoji}>{cur.emoji}</span>
-          </div>
+          <img src={cur.img} alt={cur.title} style={s.heroImg} />
         </div>
 
         <button style={{ ...s.arrow, left: '20px' }}
@@ -568,19 +566,15 @@ const s = {
     pointerEvents: 'none',
     transition: 'all 0.6s ease',
   }),
-  emojiBox: {
-    width: '260px',
-    height: '260px',
-    background: 'rgba(26,111,255,0.06)',
-    border: '2px solid rgba(26,111,255,0.12)',
+  heroImg: {
+    width: '300px',
+    height: '300px',
     borderRadius: '32px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    objectFit: 'cover',
     position: 'relative',
     zIndex: 1,
+    boxShadow: '0 24px 64px rgba(0,0,0,0.15)',
   },
-  bigEmoji: { fontSize: '110px', lineHeight: 1 },
   arrow: {
     position: 'absolute',
     top: '50%',
