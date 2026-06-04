@@ -521,7 +521,7 @@ const s = {
   prodName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '6px', lineHeight: 1.3 },
   prodDesc: { fontSize: '12px', color: '#6b7280', lineHeight: 1.5, marginBottom: '14px' },
   prodBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  prodPrice: { fontSize: '18px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  prodPrice: { fontSize: '18px', fontWeight: 800, color: '#e63946' },
   prodBadge: { fontSize: '10px', background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
   featGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '20px' },
   feat: {

@@ -154,7 +154,7 @@ const s = {
   name: { fontSize: 'clamp(24px,3vw,40px)', fontWeight: 800, letterSpacing: '-1px', color: '#0a0a0f', lineHeight: 1.2 },
   desc: { fontSize: '16px', color: '#6b7280', lineHeight: 1.7 },
   priceRow: { display: 'flex', alignItems: 'center', gap: '16px' },
-  price: { fontSize: '36px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  price: { fontSize: '36px', fontWeight: 800, color: '#e63946' },
   badge: { background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '5px 14px', borderRadius: '99px', fontSize: '12px', fontWeight: 700 },
   marginBox: { background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' },
   marginHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' },

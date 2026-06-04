@@ -150,7 +150,7 @@ const s = {
   cardName: { fontSize: '14px', fontWeight: 700, color: '#0a0a0f', marginBottom: '5px', lineHeight: 1.3 },
   cardDesc: { fontSize: '12px', color: '#6b7280', lineHeight: 1.5, marginBottom: '12px' },
   cardBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' },
-  cardPrice: { fontSize: '17px', fontWeight: 800, background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  cardPrice: { fontSize: '17px', fontWeight: 800, color: '#e63946' },
   cardBadge: { fontSize: '10px', background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
   marginRow: { display: 'flex', alignItems: 'center', gap: '6px' },
   marginLabel: { fontSize: '10px', color: '#9ca3af', minWidth: '38px' },

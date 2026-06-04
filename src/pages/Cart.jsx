@@ -88,6 +88,12 @@ function Cart() {
             Proceder al pago →
           </button>
 
+          <div style={s.trustBadges}>
+            <div style={s.trustItem}><span>🔒</span><span style={{ color: '#22c55e' }}>Pago 100% seguro</span></div>
+            <div style={s.trustItem}><span>🚚</span><span style={{ color: '#3b82f6' }}>Envío en 24-48h</span></div>
+            <div style={s.trustItem}><span>↩️</span><span style={{ color: '#6b7280' }}>Devolución en 30 días</span></div>
+          </div>
+
           <Link to="/productos" style={s.continueLink}>
             ← Continuar comprando
           </Link>
@@ -135,6 +141,8 @@ const s = {
   marginLabel: { fontSize: '12px', color: '#6b7280', marginBottom: '4px' },
   marginValue: { fontSize: '20px', fontWeight: 800, color: '#1A6FFF' },
   checkoutBtn: { width: '100%', background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', border: 'none', padding: '14px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', marginBottom: '12px' },
+  trustBadges: { display: 'flex', flexDirection: 'column', gap: '8px', padding: '14px', background: '#f8f9fa', borderRadius: '12px', border: '1px solid #e5e7eb', marginBottom: '14px' },
+  trustItem: { display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 500 },
   continueLink: { display: 'block', textAlign: 'center', fontSize: '13px', color: '#6b7280', textDecoration: 'none' },
   btnPrimary: { background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '99px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none' },
 }
