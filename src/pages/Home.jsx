@@ -105,7 +105,7 @@ function Home() {
   const scrambled = useTextScramble('Auriculares IA', 0)
 
   useEffect(() => {
-    supabase.from('products').select('*').limit(12).then(({ data }) => {
+    supabase.from('products').select('*').eq('viral', true).limit(12).then(({ data }) => {
       const all = data || []
       setFeatured(all.slice(0, 6))
       setDeals(all.slice(0, 4))
