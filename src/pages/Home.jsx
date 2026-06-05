@@ -106,6 +106,8 @@ function Home() {
   const [prodsRef, prodsVisible] = useReveal()
   const [featRef, featVisible] = useReveal()
   const [bentoRef, bentoVisible] = useReveal()
+  const [testiRef, testiVisible] = useReveal()
+  const [howRef, howVisible] = useReveal()
 
   const scrambledTitle = useTextScramble(HERO.title, 0)
   const blurStyle = useBlurIn(0)
@@ -130,6 +132,8 @@ function Home() {
   const hh = String(Math.floor(time / 3600)).padStart(2, '0')
   const mm = String(Math.floor((time % 3600) / 60)).padStart(2, '0')
   const ss = String(time % 60).padStart(2, '0')
+
+  const star = featured[0]
 
   return (
     <div>
@@ -192,6 +196,32 @@ function Home() {
         </div>
       </section>
 
+      {/* CÓMO FUNCIONA */}
+      <section style={s.section}>
+        <p style={s.label}>Simple y rápido</p>
+        <h2 style={s.title}>¿Cómo <span style={s.gradient}>funciona</span>?</h2>
+        <p style={s.sub}>En tres pasos tienes tu gadget IA en casa.</p>
+        <div ref={howRef} style={s.howGrid}>
+          {[
+            { num: '01', icon: '🔍', title: 'Elige tu gadget', desc: 'Explora el catálogo, filtra por categoría o pregúntale al asistente IA. Encuentra el gadget ideal para ti.' },
+            { num: '02', icon: '🔒', title: 'Paga con seguridad', desc: 'Checkout en segundos con encriptación SSL. Aceptamos tarjetas y medios de pago locales de toda Latinoamérica.' },
+            { num: '03', icon: '📦', title: 'Recibe en casa', desc: 'Despacho en 24-48h con seguimiento en tiempo real. ¿No quedas satisfecho? 30 días de devolución sin preguntas.' },
+          ].map(({ num, icon, title, desc }, i) => (
+            <div key={num} style={{
+              ...s.howCard,
+              opacity: howVisible ? 1 : 0,
+              transform: howVisible ? 'translateY(0)' : 'translateY(28px)',
+              transition: `opacity 0.55s ease ${i * 0.12}s, transform 0.55s ease ${i * 0.12}s`,
+            }}>
+              <div style={s.howNum}>{num}</div>
+              <div style={s.howIcon}>{icon}</div>
+              <p style={s.howTitle}>{title}</p>
+              <p style={s.howDesc}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* BENTO GRID */}
       <section style={s.sectionBento}>
         <p style={s.label}>Trending ahora</p>
@@ -246,33 +276,6 @@ function Home() {
         </div>
       </section>
 
-      {/* CATEGORÍAS */}
-      <section style={s.sectionGray}>
-        <p style={s.label}>Explora por categoría</p>
-        <h2 style={s.title}>Todo con <span style={s.gradient}>Inteligencia Artificial</span></h2>
-        <p style={s.sub}>Selecciona tu categoría y descubre los gadgets más innovadores.</p>
-        <div ref={catsRef} style={s.catsGrid}>
-          {categories.map((cat, i) => (
-            <div
-              key={cat.id}
-              onClick={() => navigate(`/productos?cat=${cat.slug}`)}
-              className="card-hover"
-              style={{
-                ...s.catCard,
-                cursor: 'pointer',
-                opacity: catsVisible ? 1 : 0,
-                transform: catsVisible ? 'translateY(0)' : 'translateY(28px)',
-                transition: `opacity 0.55s ease ${i * 0.07}s, transform 0.55s ease ${i * 0.07}s`,
-              }}
-            >
-              <div style={s.catIcon}>{cat.emoji}</div>
-              <div style={s.catName}>{cat.name}</div>
-              <div style={s.catCount}>{cat.count} productos</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* PRODUCTOS DESTACADOS */}
       <section style={s.section}>
         <p style={s.label}>Más vendidos</p>
@@ -314,6 +317,65 @@ function Home() {
         </div>
       </section>
 
+      {/* CATEGORÍAS */}
+      <section style={s.sectionGray}>
+        <p style={s.label}>Explora por categoría</p>
+        <h2 style={s.title}>Todo con <span style={s.gradient}>Inteligencia Artificial</span></h2>
+        <p style={s.sub}>Selecciona tu categoría y descubre los gadgets más innovadores.</p>
+        <div ref={catsRef} style={s.catsGrid}>
+          {categories.map((cat, i) => (
+            <div
+              key={cat.id}
+              onClick={() => navigate(`/productos?cat=${cat.slug}`)}
+              className="card-hover"
+              style={{
+                ...s.catCard,
+                cursor: 'pointer',
+                opacity: catsVisible ? 1 : 0,
+                transform: catsVisible ? 'translateY(0)' : 'translateY(28px)',
+                transition: `opacity 0.55s ease ${i * 0.07}s, transform 0.55s ease ${i * 0.07}s`,
+              }}
+            >
+              <div style={s.catIcon}>{cat.emoji}</div>
+              <div style={s.catName}>{cat.name}</div>
+              <div style={s.catCount}>{cat.count} productos</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* TESTIMONIOS */}
+      <section style={s.section}>
+        <p style={s.label}>Clientes reales</p>
+        <h2 style={s.title}>Lo que dicen <span style={s.gradient}>nuestros clientes</span></h2>
+        <p style={s.sub}>Más de 12.000 personas ya eligieron ConAI en Latinoamérica.</p>
+        <div ref={testiRef} style={s.testiGrid}>
+          {[
+            { name: 'María S.', city: 'Santiago, Chile', text: 'Llegó en 2 días, impecable. Los auriculares superaron mis expectativas. La calidad del sonido con IA es increíble.', avatar: 'MS' },
+            { name: 'Carlos R.', city: 'Bogotá, Colombia', text: 'Compré el SmartWatch para mi trabajo y es un cambio total. El proceso de compra fue súper fácil y el envío muy rápido.', avatar: 'CR' },
+            { name: 'Ana L.', city: 'Ciudad de México', text: 'Lo compré para mi hijo y le encantó. La atención es excelente y el producto exactamente como se describe. 10/10.', avatar: 'AL' },
+            { name: 'Diego M.', city: 'Lima, Perú', text: 'Ya es mi tercera compra en ConAI. Siempre llega rápido y los productos son de primera calidad. 100% recomendado.', avatar: 'DM' },
+          ].map(({ name, city, text, avatar }, i) => (
+            <div key={name} style={{
+              ...s.testiCard,
+              opacity: testiVisible ? 1 : 0,
+              transform: testiVisible ? 'translateY(0)' : 'translateY(28px)',
+              transition: `opacity 0.55s ease ${i * 0.08}s, transform 0.55s ease ${i * 0.08}s`,
+            }}>
+              <div style={s.testiStars}>⭐⭐⭐⭐⭐</div>
+              <p style={s.testiText}>"{text}"</p>
+              <div style={s.testiAuthor}>
+                <div style={s.testiAvatar}>{avatar}</div>
+                <div>
+                  <p style={s.testiName}>{name}</p>
+                  <p style={s.testiCity}>{city}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* FEATURES */}
       <section style={s.sectionGray}>
         <p style={s.label}>¿Por qué ConAI?</p>
@@ -342,15 +404,44 @@ function Home() {
         </div>
       </section>
 
-      {/* NEWSLETTER */}
-      <section style={s.section}>
-        <div style={s.newsletter}>
-          <h2 style={s.nlTitle}>Sé el primero en conocer<br />los nuevos gadgets IA</h2>
-          <p style={s.nlSub}>Únete a más de 10.000 early adopters que ya reciben las últimas novedades.</p>
-          <div style={s.nlForm}>
-            <input style={s.nlInput} type="email" placeholder="tu@email.com" />
-            <button style={s.nlBtn}>Suscribirme →</button>
+      {/* CTA FINAL */}
+      <section style={s.ctaWrap}>
+        <div style={s.heroBlobA} />
+        <div style={s.heroBlobB} />
+        <div style={s.ctaInner}>
+          <div style={s.ctaLeft}>
+            <p style={{ ...s.label, color: '#66AAFF' }}>Tu momento es ahora</p>
+            <h2 style={s.ctaTitle}>¿Listo para tu<br />primer gadget IA?</h2>
+            <ul style={s.ctaList}>
+              {[
+                '🚚 Envío en 24-48h garantizado',
+                '↩️ 30 días de devolución sin preguntas',
+                '⭐ +12.000 clientes satisfechos',
+                '🔒 Pago 100% seguro con SSL',
+              ].map(item => (
+                <li key={item} style={s.ctaItem}>{item}</li>
+              ))}
+            </ul>
+            <Link to="/productos" style={s.btnPrimary}>Ver catálogo completo →</Link>
           </div>
+          {star && (
+            <Link to={`/producto/${star.id}`} className="card-hover" style={s.ctaCard}>
+              <img
+                src={star.image_url || getCategoryImg(star.category)}
+                alt={star.name}
+                style={s.ctaCardImg}
+              />
+              <div style={s.ctaCardInfo}>
+                <p style={s.ctaCardCat}>{star.category.toUpperCase()}</p>
+                <p style={s.ctaCardName}>{star.name}</p>
+                <div style={s.ctaCardPriceRow}>
+                  <span style={s.ctaCardPrice}>${star.price}</span>
+                  <span style={s.ctaCardBadge}>⭐ Más vendido</span>
+                </div>
+                <div style={s.ctaCardBtn}>Comprar ahora →</div>
+              </div>
+            </Link>
+          )}
         </div>
       </section>
 
@@ -503,7 +594,6 @@ const s = {
   },
   countdownNum: { fontSize: '26px', fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1 },
   countdownUnit: { fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: 500, marginTop: '3px', textTransform: 'uppercase' },
-  socialProof: { fontSize: '14px', color: '#374151', fontWeight: 600, margin: 0 },
   heroBtns: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
   btnPrimary: {
     background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
@@ -530,16 +620,6 @@ const s = {
     display: 'inline-block',
     backdropFilter: 'blur(8px)',
   },
-  imageGlow: (glow) => ({
-    position: 'absolute',
-    width: '300px',
-    height: '300px',
-    borderRadius: '50%',
-    background: glow,
-    boxShadow: `0 0 100px 50px ${glow}`,
-    pointerEvents: 'none',
-    transition: 'all 0.6s ease',
-  }),
   heroImg: {
     width: '380px',
     height: '380px',
@@ -578,46 +658,40 @@ const s = {
     color: 'rgba(255,255,255,0.65)',
     fontWeight: 500,
   },
-  arrow: {
-    position: 'absolute',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: '#ffffff',
-    border: '1px solid #e5e7eb',
-    borderRadius: '50%',
-    width: '44px',
-    height: '44px',
-    fontSize: '18px',
-    cursor: 'pointer',
-    color: '#374151',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    zIndex: 2,
-    padding: 0,
-  },
-  dots: {
-    position: 'absolute',
-    bottom: '28px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    display: 'flex',
-    gap: '8px',
-    zIndex: 2,
-  },
-  dotWrap: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' },
-  dot: { height: '8px', borderRadius: '99px', position: 'relative', overflow: 'hidden', transition: 'all 0.3s ease' },
-  dotFill: (pct) => ({
-    position: 'absolute', top: 0, left: 0, height: '100%',
-    width: `${pct}%`, background: 'rgba(0,0,0,0.18)',
-    borderRadius: '99px', transition: 'width 0.05s linear',
-  }),
   section: { padding: '80px 5%', background: '#ffffff' },
   sectionGray: { padding: '80px 5%', background: '#f8f9fa' },
   label: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' },
   title: { fontSize: 'clamp(26px,4vw,42px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.2, marginBottom: '14px', color: '#0a0a0f' },
   sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '48px' },
+
+  // Cómo funciona
+  howGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' },
+  howCard: {
+    position: 'relative',
+    background: '#f8f9fa',
+    border: '1px solid #e5e7eb',
+    borderRadius: '20px',
+    padding: '36px 28px 32px',
+    overflow: 'hidden',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+  },
+  howNum: {
+    position: 'absolute',
+    top: '-6px',
+    right: '14px',
+    fontSize: '96px',
+    fontWeight: 900,
+    color: 'rgba(26,111,255,0.07)',
+    lineHeight: 1,
+    userSelect: 'none',
+    pointerEvents: 'none',
+    letterSpacing: '-4px',
+  },
+  howIcon: { fontSize: '38px', marginBottom: '18px', display: 'block' },
+  howTitle: { fontSize: '17px', fontWeight: 700, color: '#0a0a0f', marginBottom: '10px', margin: '0 0 10px 0' },
+  howDesc: { fontSize: '14px', color: '#6b7280', lineHeight: 1.65, margin: 0 },
+
+  // Categorías
   catsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: '14px' },
   catCard: {
     background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
@@ -627,6 +701,8 @@ const s = {
   catIcon: { fontSize: '32px', marginBottom: '12px' },
   catName: { fontSize: '14px', fontWeight: 600, color: '#0a0a0f', marginBottom: '4px' },
   catCount: { fontSize: '12px', color: '#9ca3af' },
+
+  // Productos
   prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '16px' },
   prodCard: {
     background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
@@ -642,6 +718,39 @@ const s = {
   prodBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   prodPrice: { fontSize: '18px', fontWeight: 800, color: '#e63946' },
   prodBadge: { fontSize: '10px', background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
+
+  // Testimonios
+  testiGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' },
+  testiCard: {
+    background: '#f8f9fa',
+    border: '1px solid #e5e7eb',
+    borderRadius: '16px',
+    padding: '24px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '14px',
+  },
+  testiStars: { fontSize: '15px', letterSpacing: '1px' },
+  testiText: { fontSize: '14px', color: '#374151', lineHeight: 1.65, fontStyle: 'italic', margin: 0, flex: 1 },
+  testiAuthor: { display: 'flex', alignItems: 'center', gap: '12px' },
+  testiAvatar: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '13px',
+    fontWeight: 700,
+    flexShrink: 0,
+  },
+  testiName: { fontSize: '14px', fontWeight: 700, color: '#0a0a0f', margin: 0 },
+  testiCity: { fontSize: '12px', color: '#9ca3af', margin: 0 },
+
+  // Features
   featGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '20px' },
   feat: {
     background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
@@ -650,12 +759,8 @@ const s = {
   featIcon: { fontSize: '32px', marginBottom: '16px' },
   featTitle: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '8px' },
   featDesc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6 },
-  newsletter: { background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)', borderRadius: '24px', padding: '56px', textAlign: 'center' },
-  nlTitle: { fontSize: '32px', fontWeight: 800, marginBottom: '12px', color: '#ffffff' },
-  nlSub: { color: 'rgba(255,255,255,0.85)', marginBottom: '28px', fontSize: '15px' },
-  nlForm: { display: 'flex', gap: '10px', maxWidth: '440px', margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' },
-  nlInput: { flex: 1, minWidth: '200px', background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: '99px', padding: '12px 20px', color: '#ffffff', fontSize: '14px', outline: 'none' },
-  nlBtn: { background: '#ffffff', color: '#1A6FFF', border: 'none', padding: '12px 28px', borderRadius: '99px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' },
+
+  // Bento
   sectionBento: { padding: '80px 5%', background: '#f8f9fa' },
   bentoGrid: {
     display: 'grid',
@@ -713,6 +818,84 @@ const s = {
   statDivider: { width: '40px', height: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 auto' },
   statNum: { fontSize: '28px', fontWeight: 800, color: '#fff', lineHeight: 1.1, marginBottom: '4px' },
   statTxt: { fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: 500, letterSpacing: '0.05em' },
+
+  // CTA Final
+  ctaWrap: {
+    position: 'relative',
+    background: 'linear-gradient(135deg, #060912 0%, #0a1628 55%, #0e0a1e 100%)',
+    overflow: 'hidden',
+    padding: '80px 5%',
+  },
+  ctaInner: {
+    position: 'relative',
+    zIndex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '48px',
+    maxWidth: '1100px',
+    margin: '0 auto',
+    flexWrap: 'wrap',
+  },
+  ctaLeft: {
+    flex: '1 1 380px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '22px',
+  },
+  ctaTitle: {
+    fontSize: 'clamp(28px, 4vw, 50px)',
+    fontWeight: 800,
+    letterSpacing: '-1.5px',
+    lineHeight: 1.15,
+    color: '#ffffff',
+    margin: 0,
+  },
+  ctaList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  ctaItem: {
+    fontSize: '15px',
+    color: 'rgba(255,255,255,0.82)',
+    fontWeight: 500,
+  },
+  ctaCard: {
+    flex: '0 0 300px',
+    background: '#ffffff',
+    borderRadius: '20px',
+    overflow: 'hidden',
+    textDecoration: 'none',
+    boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+    display: 'block',
+  },
+  ctaCardImg: {
+    width: '100%',
+    height: '210px',
+    objectFit: 'cover',
+    display: 'block',
+  },
+  ctaCardInfo: {
+    padding: '20px',
+  },
+  ctaCardCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '6px', display: 'block' },
+  ctaCardName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '12px', lineHeight: 1.3 },
+  ctaCardPriceRow: { display: 'flex', alignItems: 'center', gap: '10px' },
+  ctaCardPrice: { fontSize: '22px', fontWeight: 800, color: '#e63946' },
+  ctaCardBadge: { fontSize: '11px', background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
+  ctaCardBtn: {
+    marginTop: '14px',
+    background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
+    color: '#fff',
+    padding: '12px 20px',
+    borderRadius: '99px',
+    fontSize: '14px',
+    fontWeight: 700,
+    textAlign: 'center',
+  },
 }
 
 export default Home
