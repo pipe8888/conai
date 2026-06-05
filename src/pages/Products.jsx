@@ -24,6 +24,21 @@ function getCategoryImg(cat) {
   return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80'
 }
 
+const PRICE_RANGES = [
+  { key: 'low',  label: 'Menos de $30',  test: p => p.price < 30 },
+  { key: 'mid',  label: '$30 — $70',     test: p => p.price >= 30 && p.price <= 70 },
+  { key: 'high', label: 'Más de $70',    test: p => p.price > 70 },
+]
+
+const HIGHLIGHT_TAGS = [
+  { key: 'bestseller', label: 'Bestseller', test: p => p.viral },
+  { key: 'nuevo',      label: 'Nuevo',      test: p => p.id % 7 === 0 },
+  { key: 'descuento',  label: 'Con descuento', test: p => {
+    const orig = p.original_price || Math.round(p.price * (1.28 + (p.id % 7) * 0.04))
+    return Math.round((1 - p.price / orig) * 100) >= 20
+  }},
+]
+
 function Stars({ rating }) {
   const filled = Math.round(rating)
   return (
@@ -32,6 +47,35 @@ function Stars({ rating }) {
         <span key={i} style={{ fontSize: '12px', color: i <= filled ? '#f59e0b' : '#e5e7eb' }}>★</span>
       ))}
     </span>
+  )
+}
+
+function CheckItem({ checked, label, count, onChange }) {
+  return (
+    <button onClick={onChange} style={s.checkItem}>
+      <span style={{ ...s.checkbox, ...(checked ? s.checkboxOn : {}) }}>
+        {checked && (
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M2 5l2.5 2.5L8 3" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+      </span>
+      <span style={{ ...s.checkLabel, fontWeight: checked ? 600 : 400, color: checked ? '#111827' : '#374151' }}>
+        {label}
+      </span>
+      {count !== undefined && (
+        <span style={s.checkCount}>{count}</span>
+      )}
+    </button>
+  )
+}
+
+function SidebarSection({ title, children }) {
+  return (
+    <div style={s.section}>
+      <p style={s.sectionTitle}>{title}</p>
+      <div style={s.sectionBody}>{children}</div>
+    </div>
   )
 }
 
@@ -107,13 +151,20 @@ function Products() {
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [activeCategory, setActiveCategory] = useState(searchParams.get('cat') || null)
+  const [searchParams] = useSearchParams()
+  const [selCats, setSelCats] = useState(() => {
+    const cat = searchParams.get('cat')
+    return cat ? [cat] : []
+  })
+  const [selPrices, setSelPrices] = useState([])
+  const [selTags, setSelTags] = useState([])
   const { addToCart } = useCart()
   const sentinelRef = useRef(null)
 
   useEffect(() => {
-    setActiveCategory(searchParams.get('cat') || null)
+    const cat = searchParams.get('cat')
+    if (cat) setSelCats([cat])
+    else setSelCats([])
   }, [searchParams])
 
   useEffect(() => {
@@ -130,13 +181,17 @@ function Products() {
   }, [])
 
   const filtered = useMemo(() => {
-    if (!activeCategory) return products
-    return products.filter(p => p.category === activeCategory)
-  }, [activeCategory, products])
+    return products.filter(p => {
+      const catOk   = selCats.length === 0   || selCats.includes(p.category)
+      const priceOk = selPrices.length === 0 || PRICE_RANGES.some(r => selPrices.includes(r.key) && r.test(p))
+      const tagOk   = selTags.length === 0   || HIGHLIGHT_TAGS.some(t => selTags.includes(t.key) && t.test(p))
+      return catOk && priceOk && tagOk
+    })
+  }, [selCats, selPrices, selTags, products])
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [activeCategory])
+  }, [selCats, selPrices, selTags])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -157,7 +212,19 @@ function Products() {
     setTimeout(() => setAddedId(null), 1800)
   }
 
-  function countForCat(slug) {
+  function toggle(setter, key) {
+    setter(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key])
+  }
+
+  function clearAll() {
+    setSelCats([])
+    setSelPrices([])
+    setSelTags([])
+  }
+
+  const hasFilters = selCats.length > 0 || selPrices.length > 0 || selTags.length > 0
+
+  function countCat(slug) {
     return products.filter(p => p.category === slug).length
   }
 
@@ -176,40 +243,58 @@ function Products() {
       <div style={s.layout}>
         {/* SIDEBAR */}
         <aside style={s.sidebar}>
-          <p style={s.sidebarTitle}>Categorías</p>
-          <div style={s.catList}>
-            <button
-              style={activeCategory === null ? s.catItemActive : s.catItem}
-              onClick={() => setSearchParams({}, { replace: true })}
-            >
-              <span style={s.catItemLabel}>Todos los productos</span>
-              <span style={activeCategory === null ? s.catCountActive : s.catCount}>{products.length}</span>
+
+          {hasFilters && (
+            <button onClick={clearAll} style={s.clearBtn}>
+              ✕ Limpiar filtros
             </button>
-            {categories.map(cat => {
-              const isActive = activeCategory === cat.slug
-              const count = countForCat(cat.slug)
-              return (
-                <button
-                  key={cat.id}
-                  style={isActive ? s.catItemActive : s.catItem}
-                  onClick={() => setSearchParams({ cat: cat.slug }, { replace: true })}
-                >
-                  <span style={s.catEmoji}>{cat.emoji}</span>
-                  <span style={s.catItemLabel}>{cat.name.replace(/ IA$/i, '')}</span>
-                  <span style={isActive ? s.catCountActive : s.catCount}>{count}</span>
-                </button>
-              )
-            })}
-          </div>
+          )}
+
+          <SidebarSection title="Categorías">
+            {categories.map(cat => (
+              <CheckItem
+                key={cat.id}
+                checked={selCats.includes(cat.slug)}
+                label={cat.name.replace(/ IA$/i, '')}
+                count={countCat(cat.slug)}
+                onChange={() => toggle(setSelCats, cat.slug)}
+              />
+            ))}
+          </SidebarSection>
+
+          <div style={s.divider} />
+
+          <SidebarSection title="Precio">
+            {PRICE_RANGES.map(r => (
+              <CheckItem
+                key={r.key}
+                checked={selPrices.includes(r.key)}
+                label={r.label}
+                onChange={() => toggle(setSelPrices, r.key)}
+              />
+            ))}
+          </SidebarSection>
+
+          <div style={s.divider} />
+
+          <SidebarSection title="Destacados">
+            {HIGHLIGHT_TAGS.map(t => (
+              <CheckItem
+                key={t.key}
+                checked={selTags.includes(t.key)}
+                label={t.label}
+                onChange={() => toggle(setSelTags, t.key)}
+              />
+            ))}
+          </SidebarSection>
+
         </aside>
 
         {/* MAIN */}
         <div style={s.main}>
-          <div style={s.mainHeader}>
-            <p style={s.counter}>
-              {loading ? '' : `${filtered.length} producto${filtered.length !== 1 ? 's' : ''}`}
-            </p>
-          </div>
+          {!loading && (
+            <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
+          )}
 
           {loading ? (
             <div style={s.grid}>
@@ -254,31 +339,63 @@ function Products() {
 
 const s = {
   wrap: { padding: '88px 5% 80px', background: '#f9fafb', minHeight: '100vh' },
-
   layout: { display: 'flex', gap: '28px', alignItems: 'flex-start' },
 
   sidebar: {
-    width: '200px',
+    width: '210px',
     flexShrink: 0,
     position: 'sticky',
     top: '88px',
     background: '#fff',
     border: '1px solid #e5e7eb',
     borderRadius: '12px',
-    padding: '20px 12px',
+    padding: '20px 16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0px',
   },
-  sidebarTitle: { fontSize: '11px', fontWeight: 700, color: '#9ca3af', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px', paddingLeft: '10px' },
-  catList: { display: 'flex', flexDirection: 'column', gap: '2px' },
-  catItem: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', width: '100%', textAlign: 'left' },
-  catItemActive: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', cursor: 'pointer', width: '100%', textAlign: 'left' },
-  catEmoji: { fontSize: '15px', flexShrink: 0 },
-  catItemLabel: { fontSize: '13px', fontWeight: 500, color: 'inherit', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  catCount: { fontSize: '11px', color: '#9ca3af', background: '#f3f4f6', padding: '1px 6px', borderRadius: '99px', flexShrink: 0 },
-  catCountActive: { fontSize: '11px', color: '#fff', background: 'rgba(255,255,255,0.25)', padding: '1px 6px', borderRadius: '99px', flexShrink: 0 },
+
+  clearBtn: {
+    width: '100%', marginBottom: '16px',
+    background: '#fef2f2', border: '1px solid #fecaca',
+    borderRadius: '6px', color: '#ef4444',
+    fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+    padding: '7px 0', textAlign: 'center',
+  },
+
+  section: { paddingBottom: '4px' },
+  sectionTitle: {
+    fontSize: '10px', fontWeight: 700, color: '#9ca3af',
+    letterSpacing: '0.1em', textTransform: 'uppercase',
+    marginBottom: '10px',
+  },
+  sectionBody: { display: 'flex', flexDirection: 'column', gap: '2px' },
+
+  divider: { height: '1px', background: '#f3f4f6', margin: '14px 0' },
+
+  checkItem: {
+    display: 'flex', alignItems: 'center', gap: '9px',
+    padding: '6px 4px', border: 'none', background: 'transparent',
+    cursor: 'pointer', width: '100%', textAlign: 'left',
+    borderRadius: '6px',
+  },
+  checkbox: {
+    width: '16px', height: '16px', flexShrink: 0,
+    border: '1.5px solid #d1d5db', borderRadius: '4px',
+    background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  checkboxOn: {
+    background: '#1A6FFF', borderColor: '#1A6FFF',
+  },
+  checkLabel: { fontSize: '13px', flex: 1, lineHeight: 1.3 },
+  checkCount: {
+    fontSize: '11px', color: '#9ca3af',
+    background: '#f3f4f6', padding: '1px 6px',
+    borderRadius: '99px', flexShrink: 0,
+  },
 
   main: { flex: 1, minWidth: 0 },
-  mainHeader: { marginBottom: '14px' },
-  counter: { fontSize: '13px', color: '#6b7280' },
+  counter: { fontSize: '13px', color: '#6b7280', marginBottom: '14px' },
 
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' },
 
