@@ -182,7 +182,7 @@ function ProductDetail() {
           {/* ── IMAGEN ── */}
           <div style={s.imgCol}>
             <div style={s.imgBox}>
-              <img src={thumbImgs[thumbIdx]} alt={prod.name} style={s.imgPhoto} />
+              <img src={thumbImgs[thumbIdx]} alt={prod.name} style={{ ...s.imgPhoto, viewTransitionName: `product-img-${id}` }} />
               <span style={s.discountBadge}>-{discountPct}%</span>
               {prod.viral && <span style={s.viralBadge}>🔥 Bestseller</span>}
             </div>

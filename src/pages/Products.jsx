@@ -146,10 +146,14 @@ function ProductCard({ prod, onAdd, addedId, onQuickView }) {
   const rating = prod.rating || parseFloat((4.1 + (prod.id % 9) * 0.1).toFixed(1))
   const reviewsCount = prod.reviews_count || ((89 + prod.id * 43) % 420 + 67)
 
+  const stockLeft = prod.stock || (3 + prod.id % 7)
+
   const badgeLeft = prod.viral
-    ? { label: 'Bestseller', style: s.badgeBestseller }
+    ? { label: '🔥 Bestseller', style: s.badgeBestseller }
+    : discountPct >= 30
+    ? { label: `🔥 −${discountPct}% HOT`, style: s.badgeHot }
     : prod.id % 7 === 0
-    ? { label: 'Nuevo', style: s.badgeNew }
+    ? { label: '✨ Nuevo', style: s.badgeNew }
     : null
 
   return (
@@ -163,14 +167,15 @@ function ProductCard({ prod, onAdd, addedId, onQuickView }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <Link to={`/producto/${prod.id}`} style={s.cardImgWrap}>
+      <Link to={`/producto/${prod.id}`} style={s.cardImgWrap} viewTransition>
         <img
           src={imgSrc}
           alt={prod.name}
-          style={{ ...s.cardImg, transform: hovered ? 'scale(1.07)' : 'scale(1)' }}
+          style={{ ...s.cardImg, transform: hovered ? 'scale(1.07)' : 'scale(1)', viewTransitionName: `product-img-${prod.id}` }}
         />
         {badgeLeft && <span style={badgeLeft.style}>{badgeLeft.label}</span>}
-        <span style={s.badgeDiscount}>-{discountPct}%</span>
+        <span style={s.badgeDiscount}>−{discountPct}%</span>
+        {stockLeft <= 5 && <span style={s.badgeLowStock}>⚡ Solo {stockLeft}</span>}
         <div style={{ ...s.overlay, opacity: hovered ? 1 : 0 }}>
           <button
             style={s.overlayBtn}
@@ -512,7 +517,9 @@ const s = {
 
   badgeBestseller: { position: 'absolute', top: '10px', left: '10px', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 9px', borderRadius: '4px', zIndex: 1, letterSpacing: '0.3px' },
   badgeNew: { position: 'absolute', top: '10px', left: '10px', background: '#16a34a', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 9px', borderRadius: '4px', zIndex: 1, letterSpacing: '0.3px' },
+  badgeHot: { position: 'absolute', top: '10px', left: '10px', background: 'linear-gradient(135deg, #ff4e00, #ff9a00)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 9px', borderRadius: '4px', zIndex: 1, letterSpacing: '0.3px' },
   badgeDiscount: { position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px', zIndex: 1 },
+  badgeLowStock: { position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(0,0,0,0.72)', color: '#fff', fontSize: '10px', fontWeight: 600, padding: '3px 8px', borderRadius: '4px', zIndex: 1, backdropFilter: 'blur(4px)' },
 
   overlay: { position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.22s ease', zIndex: 2 },
   overlayBtn: { background: '#fff', color: '#111827', border: 'none', fontSize: '12px', fontWeight: 600, padding: '9px 22px', borderRadius: '99px', letterSpacing: '0.3px', whiteSpace: 'nowrap', cursor: 'pointer' },
