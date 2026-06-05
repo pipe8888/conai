@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { supabase } from '../lib/supabase'
 
 const CARD_BRANDS = {
   visa: { pattern: /^4/, label: 'Visa', color: '#1A1F71' },
@@ -85,7 +86,27 @@ export default function CheckoutPago() {
     const e2 = validate()
     if (Object.keys(e2).length > 0) { setErrors(e2); return }
     setProcessing(true)
+
+    const orderId = 'ORD-' + Date.now().toString(36).toUpperCase()
+
     await new Promise(r => setTimeout(r, 2200))
+
+    await supabase.from('orders').insert({
+      order_id: orderId,
+      customer_name: shippingData.nombre,
+      customer_email: shippingData.email,
+      customer_phone: shippingData.telefono,
+      shipping_address: shippingData.direccion,
+      shipping_city: shippingData.ciudad,
+      shipping_country: shippingData.pais,
+      shipping_postal_code: shippingData.codigoPostal,
+      items: items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+      total,
+      payment_brand: brand || 'unknown',
+      payment_last4: card.number.slice(-4),
+      status: 'paid',
+    })
+
     clearCart()
     navigate('/checkout/confirmacion', {
       state: {
@@ -93,7 +114,7 @@ export default function CheckoutPago() {
         card: { last4: card.number.slice(-4), brand },
         total,
         items,
-        orderId: 'ORD-' + Date.now().toString(36).toUpperCase(),
+        orderId,
       },
       replace: true,
     })

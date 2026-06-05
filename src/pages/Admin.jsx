@@ -6,9 +6,12 @@ import { useAuth } from '../context/AuthContext'
 const empty = { name: '', price: '', description: '', category: '', image_url: '', emoji: '🤖', badge: '', margin: 60, viral: false }
 
 function Admin() {
+  const [activeTab, setActiveTab] = useState('productos')
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [orders, setOrders] = useState([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editProduct, setEditProduct] = useState(null)
   const [form, setForm] = useState(empty)
@@ -19,6 +22,10 @@ function Admin() {
 
   useEffect(() => { fetchData() }, [])
 
+  useEffect(() => {
+    if (activeTab === 'ordenes' && orders.length === 0) fetchOrders()
+  }, [activeTab])
+
   async function fetchData() {
     const [{ data: prods }, { data: cats }] = await Promise.all([
       supabase.from('products').select('*').order('id'),
@@ -27,6 +34,13 @@ function Admin() {
     setProducts(prods || [])
     setCategories(cats || [])
     setLoading(false)
+  }
+
+  async function fetchOrders() {
+    setOrdersLoading(true)
+    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
+    setOrders(data || [])
+    setOrdersLoading(false)
   }
 
   function openNew() {
@@ -57,7 +71,6 @@ function Admin() {
     e.preventDefault()
     setSaving(true)
     setMsg('')
-
     const payload = {
       name: form.name,
       price: parseFloat(form.price),
@@ -69,11 +82,9 @@ function Admin() {
       margin: parseInt(form.margin),
       viral: form.viral,
     }
-
     const { error } = editProduct
       ? await supabase.from('products').update(payload).eq('id', editProduct.id)
       : await supabase.from('products').insert([payload])
-
     if (error) {
       setMsg('Error: ' + error.message)
     } else {
@@ -92,12 +103,11 @@ function Admin() {
   return (
     <div style={s.wrap}>
 
-      {/* HEADER */}
       <div style={s.header}>
         <div>
           <p style={s.label}>ConAI</p>
           <h1 style={s.title}>Panel Admin</h1>
-          <p style={s.sub}>{products.length} productos · {categories.length} categorías</p>
+          <p style={s.sub}>{products.length} productos · {categories.length} categorías · {orders.length} órdenes</p>
         </div>
         <div style={s.headerRight}>
           <button onClick={() => navigate('/')} style={s.btnSecondary}>Ver tienda</button>
@@ -105,68 +115,145 @@ function Admin() {
         </div>
       </div>
 
-      {/* ADD BUTTON */}
-      <button onClick={openNew} style={s.btnAdd}>+ Agregar producto</button>
+      <div style={s.tabs}>
+        <button style={activeTab === 'productos' ? s.tabActive : s.tab} onClick={() => setActiveTab('productos')}>
+          📦 Productos
+        </button>
+        <button style={activeTab === 'ordenes' ? s.tabActive : s.tab} onClick={() => setActiveTab('ordenes')}>
+          🛒 Órdenes {orders.length > 0 && <span style={s.tabBadge}>{orders.length}</span>}
+        </button>
+      </div>
 
-      {/* TABLE */}
-      {loading ? (
-        <p style={s.loading}>Cargando productos...</p>
-      ) : (
-        <div style={s.tableWrap}>
-          <table style={s.table}>
-            <thead>
-              <tr>
-                <th style={s.th}>Imagen</th>
-                <th style={s.th}>Nombre</th>
-                <th style={s.th}>Categoría</th>
-                <th style={s.th}>Precio</th>
-                <th style={s.th}>Viral</th>
-                <th style={s.th}>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(p => (
-                <tr key={p.id} style={s.tr}>
-                  <td style={s.td}>
-                    <div style={s.thumbWrap}>
-                      {p.image_url
-                        ? <img src={p.image_url} alt={p.name} style={s.thumb} />
-                        : <span style={{ fontSize: '26px' }}>{p.emoji}</span>
-                      }
-                    </div>
-                  </td>
-                  <td style={s.td}>
-                    <p style={s.prodName}>{p.name}</p>
-                    <p style={s.prodDesc}>{p.description?.slice(0, 65)}...</p>
-                  </td>
-                  <td style={s.td}>
-                    <span style={s.catBadge}>{p.category}</span>
-                  </td>
-                  <td style={s.td}>
-                    <span style={s.price}>${p.price}</span>
-                  </td>
-                  <td style={s.td}>{p.viral ? '✅' : '—'}</td>
-                  <td style={s.td}>
-                    <div style={s.actions}>
-                      <button onClick={() => openEdit(p)} style={s.btnEdit}>Editar</button>
-                      <button onClick={() => handleDelete(p.id)} style={s.btnDelete}>Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {activeTab === 'productos' && (
+        <div>
+          <button onClick={openNew} style={s.btnAdd}>+ Agregar producto</button>
+          {loading ? (
+            <p style={s.loading}>Cargando productos...</p>
+          ) : (
+            <div style={s.tableWrap}>
+              <table style={s.table}>
+                <thead>
+                  <tr>
+                    <th style={s.th}>Imagen</th>
+                    <th style={s.th}>Nombre</th>
+                    <th style={s.th}>Categoría</th>
+                    <th style={s.th}>Precio</th>
+                    <th style={s.th}>Viral</th>
+                    <th style={s.th}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map(p => (
+                    <tr key={p.id} style={s.tr}>
+                      <td style={s.td}>
+                        <div style={s.thumbWrap}>
+                          {p.image_url
+                            ? <img src={p.image_url} alt={p.name} style={s.thumb} />
+                            : <span style={{ fontSize: '26px' }}>{p.emoji}</span>
+                          }
+                        </div>
+                      </td>
+                      <td style={s.td}>
+                        <p style={s.prodName}>{p.name}</p>
+                        <p style={s.prodDesc}>{p.description?.slice(0, 65)}...</p>
+                      </td>
+                      <td style={s.td}>
+                        <span style={s.catBadge}>{p.category}</span>
+                      </td>
+                      <td style={s.td}>
+                        <span style={s.price}>${p.price}</span>
+                      </td>
+                      <td style={s.td}>{p.viral ? '✅' : '—'}</td>
+                      <td style={s.td}>
+                        <div style={s.actions}>
+                          <button onClick={() => openEdit(p)} style={s.btnEdit}>Editar</button>
+                          <button onClick={() => handleDelete(p.id)} style={s.btnDelete}>Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
-      {/* MODAL */}
+      {activeTab === 'ordenes' && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            <button onClick={fetchOrders} style={s.btnSecondary}>↺ Actualizar</button>
+          </div>
+          {ordersLoading ? (
+            <p style={s.loading}>Cargando órdenes...</p>
+          ) : orders.length === 0 ? (
+            <div style={s.emptyOrders}>
+              <p style={{ fontSize: '40px', marginBottom: '12px' }}>📭</p>
+              <p style={{ color: '#8b8a9e', fontSize: '15px' }}>Aún no hay órdenes</p>
+            </div>
+          ) : (
+            <div style={s.tableWrap}>
+              <table style={s.table}>
+                <thead>
+                  <tr>
+                    <th style={s.th}>Orden</th>
+                    <th style={s.th}>Cliente</th>
+                    <th style={s.th}>Destino</th>
+                    <th style={s.th}>Productos</th>
+                    <th style={s.th}>Total</th>
+                    <th style={s.th}>Pago</th>
+                    <th style={s.th}>Fecha</th>
+                    <th style={s.th}>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map(o => (
+                    <tr key={o.id} style={s.tr}>
+                      <td style={s.td}>
+                        <span style={s.orderId}>{o.order_id}</span>
+                      </td>
+                      <td style={s.td}>
+                        <p style={s.prodName}>{o.customer_name}</p>
+                        <p style={s.prodDesc}>{o.customer_email}</p>
+                      </td>
+                      <td style={s.td}>
+                        <p style={s.prodDesc}>{o.shipping_city}, {o.shipping_country}</p>
+                      </td>
+                      <td style={s.td}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          {(o.items || []).map((item, i) => (
+                            <p key={i} style={{ ...s.prodDesc, margin: 0 }}>{item.name} x{item.quantity}</p>
+                          ))}
+                        </div>
+                      </td>
+                      <td style={s.td}>
+                        <span style={s.price}>${Number(o.total).toFixed(2)}</span>
+                      </td>
+                      <td style={s.td}>
+                        <p style={s.prodDesc}>{o.payment_brand} ···{o.payment_last4}</p>
+                      </td>
+                      <td style={s.td}>
+                        <p style={s.prodDesc}>
+                          {new Date(o.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </td>
+                      <td style={s.td}>
+                        <span style={o.status === 'paid' ? s.statusPaid : s.statusOther}>{o.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {showForm && (
         <div style={s.overlay} onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
           <div style={s.modal}>
             <h2 style={s.modalTitle}>{editProduct ? 'Editar producto' : 'Nuevo producto'}</h2>
-
             <form onSubmit={handleSubmit} style={s.form}>
-
               <div style={s.row}>
                 <Field label="Nombre *">
                   <input style={s.input} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
@@ -175,11 +262,9 @@ function Admin() {
                   <input style={s.input} type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required />
                 </Field>
               </div>
-
               <Field label="Descripción">
                 <textarea style={{ ...s.input, height: '80px', resize: 'vertical' }} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
               </Field>
-
               <div style={s.row}>
                 <Field label="Categoría *">
                   <select style={{ ...s.input, appearance: 'none' }} value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required>
@@ -191,15 +276,12 @@ function Admin() {
                   <input style={s.input} value={form.emoji} onChange={e => setForm({ ...form, emoji: e.target.value })} />
                 </Field>
               </div>
-
               <Field label="URL de imagen">
                 <input style={s.input} type="url" placeholder="https://images.unsplash.com/..." value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} />
               </Field>
-
               {form.image_url && (
                 <img src={form.image_url} alt="preview" style={s.imgPreview} />
               )}
-
               <div style={s.row}>
                 <Field label="Badge (ej: Hot, Nuevo)">
                   <input style={s.input} value={form.badge} onChange={e => setForm({ ...form, badge: e.target.value })} />
@@ -208,21 +290,17 @@ function Admin() {
                   <input style={s.input} type="number" min="0" max="100" value={form.margin} onChange={e => setForm({ ...form, margin: e.target.value })} />
                 </Field>
               </div>
-
               <label style={s.checkLabel}>
                 <input type="checkbox" checked={form.viral} onChange={e => setForm({ ...form, viral: e.target.checked })} style={{ accentColor: '#6c63ff', width: '16px', height: '16px' }} />
                 <span>Producto viral — aparece en la sección destacada del Home</span>
               </label>
-
               {msg && <p style={s.error}>{msg}</p>}
-
               <div style={s.formBtns}>
                 <button type="button" onClick={() => setShowForm(false)} style={s.btnGhost}>Cancelar</button>
                 <button type="submit" style={s.btnPrimary} disabled={saving}>
                   {saving ? 'Guardando...' : editProduct ? 'Guardar cambios' : 'Crear producto'}
                 </button>
               </div>
-
             </form>
           </div>
         </div>
@@ -247,6 +325,10 @@ const s = {
   title: { fontSize: '28px', fontWeight: 800, margin: '0 0 4px' },
   sub: { fontSize: '14px', color: '#8b8a9e', margin: 0 },
   headerRight: { display: 'flex', gap: '10px', alignItems: 'center' },
+  tabs: { display: 'flex', gap: '4px', marginBottom: '28px', borderBottom: '1px solid rgba(108,99,255,0.2)', paddingBottom: '0' },
+  tab: { padding: '10px 20px', background: 'transparent', border: 'none', borderBottom: '2px solid transparent', color: '#8b8a9e', fontSize: '14px', fontWeight: 500, cursor: 'pointer', borderRadius: '6px 6px 0 0', display: 'flex', alignItems: 'center', gap: '6px' },
+  tabActive: { padding: '10px 20px', background: 'rgba(108,99,255,0.08)', border: 'none', borderBottom: '2px solid #6c63ff', color: '#f1f0ff', fontSize: '14px', fontWeight: 700, cursor: 'pointer', borderRadius: '6px 6px 0 0', display: 'flex', alignItems: 'center', gap: '6px' },
+  tabBadge: { background: '#6c63ff', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '1px 7px', borderRadius: '99px' },
   btnAdd: { background: 'linear-gradient(135deg,#6c63ff,#a78bfa)', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '99px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', marginBottom: '24px' },
   btnPrimary: { background: 'linear-gradient(135deg,#6c63ff,#a78bfa)', color: '#fff', border: 'none', padding: '12px 28px', borderRadius: '99px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' },
   btnSecondary: { background: 'transparent', color: '#f1f0ff', border: '1px solid rgba(108,99,255,0.4)', padding: '8px 18px', borderRadius: '99px', fontSize: '13px', cursor: 'pointer' },
@@ -254,6 +336,7 @@ const s = {
   btnEdit: { background: 'rgba(108,99,255,0.15)', color: '#a78bfa', border: '1px solid rgba(108,99,255,0.3)', padding: '6px 14px', borderRadius: '99px', fontSize: '12px', cursor: 'pointer', fontWeight: 600 },
   btnDelete: { background: 'rgba(255,107,107,0.1)', color: '#ff6b6b', border: '1px solid rgba(255,107,107,0.25)', padding: '6px 14px', borderRadius: '99px', fontSize: '12px', cursor: 'pointer', fontWeight: 600 },
   loading: { color: '#8b8a9e', textAlign: 'center', padding: '80px 0', fontSize: '16px' },
+  emptyOrders: { textAlign: 'center', padding: '80px 0' },
   tableWrap: { overflowX: 'auto', borderRadius: '16px', border: '1px solid rgba(108,99,255,0.2)' },
   table: { width: '100%', borderCollapse: 'collapse' },
   th: { padding: '14px 16px', fontSize: '11px', color: '#8b8a9e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: 'left', borderBottom: '1px solid rgba(108,99,255,0.15)', background: 'rgba(108,99,255,0.05)', whiteSpace: 'nowrap' },
@@ -265,6 +348,9 @@ const s = {
   prodDesc: { fontSize: '12px', color: '#8b8a9e', margin: 0 },
   catBadge: { fontSize: '11px', background: 'rgba(108,99,255,0.1)', color: '#a78bfa', padding: '3px 10px', borderRadius: '99px', fontWeight: 600, whiteSpace: 'nowrap' },
   price: { fontSize: '15px', fontWeight: 700, background: 'linear-gradient(135deg,#6c63ff,#22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  orderId: { fontSize: '12px', fontWeight: 700, color: '#a78bfa', fontFamily: 'monospace', background: 'rgba(108,99,255,0.1)', padding: '3px 8px', borderRadius: '6px' },
+  statusPaid: { fontSize: '11px', fontWeight: 700, color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '3px 10px', borderRadius: '99px', whiteSpace: 'nowrap' },
+  statusOther: { fontSize: '11px', fontWeight: 700, color: '#f59e0b', background: 'rgba(245,158,11,0.1)', padding: '3px 10px', borderRadius: '99px', whiteSpace: 'nowrap' },
   actions: { display: 'flex', gap: '8px' },
   overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '20px' },
   modal: { background: '#13131c', border: '1px solid rgba(108,99,255,0.3)', borderRadius: '24px', padding: '40px', width: '100%', maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto' },
