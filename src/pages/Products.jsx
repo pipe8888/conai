@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
@@ -113,14 +113,8 @@ function Products() {
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const { addToCart } = useCart()
   const sentinelRef = useRef(null)
-
-  useEffect(() => {
-    setSearchQuery(searchParams.get('q') || '')
-  }, [searchParams])
 
   useEffect(() => {
     async function fetchData() {
@@ -130,22 +124,6 @@ function Products() {
     }
     fetchData()
   }, [])
-
-  const filtered = useMemo(() => {
-    if (!searchQuery) return products
-    const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean)
-    return products.filter(p =>
-      terms.some(t =>
-        p.name.toLowerCase().includes(t) ||
-        (p.category || '').toLowerCase().includes(t) ||
-        (p.description || '').toLowerCase().includes(t)
-      )
-    )
-  }, [searchQuery, products])
-
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE)
-  }, [searchQuery])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -166,16 +144,6 @@ function Products() {
     setTimeout(() => setAddedId(null), 1800)
   }
 
-  function handleSearch(val) {
-    setSearchQuery(val)
-    setSearchParams(prev => {
-      const p = new URLSearchParams(prev)
-      if (val) p.set('q', val)
-      else p.delete('q')
-      return p
-    }, { replace: true })
-  }
-
   return (
     <div style={s.wrap}>
       <Helmet>
@@ -187,31 +155,6 @@ function Products() {
         <meta property="og:url" content="https://conai.vercel.app/productos" />
         <link rel="canonical" href="https://conai.vercel.app/productos" />
       </Helmet>
-
-      {/* BUSCADOR */}
-      <div style={s.searchRow}>
-        <div style={s.searchBox}>
-          <svg style={s.searchIcon} width="16" height="16" viewBox="0 0 18 18" fill="none">
-            <circle cx="8" cy="8" r="5.5" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="12.5" y1="12.5" x2="16" y2="16" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-          <input
-            style={s.searchInput}
-            type="text"
-            placeholder="Buscar productos..."
-            value={searchQuery}
-            onChange={e => handleSearch(e.target.value)}
-          />
-          {searchQuery && (
-            <button style={s.clearSearch} onClick={() => handleSearch('')} aria-label="Limpiar">✕</button>
-          )}
-        </div>
-      </div>
-
-      {/* CONTADOR */}
-      {!loading && (
-        <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
-      )}
 
       {/* GRID */}
       {loading ? (
@@ -229,13 +172,13 @@ function Products() {
         </div>
       ) : (
         <div style={s.grid}>
-          {filtered.slice(0, visibleCount).map(prod => (
+          {products.slice(0, visibleCount).map(prod => (
             <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} />
           ))}
         </div>
       )}
 
-      {!loading && visibleCount < filtered.length && (
+      {!loading && visibleCount < products.length && (
         <div ref={sentinelRef} style={s.sentinel}>
           <span style={s.sentinelDot} />
           <span style={{ ...s.sentinelDot, animationDelay: '0.2s' }} />
@@ -243,7 +186,7 @@ function Products() {
         </div>
       )}
 
-      {!loading && filtered.length === 0 && (
+      {!loading && products.length === 0 && (
         <div style={s.empty}>
           <p style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</p>
           <p style={{ color: '#9ca3af', fontSize: '14px' }}>No se encontraron productos</p>
@@ -255,12 +198,6 @@ function Products() {
 
 const s = {
   wrap: { padding: '88px 5% 80px', background: '#f9fafb', minHeight: '100vh' },
-
-  searchRow: { display: 'flex', gap: '10px', marginBottom: '14px' },
-  searchBox: { flex: 1, position: 'relative', display: 'flex', alignItems: 'center' },
-  searchIcon: { position: 'absolute', left: '14px', pointerEvents: 'none' },
-  searchInput: { width: '100%', height: '40px', paddingLeft: '40px', paddingRight: '36px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none' },
-  clearSearch: { position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#9ca3af', padding: '4px', lineHeight: 1 },
 
   counter: { fontSize: '13px', color: '#6b7280', marginBottom: '16px' },
 
