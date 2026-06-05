@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import AdminRoute from './components/AdminRoute'
 import SocialProofPopup from './components/SocialProofPopup'
+import CartDrawer from './components/CartDrawer'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
@@ -36,6 +37,7 @@ function App() {
         </main>
         <Footer />
         <SocialProofPopup />
+        <CartDrawer />
       </BrowserRouter>
     </HelmetProvider>
   )

@@ -8,7 +8,7 @@ import LogoSVG from './LogoSVG'
 const ADMIN_EMAIL = 'pipeblue17@gmail.com'
 
 function Navbar() {
-  const { count } = useCart()
+  const { count, openDrawer } = useCart()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -116,7 +116,7 @@ function Navbar() {
             </Link>
           )}
 
-          <button onClick={() => navigate('/carrito')} style={s.cartBtn} title="Carrito">
+          <button onClick={openDrawer} style={s.cartBtn} title="Carrito">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M2 2h2.5l2.1 9.4a1 1 0 0 0 1 .8h7.2a1 1 0 0 0 .97-.76L17 7H5" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <circle cx="8.5" cy="16.5" r="1.2" stroke="#6b7280" strokeWidth="1.5"/>
