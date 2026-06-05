@@ -222,57 +222,43 @@ function Home() {
         </div>
       </section>
 
-      {/* BENTO GRID */}
+      {/* TRENDING GRID */}
       <section style={s.sectionBento}>
         <p style={s.label}>Trending ahora</p>
         <h2 style={s.title}>Lo que todos <span style={s.gradient}>están comprando</span></h2>
         <p style={s.sub}>Gadgets IA seleccionados — los más buscados de esta semana.</p>
-        <div ref={bentoRef} style={s.bentoGrid}>
-
+        <div ref={bentoRef} style={s.trendGrid}>
           {[
-            { area: 'big',  img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con IA adaptativa',              price: '$79',  ribbon: 'MÁS VENDIDO',  ribbonColor: '#f59e0b', delay: 0    },
-            { area: 'sm1',  img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',        name: 'SmartWatch Pro con sensor IA',               price: '$129', ribbon: 'NUEVO',         ribbonColor: '#22c55e', delay: 0.08 },
-            { area: 'sm2',  img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',       name: 'FitBand 360 — monitoreo 24/7',               price: '$49',  ribbon: '−40%',          ribbonColor: '#1A6FFF', delay: 0.16 },
-            { area: 'wide', img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',         name: 'SoundMax AI — cancelación activa de ruido',  price: '$159', ribbon: 'OFERTA FLASH',  ribbonColor: '#ef4444', delay: 0.06 },
-            { area: 'sm3',  img: 'photo-1485827404703-89b55fcc595e', cat: 'ROBÓTICA',         name: 'AI Companion — asistente personal',          price: '$299', ribbon: 'TRENDING',      ribbonColor: '#7B5FFF', delay: 0.22 },
-          ].map(({ area, img, cat, name, price, ribbon, ribbonColor, delay }) => (
+            { img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con IA adaptativa',             price: '$79',  badge: 'MÁS VENDIDO',  badgeColor: '#f59e0b', delay: 0    },
+            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',        name: 'SmartWatch Pro con sensor IA',              price: '$129', badge: 'NUEVO',         badgeColor: '#22c55e', delay: 0.08 },
+            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',       name: 'FitBand 360 — monitoreo 24/7',              price: '$49',  badge: '−40%',          badgeColor: '#1A6FFF', delay: 0.16 },
+            { img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',         name: 'SoundMax AI — cancelación activa de ruido', price: '$159', badge: 'OFERTA FLASH',  badgeColor: '#ef4444', delay: 0.24 },
+          ].map(({ img, cat, name, price, badge, badgeColor, delay }, i) => (
             <Link
-              key={area}
+              key={i}
               to="/productos"
               className="card-hover"
               style={{
-                ...s.bentoCell,
-                gridArea: area,
+                ...s.trendCard,
                 opacity: bentoVisible ? 1 : 0,
                 transform: bentoVisible ? 'translateY(0)' : 'translateY(28px)',
                 transition: `opacity 0.55s ease ${delay}s, transform 0.55s ease ${delay}s`,
               }}
             >
-              <div style={s.ribbon(ribbon, ribbonColor)} />
-              <img src={`https://images.unsplash.com/${img}?w=700&q=80`} alt={name} style={s.bentoImg} />
-              <div style={s.bentoOverlay}>
-                <span style={s.bentoCat}>{cat}</span>
-                <p style={s.bentoName}>{name}</p>
-                <span style={s.bentoPrice}>{price}</span>
+              <div style={s.trendImgWrap}>
+                <img src={`https://images.unsplash.com/${img}?w=700&q=80`} alt={name} style={s.trendImg} />
+                <span style={{ ...s.trendBadge, background: badgeColor }}>{badge}</span>
+              </div>
+              <div style={s.trendInfo}>
+                <p style={s.trendCat}>{cat}</p>
+                <p style={s.trendName}>{name}</p>
+                <div style={s.trendBottom}>
+                  <span style={s.trendPrice}>{price}</span>
+                  <span style={s.trendCta}>Ver →</span>
+                </div>
               </div>
             </Link>
           ))}
-
-          <div style={{
-            ...s.bentoStat,
-            opacity: bentoVisible ? 1 : 0,
-            transform: bentoVisible ? 'translateY(0)' : 'translateY(28px)',
-            transition: 'opacity 0.55s ease 0.12s, transform 0.55s ease 0.12s',
-          }}>
-            {[{ num: '12.4k+', txt: 'clientes' }, { num: '4.9★', txt: 'promedio' }, { num: '−45%', txt: 'desc. máx.' }].map(({ num, txt }, i) => (
-              <div key={i} style={s.statBlock}>
-                {i > 0 && <div style={s.statDivider} />}
-                <div style={s.statNum}>{num}</div>
-                <div style={s.statTxt}>{txt}</div>
-              </div>
-            ))}
-          </div>
-
         </div>
       </section>
 
@@ -760,64 +746,47 @@ const s = {
   featTitle: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '8px' },
   featDesc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6 },
 
-  // Bento
+  // Trending grid
   sectionBento: { padding: '80px 5%', background: '#f8f9fa' },
-  bentoGrid: {
+  trendGrid: {
     display: 'grid',
-    gridTemplateColumns: '2fr 1.3fr 1fr',
-    gridTemplateRows: '220px 220px 200px',
-    gridTemplateAreas: '"big sm1 stat" "big sm2 stat" "wide wide sm3"',
-    gap: '12px',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '16px',
   },
-  bentoCell: {
-    position: 'relative',
+  trendCard: {
+    background: '#ffffff',
+    border: '1px solid #e5e7eb',
     borderRadius: '20px',
     overflow: 'hidden',
-    cursor: 'pointer',
     textDecoration: 'none',
     display: 'block',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
   },
-  ribbon: (text, color) => ({
+  trendImgWrap: {
+    position: 'relative',
+    height: '240px',
+    overflow: 'hidden',
+    background: '#f0f2f5',
+  },
+  trendImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
+  trendBadge: {
     position: 'absolute',
-    top: '24px',
-    left: '-28px',
-    width: '115px',
-    textAlign: 'center',
-    background: color,
+    top: '14px',
+    left: '14px',
     color: '#fff',
-    fontSize: '10px',
+    fontSize: '11px',
     fontWeight: 800,
-    letterSpacing: '0.07em',
-    padding: '5px 0',
-    transform: 'rotate(-45deg)',
-    zIndex: 3,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-  }),
-  bentoImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
-  bentoOverlay: {
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
-    padding: '28px 16px 16px',
-    zIndex: 2,
+    letterSpacing: '0.05em',
+    padding: '5px 12px',
+    borderRadius: '99px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
   },
-  bentoCat: { fontSize: '10px', color: 'rgba(255,255,255,0.6)', fontWeight: 600, letterSpacing: '0.1em', display: 'block', marginBottom: '4px' },
-  bentoName: { fontSize: '13px', fontWeight: 700, color: '#fff', margin: '0 0 6px 0', lineHeight: 1.3 },
-  bentoPrice: { fontSize: '16px', fontWeight: 800, color: '#fff' },
-  bentoStat: {
-    gridArea: 'stat',
-    background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
-    borderRadius: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '24px 16px',
-  },
-  statBlock: { width: '100%', textAlign: 'center', padding: '10px 0' },
-  statDivider: { width: '40px', height: '1px', background: 'rgba(255,255,255,0.2)', margin: '0 auto' },
-  statNum: { fontSize: '28px', fontWeight: 800, color: '#fff', lineHeight: 1.1, marginBottom: '4px' },
-  statTxt: { fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: 500, letterSpacing: '0.05em' },
+  trendInfo: { padding: '18px 20px 20px' },
+  trendCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.1em', marginBottom: '6px' },
+  trendName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', lineHeight: 1.35, marginBottom: '14px' },
+  trendBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+  trendPrice: { fontSize: '20px', fontWeight: 800, color: '#e63946' },
+  trendCta: { fontSize: '13px', fontWeight: 600, color: '#1A6FFF' },
 
   // CTA Final
   ctaWrap: {
