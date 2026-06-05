@@ -110,56 +110,42 @@ function ProductCard({ prod, onAdd, addedId }) {
 
 function Products() {
   const [products, setProducts] = useState([])
-  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
-  const [activeCategory, setActiveCategory] = useState(searchParams.get('cat') || null)
   const { addToCart } = useCart()
-  const dropdownRef = useRef(null)
   const sentinelRef = useRef(null)
 
   useEffect(() => {
     setSearchQuery(searchParams.get('q') || '')
-    setActiveCategory(searchParams.get('cat') || null)
   }, [searchParams])
 
   useEffect(() => {
     async function fetchData() {
-      const [{ data: prods }, { data: cats }] = await Promise.all([
-        supabase.from('products').select('*').order('id'),
-        supabase.from('categories').select('*').order('id'),
-      ])
+      const { data: prods } = await supabase.from('products').select('*').order('id')
       setProducts(prods || [])
-      setCategories(cats || [])
       setLoading(false)
     }
     fetchData()
   }, [])
 
   const filtered = useMemo(() => {
-    if (searchQuery) {
-      const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean)
-      return products.filter(p =>
-        terms.some(t =>
-          p.name.toLowerCase().includes(t) ||
-          (p.category || '').toLowerCase().includes(t) ||
-          (p.description || '').toLowerCase().includes(t)
-        )
+    if (!searchQuery) return products
+    const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean)
+    return products.filter(p =>
+      terms.some(t =>
+        p.name.toLowerCase().includes(t) ||
+        (p.category || '').toLowerCase().includes(t) ||
+        (p.description || '').toLowerCase().includes(t)
       )
-    }
-    if (activeCategory) {
-      return products.filter(p => p.category === activeCategory)
-    }
-    return products
-  }, [searchQuery, activeCategory, products])
+    )
+  }, [searchQuery, products])
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [searchQuery, activeCategory])
+  }, [searchQuery])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -171,16 +157,6 @@ function Products() {
     observer.observe(sentinel)
     return () => observer.disconnect()
   }, [filtered])
-
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   function handleAdd(e, prod) {
     e.preventDefault()
@@ -199,25 +175,6 @@ function Products() {
       return p
     }, { replace: true })
   }
-
-  function selectCategory(cat) {
-    setActiveCategory(cat.slug)
-    setSearchParams({ cat: cat.slug }, { replace: true })
-    setDropdownOpen(false)
-  }
-
-  function clearCategory() {
-    setActiveCategory(null)
-    setSearchParams(prev => {
-      const p = new URLSearchParams(prev)
-      p.delete('cat')
-      return p
-    }, { replace: true })
-  }
-
-  const activeCategoryName = activeCategory
-    ? categories.find(c => c.slug === activeCategory)?.name?.replace(/ IA$/i, '')
-    : null
 
   return (
     <div style={s.wrap}>
@@ -250,48 +207,6 @@ function Products() {
           )}
         </div>
       </div>
-
-      {/* FILTRO CATEGORÍA */}
-      <div style={s.filterRow}>
-        <div ref={dropdownRef} style={{ position: 'relative' }}>
-          <button
-            style={activeCategory ? s.chipActive : s.chip}
-            onClick={() => setDropdownOpen(o => !o)}
-          >
-            {activeCategoryName || 'Categoría'} ▾
-          </button>
-          {dropdownOpen && (
-            <div style={s.dropdown} className="drawer-slide-in">
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  style={{
-                    ...s.dropdownItem,
-                    ...(activeCategory === cat.slug ? s.dropdownItemActive : {}),
-                  }}
-                  onClick={() => selectCategory(cat)}
-                >
-                  <span>{cat.emoji}</span>
-                  <span>{cat.name.replace(/ IA$/i, '')}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {activeCategory && (
-          <button style={s.clearChip} onClick={clearCategory}>
-            ✕ {activeCategoryName}
-          </button>
-        )}
-      </div>
-
-      {/* TÍTULO CATEGORÍA ACTIVA */}
-      {activeCategoryName && (
-        <div style={s.catHeader}>
-          <h2 style={s.catTitle}>{activeCategoryName}</h2>
-        </div>
-      )}
 
       {/* CONTADOR */}
       {!loading && (
@@ -347,17 +262,6 @@ const s = {
   searchInput: { width: '100%', height: '40px', paddingLeft: '40px', paddingRight: '36px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none' },
   clearSearch: { position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#9ca3af', padding: '4px', lineHeight: 1 },
 
-  filterRow: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px', alignItems: 'center' },
-  chip: { height: '32px', padding: '0 14px', border: '1px solid #d1d5db', borderRadius: '4px', background: '#fff', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 400 },
-  chipActive: { height: '32px', padding: '0 14px', border: '1px solid #0a0a0f', borderRadius: '4px', background: '#0a0a0f', fontSize: '13px', color: '#fff', cursor: 'pointer', fontWeight: 500 },
-  clearChip: { height: '28px', padding: '0 12px', border: '1px solid #d1d5db', borderRadius: '99px', background: '#f3f4f6', fontSize: '12px', color: '#6b7280', cursor: 'pointer' },
-
-  dropdown: { position: 'absolute', top: '38px', left: 0, zIndex: 300, background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: '200px', padding: '6px', display: 'flex', flexDirection: 'column', gap: '2px' },
-  dropdownItem: { display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', borderRadius: '6px', border: 'none', background: 'transparent', fontSize: '13px', color: '#374151', cursor: 'pointer', textAlign: 'left' },
-  dropdownItemActive: { background: '#f3f4f6', fontWeight: 600, color: '#0a0a0f' },
-
-  catHeader: { marginBottom: '8px' },
-  catTitle: { fontSize: '22px', fontWeight: 700, color: '#0a0a0f', letterSpacing: '-0.5px' },
   counter: { fontSize: '13px', color: '#6b7280', marginBottom: '16px' },
 
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '16px' },
