@@ -22,6 +22,15 @@ const HERO = {
   accentGlow: 'rgba(26,111,255,0.3)',
 }
 
+const CAT_ACCENTS = [
+  { bg: 'rgba(239,68,68,0.07)',  border: 'rgba(239,68,68,0.15)',  text: '#ef4444' },
+  { bg: 'rgba(245,158,11,0.07)', border: 'rgba(245,158,11,0.15)', text: '#d97706' },
+  { bg: 'rgba(34,197,94,0.07)',  border: 'rgba(34,197,94,0.15)',  text: '#16a34a' },
+  { bg: 'rgba(26,111,255,0.07)', border: 'rgba(26,111,255,0.15)', text: '#1A6FFF' },
+  { bg: 'rgba(139,92,246,0.07)', border: 'rgba(139,92,246,0.15)', text: '#7c3aed' },
+  { bg: 'rgba(20,184,166,0.07)', border: 'rgba(20,184,166,0.15)', text: '#0d9488' },
+]
+
 const CATEGORY_IMGS = {
   auricular: 'photo-1505740420928-5e560c06d30e',
   audio:     'photo-1505740420928-5e560c06d30e',
@@ -308,25 +317,33 @@ function Home() {
         <p style={s.label}>Explora por categoría</p>
         <h2 style={s.title}>Todo con <span style={s.gradient}>Inteligencia Artificial</span></h2>
         <p style={s.sub}>Selecciona tu categoría y descubre los gadgets más innovadores.</p>
-        <div ref={catsRef} style={s.catsGrid}>
-          {categories.map((cat, i) => (
-            <div
-              key={cat.id}
-              onClick={() => navigate(`/productos?cat=${cat.slug}`)}
-              className="card-hover"
-              style={{
-                ...s.catCard,
-                cursor: 'pointer',
-                opacity: catsVisible ? 1 : 0,
-                transform: catsVisible ? 'translateY(0)' : 'translateY(28px)',
-                transition: `opacity 0.55s ease ${i * 0.07}s, transform 0.55s ease ${i * 0.07}s`,
-              }}
-            >
-              <div style={s.catIcon}>{cat.emoji}</div>
-              <div style={s.catName}>{cat.name}</div>
-              <div style={s.catCount}>{cat.count} productos</div>
-            </div>
-          ))}
+        <div ref={catsRef} style={s.accentGrid}>
+          {categories.map((cat, i) => {
+            const accent = CAT_ACCENTS[i % CAT_ACCENTS.length]
+            return (
+              <div
+                key={cat.id}
+                onClick={() => navigate(`/productos?cat=${cat.slug}`)}
+                className="card-hover"
+                style={{
+                  ...s.accentCard,
+                  background: accent.bg,
+                  border: `1px solid ${accent.border}`,
+                  cursor: 'pointer',
+                  opacity: catsVisible ? 1 : 0,
+                  transform: catsVisible ? 'translateY(0)' : 'translateY(28px)',
+                  transition: `opacity 0.55s ease ${i * 0.07}s, transform 0.55s ease ${i * 0.07}s`,
+                }}
+              >
+                <div style={{ ...s.accentEmoji, background: accent.border }}>{cat.emoji}</div>
+                <div style={s.accentMeta}>
+                  <p style={s.accentName}>{cat.name}</p>
+                  <p style={s.accentCount}>{cat.count} productos</p>
+                </div>
+                <span style={{ ...s.accentArrow, color: accent.text }}>→</span>
+              </div>
+            )
+          })}
         </div>
       </section>
 
@@ -677,16 +694,33 @@ const s = {
   howTitle: { fontSize: '17px', fontWeight: 700, color: '#0a0a0f', marginBottom: '10px', margin: '0 0 10px 0' },
   howDesc: { fontSize: '14px', color: '#6b7280', lineHeight: 1.65, margin: 0 },
 
-  // Categorías
-  catsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: '14px' },
-  catCard: {
-    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
-    padding: '24px 18px', textAlign: 'center', textDecoration: 'none',
-    display: 'block', boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+  // Categorías accent
+  accentGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+    gap: '12px',
   },
-  catIcon: { fontSize: '32px', marginBottom: '12px' },
-  catName: { fontSize: '14px', fontWeight: 600, color: '#0a0a0f', marginBottom: '4px' },
-  catCount: { fontSize: '12px', color: '#9ca3af' },
+  accentCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    borderRadius: '16px',
+    padding: '18px 20px',
+  },
+  accentEmoji: {
+    width: '52px',
+    height: '52px',
+    borderRadius: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '26px',
+    flexShrink: 0,
+  },
+  accentMeta: { flex: 1, minWidth: 0 },
+  accentName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', margin: '0 0 3px 0' },
+  accentCount: { fontSize: '12px', color: '#9ca3af', margin: 0 },
+  accentArrow: { fontSize: '18px', fontWeight: 700, flexShrink: 0 },
 
   // Productos
   prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '16px' },
