@@ -195,34 +195,36 @@ function Home() {
         <p style={s.label}>Trending ahora</p>
         <h2 style={s.title}>Lo que todos <span style={s.gradient}>están comprando</span></h2>
         <p style={s.sub}>Gadgets IA seleccionados — los más buscados de esta semana.</p>
-        <div ref={bentoRef} style={s.trendGrid}>
+        <div ref={bentoRef} className="scroll-track" style={s.scrollTrack}>
           {[
             { img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con IA adaptativa',             price: '$79',  badge: 'MÁS VENDIDO',  badgeColor: '#f59e0b', delay: 0    },
-            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',        name: 'SmartWatch Pro con sensor IA',              price: '$129', badge: 'NUEVO',         badgeColor: '#22c55e', delay: 0.08 },
-            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',       name: 'FitBand 360 — monitoreo 24/7',              price: '$49',  badge: '−40%',          badgeColor: '#1A6FFF', delay: 0.16 },
-            { img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',         name: 'SoundMax AI — cancelación activa de ruido', price: '$159', badge: 'OFERTA FLASH',  badgeColor: '#ef4444', delay: 0.24 },
+            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',        name: 'SmartWatch Pro con sensor IA',              price: '$129', badge: 'NUEVO',         badgeColor: '#22c55e', delay: 0.06 },
+            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',       name: 'FitBand 360 — monitoreo 24/7',              price: '$49',  badge: '−40%',          badgeColor: '#1A6FFF', delay: 0.12 },
+            { img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',         name: 'SoundMax AI — cancelación activa de ruido', price: '$159', badge: 'OFERTA FLASH',  badgeColor: '#ef4444', delay: 0.18 },
           ].map(({ img, cat, name, price, badge, badgeColor, delay }, i) => (
             <Link
               key={i}
               to="/productos"
               className="card-hover"
               style={{
-                ...s.trendCard,
+                ...s.appleCard,
                 opacity: bentoVisible ? 1 : 0,
-                transform: bentoVisible ? 'translateY(0)' : 'translateY(28px)',
-                transition: `opacity 0.55s ease ${delay}s, transform 0.55s ease ${delay}s`,
+                transform: bentoVisible ? 'translateY(0)' : 'translateY(16px)',
+                transition: `opacity 0.45s ease ${delay}s, transform 0.45s ease ${delay}s`,
               }}
             >
-              <div style={s.trendImgWrap}>
-                <img src={`https://images.unsplash.com/${img}?w=700&q=80`} alt={name} style={s.trendImg} />
-                <span style={{ ...s.trendBadge, background: badgeColor }}>{badge}</span>
+              <div style={s.appleCardTop}>
+                <span style={s.appleChip}>{cat}</span>
+                <span style={{ ...s.appleBadge, background: badgeColor }}>{badge}</span>
               </div>
-              <div style={s.trendInfo}>
-                <p style={s.trendCat}>{cat}</p>
-                <p style={s.trendName}>{name}</p>
-                <div style={s.trendBottom}>
-                  <span style={s.trendPrice}>{price}</span>
-                  <span style={s.trendCta}>Ver →</span>
+              <div style={s.appleImgWrap}>
+                <img src={`https://images.unsplash.com/${img}?w=400&q=80`} alt={name} style={s.appleImg} />
+              </div>
+              <div style={s.appleInfo}>
+                <p style={s.appleName}>{name}</p>
+                <div style={s.appleBottom}>
+                  <span style={s.applePrice}>{price}</span>
+                  <span style={s.appleCta}>Ver →</span>
                 </div>
               </div>
             </Link>
@@ -235,32 +237,35 @@ function Home() {
         <p style={s.label}>Más vendidos</p>
         <h2 style={s.title}>Productos <span style={s.gradient}>Destacados</span></h2>
         <p style={s.sub}>Los gadgets IA con mayor demanda y mejores márgenes.</p>
-        <div ref={prodsRef} style={s.prodsGrid}>
+        <div ref={prodsRef} className="scroll-track" style={s.scrollTrack}>
           {featured.map((prod, i) => (
-            <Link key={prod.id} to={`/producto/${prod.id}`}
+            <Link
+              key={prod.id}
+              to={`/producto/${prod.id}`}
               className="card-hover"
               style={{
-                ...s.prodCard,
+                ...s.appleCard,
                 opacity: prodsVisible ? 1 : 0,
-                transform: prodsVisible ? 'translateY(0)' : 'translateY(28px)',
-                transition: `opacity 0.55s ease ${i * 0.09}s, transform 0.55s ease ${i * 0.09}s`,
+                transform: prodsVisible ? 'translateY(0)' : 'translateY(16px)',
+                transition: `opacity 0.45s ease ${i * 0.09}s, transform 0.45s ease ${i * 0.09}s`,
               }}
             >
-              <div className="card-hover" style={s.prodImg}>
+              <div style={s.appleCardTop}>
+                <span style={s.appleChip}>{prod.category.toUpperCase()}</span>
+              </div>
+              <div style={s.appleImgWrap}>
                 <img
                   src={prod.image_url || getCategoryImg(prod.category)}
                   alt={prod.name}
-                  style={s.prodImgPhoto}
+                  style={s.appleImg}
                 />
-                <div className="prod-card-btn">Ver producto →</div>
               </div>
-              <div style={s.prodInfo}>
-                <p style={s.prodCat}>{prod.category.toUpperCase()}</p>
-                <p style={s.prodName}>{prod.name}</p>
-                <p style={s.prodDesc}>{prod.description}</p>
-                <div style={s.prodBottom}>
-                  <span style={s.prodPrice}>${prod.price}</span>
-                  <span style={s.prodBadge}>{prod.badge}</span>
+              <div style={s.appleInfo}>
+                <p style={s.appleName}>{prod.name}</p>
+                <p style={s.appleDesc}>{prod.description}</p>
+                <div style={s.appleBottom}>
+                  <span style={s.applePrice}>${prod.price}</span>
+                  <span style={s.appleCta}>Ver →</span>
                 </div>
               </div>
             </Link>
@@ -276,32 +281,36 @@ function Home() {
         <p style={s.label}>Solo por hoy</p>
         <h2 style={s.title}>Ofertas <span style={s.gradient}>del día</span></h2>
         <p style={s.sub}>Descuentos limitados en los gadgets más populares.</p>
-        <div ref={dealsRef} style={s.dealsGrid}>
+        <div ref={dealsRef} className="scroll-track" style={s.scrollTrack}>
           {[
             { img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',       name: 'SoundMax AI — cancelación activa de ruido',    orig: '$159', price: '$89', pct: '−44%', pctColor: '#ef4444', delay: 0    },
-            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',       name: 'SmartWatch Pro con monitoreo de salud IA',      orig: '$129', price: '$79', pct: '−38%', pctColor: '#f59e0b', delay: 0.07 },
-            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',      name: 'FitBand 360 — monitoreo 24/7 con IA',           orig: '$85',  price: '$49', pct: '−42%', pctColor: '#1A6FFF', delay: 0.14 },
-            { img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con sonido adaptativo',              orig: '$89',  price: '$49', pct: '−45%', pctColor: '#22c55e', delay: 0.21 },
+            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',       name: 'SmartWatch Pro con monitoreo de salud IA',      orig: '$129', price: '$79', pct: '−38%', pctColor: '#f59e0b', delay: 0.06 },
+            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',      name: 'FitBand 360 — monitoreo 24/7 con IA',           orig: '$85',  price: '$49', pct: '−42%', pctColor: '#1A6FFF', delay: 0.12 },
+            { img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con sonido adaptativo',              orig: '$89',  price: '$49', pct: '−45%', pctColor: '#22c55e', delay: 0.18 },
           ].map(({ img, cat, name, orig, price, pct, pctColor, delay }, i) => (
             <Link key={i} to="/productos" className="card-hover" style={{
-              ...s.dealCard,
+              ...s.appleCard,
               opacity: dealsVisible ? 1 : 0,
-              transform: dealsVisible ? 'translateY(0)' : 'translateY(20px)',
-              transition: `opacity 0.5s ease ${delay}s, transform 0.5s ease ${delay}s`,
+              transform: dealsVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: `opacity 0.45s ease ${delay}s, transform 0.45s ease ${delay}s`,
             }}>
-              <div style={s.dealImgWrap}>
-                <img src={`https://images.unsplash.com/${img}?w=300&q=80`} alt={name} style={s.dealImg} />
+              <div style={s.appleCardTop}>
+                <span style={s.appleChip}>{cat}</span>
+                <span style={{ ...s.appleBadge, background: pctColor }}>{pct}</span>
               </div>
-              <div style={s.dealInfo}>
-                <p style={s.dealCat}>{cat}</p>
-                <p style={s.dealName}>{name}</p>
-                <div style={s.dealPriceRow}>
-                  <span style={s.dealOrig}>{orig}</span>
-                  <span style={s.dealPrice}>{price}</span>
-                  <span style={{ ...s.dealPct, background: pctColor }}>{pct}</span>
+              <div style={s.appleImgWrap}>
+                <img src={`https://images.unsplash.com/${img}?w=400&q=80`} alt={name} style={s.appleImg} />
+              </div>
+              <div style={s.appleInfo}>
+                <p style={s.appleName}>{name}</p>
+                <div style={s.appleBottom}>
+                  <div>
+                    <span style={s.appleOrig}>{orig}&nbsp;&nbsp;</span>
+                    <span style={s.applePrice}>{price}</span>
+                  </div>
+                  <span style={s.appleCta}>Ver →</span>
                 </div>
               </div>
-              <span style={s.dealCta}>Ver →</span>
             </Link>
           ))}
         </div>
@@ -340,28 +349,30 @@ function Home() {
       </section>
 
       {/* FEATURES */}
-      <section style={s.sectionGray}>
+      <section style={s.section}>
         <p style={s.label}>¿Por qué ConAI?</p>
         <h2 style={s.title}>Tu tienda IA de <span style={s.gradient}>confianza</span></h2>
-        <div ref={featRef} style={s.featGrid}>
+        <div ref={featRef} className="scroll-track" style={s.scrollTrack}>
           {[
             { icon: '🤖', t: '100% Productos IA', d: 'Cada producto está seleccionado por su integración real con inteligencia artificial.' },
             { icon: '🚚', t: 'Envío Rápido', d: 'Despacho en 24-48h con proveedores verificados y seguimiento en tiempo real.' },
             { icon: '🔒', t: 'Compra Segura', d: 'Pago 100% seguro con encriptación SSL y garantía de devolución de 30 días.' },
             { icon: '🌟', t: 'Soporte 24/7', d: 'Asistente IA + chat en vivo disponibles en todo momento.' },
           ].map((f, i) => (
-            <div key={i}
+            <div
+              key={i}
               className="card-hover"
               style={{
-                ...s.feat,
+                ...s.appleCard,
+                flex: '0 0 220px',
                 opacity: featVisible ? 1 : 0,
-                transform: featVisible ? 'translateY(0)' : 'translateY(28px)',
-                transition: `opacity 0.55s ease ${i * 0.1}s, transform 0.55s ease ${i * 0.1}s`,
+                transform: featVisible ? 'translateY(0)' : 'translateY(16px)',
+                transition: `opacity 0.45s ease ${i * 0.1}s, transform 0.45s ease ${i * 0.1}s`,
               }}
             >
-              <div style={s.featIcon}>{f.icon}</div>
-              <p style={s.featTitle}>{f.t}</p>
-              <p style={s.featDesc}>{f.d}</p>
+              <div style={s.appleFeatIcon}>{f.icon}</div>
+              <p style={s.appleFeatTitle}>{f.t}</p>
+              <p style={s.appleFeatDesc}>{f.d}</p>
             </div>
           ))}
         </div>
@@ -627,53 +638,70 @@ const s = {
   title: { fontSize: 'clamp(26px,4vw,42px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.2, marginBottom: '14px', color: '#0a0a0f' },
   sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '48px' },
 
-  // Ofertas del día
-  dealsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '12px' },
-  dealCard: {
+  // Apple/Linear shared
+  scrollTrack: {
+    display: 'flex',
+    gap: '14px',
+    overflowX: 'auto',
+    scrollSnapType: 'x mandatory',
+    scrollbarWidth: 'none',
+    paddingBottom: '8px',
+  },
+  appleCard: {
+    flex: '0 0 240px',
+    scrollSnapAlign: 'start',
+    background: '#ffffff',
+    borderRadius: '20px',
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    textDecoration: 'none',
+    boxShadow: '0 2px 16px rgba(0,0,0,0.07)',
+    border: '1px solid rgba(0,0,0,0.05)',
+  },
+  appleCardTop: {
     display: 'flex',
     alignItems: 'center',
-    gap: '20px',
-    background: '#ffffff',
-    border: '1px solid #e5e7eb',
-    borderRadius: '16px',
-    padding: '16px 20px',
-    textDecoration: 'none',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    justifyContent: 'space-between',
+    marginBottom: '14px',
+    gap: '8px',
   },
-  dealImgWrap: {
-    width: '110px',
-    height: '110px',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    background: '#f0f2f5',
+  appleChip: {
+    fontSize: '10px',
+    fontWeight: 700,
+    color: '#1A6FFF',
+    background: 'rgba(26,111,255,0.08)',
+    padding: '4px 10px',
+    borderRadius: '99px',
+    letterSpacing: '0.06em',
     flexShrink: 0,
   },
-  dealImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
-  dealInfo: { flex: 1, minWidth: 0 },
-  dealCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.1em', marginBottom: '5px' },
-  dealName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', lineHeight: 1.3, marginBottom: '10px' },
-  dealPriceRow: { display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' },
-  dealOrig: { fontSize: '14px', color: '#9ca3af', textDecoration: 'line-through', fontWeight: 500 },
-  dealPrice: { fontSize: '22px', fontWeight: 800, color: '#e63946' },
-  dealPct: { fontSize: '11px', fontWeight: 800, color: '#fff', padding: '3px 10px', borderRadius: '99px' },
-  dealCta: { fontSize: '14px', fontWeight: 700, color: '#1A6FFF', flexShrink: 0, paddingLeft: '12px' },
-
-  // Productos
-  prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '16px' },
-  prodCard: {
-    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
-    overflow: 'hidden', textDecoration: 'none', display: 'block',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+  appleBadge: {
+    fontSize: '10px',
+    fontWeight: 800,
+    color: '#fff',
+    padding: '3px 10px',
+    borderRadius: '99px',
+    flexShrink: 0,
   },
-  prodImg: { aspectRatio: '4/5', position: 'relative', overflow: 'hidden', background: '#f0f2f5' },
-  prodImgPhoto: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
-  prodInfo: { padding: '16px' },
-  prodCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '6px' },
-  prodName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '6px', lineHeight: 1.3 },
-  prodDesc: { fontSize: '12px', color: '#6b7280', lineHeight: 1.5, marginBottom: '14px' },
-  prodBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  prodPrice: { fontSize: '18px', fontWeight: 800, color: '#e63946' },
-  prodBadge: { fontSize: '10px', background: 'rgba(26,111,255,0.1)', color: '#1A6FFF', padding: '3px 10px', borderRadius: '99px', fontWeight: 600 },
+  appleImgWrap: {
+    height: '160px',
+    borderRadius: '14px',
+    overflow: 'hidden',
+    background: '#f5f5f7',
+    marginBottom: '16px',
+  },
+  appleImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
+  appleInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' },
+  appleName: { fontSize: '14px', fontWeight: 700, color: '#0a0a0f', lineHeight: 1.35, margin: 0 },
+  appleDesc: { fontSize: '12px', color: '#6b7280', lineHeight: 1.5, margin: 0 },
+  appleBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '10px' },
+  appleOrig: { fontSize: '12px', color: '#9ca3af', textDecoration: 'line-through', fontWeight: 500 },
+  applePrice: { fontSize: '18px', fontWeight: 800, color: '#e63946' },
+  appleCta: { fontSize: '13px', fontWeight: 600, color: '#1A6FFF' },
+  appleFeatIcon: { fontSize: '36px', marginBottom: '16px' },
+  appleFeatTitle: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', margin: '0 0 8px 0' },
+  appleFeatDesc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6, margin: 0 },
 
   // Testimonios
   testiGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' },
@@ -706,57 +734,8 @@ const s = {
   testiName: { fontSize: '14px', fontWeight: 700, color: '#0a0a0f', margin: 0 },
   testiCity: { fontSize: '12px', color: '#9ca3af', margin: 0 },
 
-  // Features
-  featGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '20px' },
-  feat: {
-    background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px',
-    padding: '28px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-  },
-  featIcon: { fontSize: '32px', marginBottom: '16px' },
-  featTitle: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', marginBottom: '8px' },
-  featDesc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6 },
-
-  // Trending grid
+  // Trending section bg
   sectionBento: { padding: '80px 5%', background: '#f8f9fa' },
-  trendGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '16px',
-  },
-  trendCard: {
-    background: '#ffffff',
-    border: '1px solid #e5e7eb',
-    borderRadius: '20px',
-    overflow: 'hidden',
-    textDecoration: 'none',
-    display: 'block',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-  },
-  trendImgWrap: {
-    position: 'relative',
-    height: '240px',
-    overflow: 'hidden',
-    background: '#f0f2f5',
-  },
-  trendImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
-  trendBadge: {
-    position: 'absolute',
-    top: '14px',
-    left: '14px',
-    color: '#fff',
-    fontSize: '11px',
-    fontWeight: 800,
-    letterSpacing: '0.05em',
-    padding: '5px 12px',
-    borderRadius: '99px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
-  },
-  trendInfo: { padding: '18px 20px 20px' },
-  trendCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.1em', marginBottom: '6px' },
-  trendName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', lineHeight: 1.35, marginBottom: '14px' },
-  trendBottom: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  trendPrice: { fontSize: '20px', fontWeight: 800, color: '#e63946' },
-  trendCta: { fontSize: '13px', fontWeight: 600, color: '#1A6FFF' },
 
   // CTA Final
   ctaWrap: {

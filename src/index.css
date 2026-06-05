@@ -72,7 +72,8 @@ body {
   transform: scaleX(1);
 }
 
-.cat-row::-webkit-scrollbar {
+.cat-row::-webkit-scrollbar,
+.scroll-track::-webkit-scrollbar {
   display: none;
 }
 
