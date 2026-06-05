@@ -8,7 +8,6 @@ function ScrollToTop() {
 }
 import { HelmetProvider } from 'react-helmet-async'
 import Navbar from './components/Navbar'
-import Footer from './components/Footer'
 import AdminRoute from './components/AdminRoute'
 import SocialProofPopup from './components/SocialProofPopup'
 import CartDrawer from './components/CartDrawer'
@@ -44,7 +43,6 @@ function App() {
             <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
           </Routes>
         </main>
-        <Footer />
         <CartDrawer />
         <AIAssistant />
       </BrowserRouter>
