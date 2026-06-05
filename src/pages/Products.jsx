@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
 
-const PAGE_SIZE = 9
+const PAGE_SIZE = 6
 
 const CATEGORY_IMGS = {
   auricular: 'photo-1505740420928-5e560c06d30e',
@@ -19,59 +19,37 @@ const CATEGORY_IMGS = {
 function getCategoryImg(cat) {
   const key = (cat || '').toLowerCase()
   for (const [k, v] of Object.entries(CATEGORY_IMGS)) {
-    if (key.includes(k)) return `https://images.unsplash.com/${v}?w=500&q=85`
+    if (key.includes(k)) return `https://images.unsplash.com/${v}?w=400&q=80`
   }
-  return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=85'
+  return 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80'
 }
 
 function ProductCard({ prod, onAdd, addedId }) {
-  const [hovered, setHovered] = useState(false)
   const imgSrc = prod.image_url || getCategoryImg(prod.category)
   const isAdded = addedId === prod.id
-
   return (
-    <div
-      style={{ ...s.card, ...(hovered ? s.cardHover : {}) }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <Link to={`/producto/${prod.id}`} style={s.imgWrap}>
-        <img
-          src={imgSrc}
-          alt={prod.name}
-          style={{ ...s.img, transform: hovered ? 'scale(1.06)' : 'scale(1)' }}
-        />
-        {prod.viral && <span style={s.viralBadge}>🔥 Viral</span>}
-        <div style={{ ...s.overlay, opacity: hovered ? 1 : 0 }}>
-          <span style={s.overlayBtn}>Ver producto →</span>
-        </div>
+    <div style={s.card} className="product-card">
+      <Link to={`/producto/${prod.id}`} style={s.cardImgWrap}>
+        <img src={imgSrc} alt={prod.name} style={s.cardImg} />
+        {prod.viral && <span style={s.viralTag}>🔥 Viral</span>}
       </Link>
-
-      <div style={s.body}>
-        <span style={s.catChip}>{prod.category || 'Gadget'}</span>
-
+      <div style={s.cardBody}>
         <Link to={`/producto/${prod.id}`} style={{ textDecoration: 'none' }}>
-          <p style={s.name}>{prod.name}</p>
+          <p style={s.cardName}>{prod.name}</p>
         </Link>
-
-        <div style={s.ratingRow}>
-          <span style={s.stars}>★★★★★</span>
-          <span style={s.ratingCount}>4.8 · 128</span>
+        <p style={s.cardPrice}>${prod.price} USD</p>
+        <p style={s.cardBy}>Por {prod.category || 'ConAI'}</p>
+        <div style={s.cardActions}>
+          <button
+            style={isAdded ? s.btnAddedFull : s.btnImport}
+            onClick={(e) => onAdd(e, prod)}
+          >
+            {isAdded ? '✓ Agregado' : 'Agregar al carrito'}
+          </button>
+          <Link to={`/producto/${prod.id}`} style={s.btnView}>
+            Ver producto
+          </Link>
         </div>
-
-        <div style={s.priceRow}>
-          <span style={s.price}>${prod.price}</span>
-          <span style={s.curr}>USD</span>
-        </div>
-
-        <span style={s.freeShip}>✓ Envío gratis</span>
-
-        <button
-          style={{ ...(isAdded ? s.btnAdded : s.btnAdd) }}
-          onClick={e => onAdd(e, prod)}
-        >
-          {isAdded ? '✓ Agregado al carrito' : '+ Agregar al carrito'}
-        </button>
       </div>
     </div>
   )
@@ -83,12 +61,15 @@ function Products() {
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [activeCategory, setActiveCategory] = useState(searchParams.get('cat') || null)
   const { addToCart } = useCart()
+  const dropdownRef = useRef(null)
   const sentinelRef = useRef(null)
 
+  // Sincronizar estado desde URL (para cuando el navbar cambia la ruta)
   useEffect(() => {
     setSearchQuery(searchParams.get('q') || '')
     setActiveCategory(searchParams.get('cat') || null)
@@ -124,7 +105,9 @@ function Products() {
     return products
   }, [searchQuery, activeCategory, products])
 
-  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [searchQuery, activeCategory])
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [searchQuery, activeCategory])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -136,6 +119,16 @@ function Products() {
     observer.observe(sentinel)
     return () => observer.disconnect()
   }, [filtered])
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   function handleAdd(e, prod) {
     e.preventDefault()
@@ -155,18 +148,10 @@ function Products() {
     }, { replace: true })
   }
 
-  function handleCategory(slug) {
-    if (activeCategory === slug) {
-      setActiveCategory(null)
-      setSearchParams(prev => {
-        const p = new URLSearchParams(prev)
-        p.delete('cat')
-        return p
-      }, { replace: true })
-    } else {
-      setActiveCategory(slug)
-      setSearchParams({ cat: slug }, { replace: true })
-    }
+  function selectCategory(cat) {
+    setActiveCategory(cat.slug)
+    setSearchParams({ cat: cat.slug }, { replace: true })
+    setDropdownOpen(false)
   }
 
   function clearCategory() {
@@ -194,12 +179,6 @@ function Products() {
         <link rel="canonical" href="https://conai.vercel.app/productos" />
       </Helmet>
 
-      {/* HEADER */}
-      <div style={s.pageHeader}>
-        <h1 style={s.pageTitle}>Catálogo IA</h1>
-        <p style={s.pageSub}>Los gadgets más avanzados del mercado</p>
-      </div>
-
       {/* BUSCADOR */}
       <div style={s.searchRow}>
         <div style={s.searchBox}>
@@ -215,43 +194,61 @@ function Products() {
             onChange={e => handleSearch(e.target.value)}
           />
           {searchQuery && (
-            <button style={s.clearSearch} onClick={() => handleSearch('')}>✕</button>
+            <button style={s.clearSearch} onClick={() => handleSearch('')} aria-label="Limpiar">✕</button>
           )}
         </div>
       </div>
 
-      {/* CATEGORÍAS PILLS */}
-      <div style={s.pillsRow}>
-        <button
-          style={!activeCategory ? s.pillActive : s.pill}
-          onClick={clearCategory}
-        >
-          Todos
-        </button>
-        {categories.map(cat => (
+      {/* FILTRO CATEGORÍA */}
+      <div style={s.filterRow}>
+        <div ref={dropdownRef} style={{ position: 'relative' }}>
           <button
-            key={cat.id}
-            style={activeCategory === cat.slug ? s.pillActive : s.pill}
-            onClick={() => handleCategory(cat.slug)}
+            style={activeCategory ? s.chipActive : s.chip}
+            onClick={() => setDropdownOpen(o => !o)}
           >
-            {cat.emoji} {cat.name.replace(/ IA$/i, '')}
+            {activeCategoryName || 'Categoría'} ▾
           </button>
-        ))}
+          {dropdownOpen && (
+            <div style={s.dropdown} className="drawer-slide-in">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  style={{
+                    ...s.dropdownItem,
+                    ...(activeCategory === cat.slug ? s.dropdownItemActive : {}),
+                  }}
+                  onClick={() => selectCategory(cat)}
+                >
+                  <span>{cat.emoji}</span>
+                  <span>{cat.name.replace(/ IA$/i, '')}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {activeCategory && (
+          <button style={s.clearChip} onClick={clearCategory}>
+            ✕ {activeCategoryName}
+          </button>
+        )}
       </div>
 
-      {/* RESULTADOS INFO */}
-      {!loading && (
-        <div style={s.resultsRow}>
-          {activeCategoryName && <h2 style={s.catTitle}>{activeCategoryName}</h2>}
-          <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
+      {/* TÍTULO CATEGORÍA ACTIVA */}
+      {activeCategoryName && (
+        <div style={s.catHeader}>
+          <h2 style={s.catTitle}>{activeCategoryName}</h2>
         </div>
+      )}
+
+      {/* CONTADOR */}
+      {!loading && (
+        <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
       )}
 
       {/* GRID */}
       {loading ? (
-        <div style={s.loadingWrap}>
-          <p style={s.counter}>Cargando productos...</p>
-        </div>
+        <p style={s.counter}>Cargando...</p>
       ) : (
         <div style={s.grid}>
           {filtered.slice(0, visibleCount).map(prod => (
@@ -274,58 +271,51 @@ function Products() {
           <p style={{ color: '#9ca3af', fontSize: '14px' }}>No se encontraron productos</p>
         </div>
       )}
+
     </div>
   )
 }
 
 const s = {
-  wrap: { padding: '72px 5% 80px', background: '#f5f6fa', minHeight: '100vh' },
+  wrap: { padding: '88px 5% 80px', background: '#f9fafb', minHeight: '100vh' },
 
-  pageHeader: { marginBottom: '28px', paddingTop: '16px' },
-  pageTitle: { fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, color: '#0a0a0f', letterSpacing: '-1px', margin: '0 0 6px' },
-  pageSub: { fontSize: '15px', color: '#6b7280', margin: 0 },
-
-  searchRow: { marginBottom: '16px' },
-  searchBox: { position: 'relative', display: 'flex', alignItems: 'center', maxWidth: '480px' },
+  searchRow: { display: 'flex', gap: '10px', marginBottom: '14px' },
+  searchBox: { flex: 1, position: 'relative', display: 'flex', alignItems: 'center' },
   searchIcon: { position: 'absolute', left: '14px', pointerEvents: 'none' },
-  searchInput: { width: '100%', height: '44px', paddingLeft: '42px', paddingRight: '36px', border: '1.5px solid #e5e7eb', borderRadius: '10px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' },
-  clearSearch: { position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#9ca3af', padding: '4px' },
+  searchInput: { width: '100%', height: '40px', paddingLeft: '40px', paddingRight: '36px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none' },
+  clearSearch: { position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#9ca3af', padding: '4px', lineHeight: 1 },
 
-  pillsRow: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '24px' },
-  pill: { height: '34px', padding: '0 16px', border: '1.5px solid #e5e7eb', borderRadius: '99px', background: '#fff', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' },
-  pillActive: { height: '34px', padding: '0 16px', border: '1.5px solid #1A6FFF', borderRadius: '99px', background: '#1A6FFF', fontSize: '13px', color: '#fff', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' },
+  filterRow: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px', alignItems: 'center' },
+  chip: { height: '32px', padding: '0 14px', border: '1px solid #d1d5db', borderRadius: '4px', background: '#fff', fontSize: '13px', color: '#374151', cursor: 'pointer', fontWeight: 400 },
+  chipActive: { height: '32px', padding: '0 14px', border: '1px solid #0a0a0f', borderRadius: '4px', background: '#0a0a0f', fontSize: '13px', color: '#fff', cursor: 'pointer', fontWeight: 500 },
+  clearChip: { height: '28px', padding: '0 12px', border: '1px solid #d1d5db', borderRadius: '99px', background: '#f3f4f6', fontSize: '12px', color: '#6b7280', cursor: 'pointer' },
 
-  resultsRow: { display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '20px' },
-  catTitle: { fontSize: '20px', fontWeight: 700, color: '#0a0a0f', margin: 0, letterSpacing: '-0.5px' },
-  counter: { fontSize: '13px', color: '#9ca3af', margin: 0 },
-  loadingWrap: { padding: '48px 0', textAlign: 'center' },
+  dropdown: { position: 'absolute', top: '38px', left: 0, zIndex: 300, background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: '200px', padding: '6px', display: 'flex', flexDirection: 'column', gap: '2px' },
+  dropdownItem: { display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', borderRadius: '6px', border: 'none', background: 'transparent', fontSize: '13px', color: '#374151', cursor: 'pointer', textAlign: 'left' },
+  dropdownItemActive: { background: '#f3f4f6', fontWeight: 600, color: '#0a0a0f' },
 
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' },
+  catHeader: { marginBottom: '8px' },
+  catTitle: { fontSize: '22px', fontWeight: 700, color: '#0a0a0f', letterSpacing: '-0.5px' },
+  counter: { fontSize: '13px', color: '#6b7280', marginBottom: '16px' },
 
-  card: { background: '#fff', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', transition: 'box-shadow 0.25s, transform 0.25s', display: 'flex', flexDirection: 'column' },
-  cardHover: { boxShadow: '0 12px 40px rgba(0,0,0,0.13)', transform: 'translateY(-4px)' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '12px' },
 
-  imgWrap: { display: 'block', position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', background: '#f3f4f6', textDecoration: 'none', flexShrink: 0 },
-  img: { width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' },
-  viralBadge: { position: 'absolute', top: '10px', left: '10px', background: 'linear-gradient(135deg,#ef4444,#f97316)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', zIndex: 1 },
-  overlay: { position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.48)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.25s' },
-  overlayBtn: { background: '#fff', color: '#0a0a0f', fontSize: '13px', fontWeight: 700, padding: '10px 20px', borderRadius: '8px', pointerEvents: 'none' },
+  card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: '4px', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
+  cardImgWrap: { display: 'block', position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', background: '#f3f4f6', textDecoration: 'none' },
+  cardImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.3s ease' },
+  viralTag: { position: 'absolute', top: '8px', left: '8px', background: 'rgba(239,68,68,0.88)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '3px' },
+  cardBody: { padding: '12px', display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 },
+  cardName: { fontSize: '13px', color: '#374151', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 },
+  cardPrice: { fontSize: '14px', fontWeight: 700, color: '#111827', margin: 0 },
+  cardBy: { fontSize: '12px', color: '#9ca3af', margin: 0 },
+  cardActions: { display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' },
+  btnImport: { height: '34px', background: 'transparent', border: '1px solid #374151', borderRadius: '4px', fontSize: '13px', fontWeight: 500, color: '#111827', cursor: 'pointer' },
+  btnAddedFull: { height: '34px', background: '#16a34a', border: '1px solid #16a34a', borderRadius: '4px', fontSize: '13px', fontWeight: 500, color: '#fff', cursor: 'pointer' },
+  btnView: { height: '34px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '4px', fontSize: '13px', fontWeight: 400, color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' },
 
-  body: { padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 },
-  catChip: { fontSize: '10px', fontWeight: 700, color: '#1A6FFF', background: 'rgba(26,111,255,0.08)', padding: '3px 10px', borderRadius: '99px', alignSelf: 'flex-start', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' },
-  name: { fontSize: '14px', fontWeight: 700, color: '#0a0a0f', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '0 0 8px' },
-  ratingRow: { display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '10px' },
-  stars: { color: '#f59e0b', fontSize: '12px', letterSpacing: '1px' },
-  ratingCount: { fontSize: '11px', color: '#9ca3af' },
-  priceRow: { display: 'flex', alignItems: 'baseline', gap: '5px', marginBottom: '4px' },
-  price: { fontSize: '22px', fontWeight: 800, color: '#1A6FFF', letterSpacing: '-0.5px' },
-  curr: { fontSize: '13px', fontWeight: 500, color: '#9ca3af' },
-  freeShip: { fontSize: '11px', fontWeight: 600, color: '#16a34a', marginBottom: '14px' },
-  btnAdd: { width: '100%', height: '42px', background: 'linear-gradient(135deg,#0a0a0f,#374151)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em', marginTop: 'auto' },
-  btnAdded: { width: '100%', height: '42px', background: 'linear-gradient(135deg,#16a34a,#22c55e)', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', marginTop: 'auto' },
-
-  sentinel: { display: 'flex', justifyContent: 'center', gap: '6px', padding: '32px 0' },
+  sentinel: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px', padding: '32px 0 16px' },
   sentinelDot: { width: '6px', height: '6px', borderRadius: '50%', background: '#d1d5db', animation: 'pulse 1.2s ease-in-out infinite' },
+
   empty: { textAlign: 'center', padding: '80px 0' },
 }
 
