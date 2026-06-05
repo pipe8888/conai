@@ -5,12 +5,9 @@ import { supabase } from '../lib/supabase'
 
 const HERO = {
   badge: '⚡ SOLO HOY — STOCK LIMITADO',
-  badgeBg: 'rgba(239,68,68,0.1)',
-  badgeColor: '#ef4444',
-  badgeBorder: 'rgba(239,68,68,0.25)',
   title: 'Auriculares IA',
-  sub: 'que evolucionan con vos',
-  img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=700&q=85',
+  sub: 'que se adaptan a ti',
+  img: 'https://images.unsplash.com/photo-1614680376739-414d95ff43df?w=700&q=85',
   originalPrice: '$89',
   price: '$49',
   discount: '-45%',
@@ -18,8 +15,8 @@ const HERO = {
   cta1To: '/productos?cat=auriculares',
   cta2Label: 'Ver todo el catálogo',
   cta2To: '/productos',
-  accentRgb: '26,111,255',
-  accentGlow: 'rgba(26,111,255,0.3)',
+  stock: 7,
+  stockMax: 30,
 }
 
 
@@ -151,21 +148,46 @@ function Home() {
         <div style={s.heroBlobA} />
         <div style={s.heroBlobB} />
         <div style={s.heroInner} className="slide-content-next">
+
+          {/* LEFT */}
           <div style={s.heroLeft}>
             <span style={s.slideBadge}>{HERO.badge}</span>
-            <div style={s.socialProofRow}>
-              ⭐ <strong style={{ color: '#fff', fontWeight: 700 }}>4.9</strong>
-              <span style={{ color: 'rgba(255,255,255,0.5)', marginLeft: '4px' }}>· 2,847 compradores</span>
+
+            {/* Avatares + estrellas */}
+            <div style={s.avatarRow}>
+              {['AV','BM','CL','DR','ES'].map((initials, i) => (
+                <div key={initials} style={{ ...s.avatarCircle, marginLeft: i === 0 ? 0 : '-10px', zIndex: 5 - i }}>
+                  {initials}
+                </div>
+              ))}
+              <div style={s.avatarLabel}>
+                <span style={s.avatarStars}>⭐⭐⭐⭐⭐</span>
+                <span style={s.avatarCount}>+2,847 compradores felices</span>
+              </div>
             </div>
+
             <h1 style={s.heroTitle}>
               {scrambledTitle}<br />
               <span style={{ ...s.gradient, ...blurStyle }}>{HERO.sub}</span>
             </h1>
+
             <div style={s.priceRow}>
               <span style={s.priceOld}>{HERO.originalPrice}</span>
               <span style={s.priceBig}>{HERO.price}</span>
               <span style={s.discountBadge}>{HERO.discount}</span>
             </div>
+
+            {/* Stock bar */}
+            <div style={s.stockWrap}>
+              <div style={s.stockTop}>
+                <span style={s.stockLabel}>🔥 ¡Casi agotado!</span>
+                <span style={s.stockCount}>Solo {HERO.stock} unidades</span>
+              </div>
+              <div style={s.stockBar}>
+                <div style={{ ...s.stockFill, width: `${Math.round((HERO.stock / HERO.stockMax) * 100)}%` }} />
+              </div>
+            </div>
+
             <div style={s.countdown}>
               <span style={s.countdownLabel}>⚡ Oferta termina en:</span>
               <div style={s.countdownBlocks}>
@@ -177,21 +199,44 @@ function Home() {
                 ))}
               </div>
             </div>
+
             <div style={s.heroBtns}>
               <Link to={HERO.cta1To} style={s.btnPrimary}>{HERO.cta1Label}</Link>
               <Link to={HERO.cta2To} style={s.btnOutline}>{HERO.cta2Label}</Link>
             </div>
+
             <div style={s.trustBar}>
               {['🚚 Envío gratis', '↩️ 30 días devolución', '🔒 Pago seguro'].map(t => (
                 <span key={t} style={s.trustItem}>{t}</span>
               ))}
             </div>
           </div>
+
+          {/* RIGHT */}
           <div style={s.heroRight}>
             <div style={s.heroImgGlow} />
-            <img src={HERO.img} alt="Auriculares IA" style={s.heroImg} />
+            <img src={HERO.img} alt="Auriculares IA" style={s.heroImg} className="slide-image-next" />
             <div style={s.discountPill}>{HERO.discount}</div>
+
+            {/* Tarjeta flotante de reseña */}
+            <div style={s.floatReview}>
+              <div style={s.floatReviewTop}>
+                <div style={s.floatAvatar}>MG</div>
+                <div>
+                  <p style={s.floatName}>María G. — Santiago</p>
+                  <span style={s.floatStars}>⭐⭐⭐⭐⭐</span>
+                </div>
+              </div>
+              <p style={s.floatText}>"Sonido increíble, llegó en 3 días. 100% recomendado."</p>
+            </div>
+
+            {/* Badge de pedidos recientes */}
+            <div style={s.floatOrders}>
+              <span style={s.floatOrdersDot} />
+              12 personas lo compraron hoy
+            </div>
           </div>
+
         </div>
       </section>
 
@@ -623,6 +668,101 @@ const s = {
     fontSize: '12px',
     color: 'rgba(255,255,255,0.65)',
     fontWeight: 500,
+  },
+
+  // Avatar row
+  avatarRow: { display: 'flex', alignItems: 'center', gap: '12px' },
+  avatarCircle: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
+    border: '2px solid #0a1628',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '10px',
+    fontWeight: 700,
+    color: '#fff',
+    flexShrink: 0,
+  },
+  avatarLabel: { display: 'flex', flexDirection: 'column', gap: '2px' },
+  avatarStars: { fontSize: '12px', lineHeight: 1 },
+  avatarCount: { fontSize: '12px', color: 'rgba(255,255,255,0.7)', fontWeight: 500 },
+
+  // Stock bar
+  stockWrap: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    background: 'rgba(239,68,68,0.08)',
+    border: '1px solid rgba(239,68,68,0.2)',
+    borderRadius: '12px',
+    padding: '12px 16px',
+  },
+  stockTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  stockLabel: { fontSize: '13px', fontWeight: 700, color: '#fca5a5' },
+  stockCount: { fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' },
+  stockBar: { height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.1)', overflow: 'hidden' },
+  stockFill: { height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #ef4444, #f97316)', transition: 'width 1s ease' },
+
+  // Floating review card
+  floatReview: {
+    position: 'absolute',
+    bottom: '-20px',
+    left: '-30px',
+    background: 'rgba(255,255,255,0.96)',
+    backdropFilter: 'blur(16px)',
+    borderRadius: '16px',
+    padding: '14px 16px',
+    width: '230px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+    zIndex: 2,
+  },
+  floatReviewTop: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' },
+  floatAvatar: {
+    width: '34px',
+    height: '34px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #1A6FFF, #4F94FF)',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '11px',
+    fontWeight: 700,
+    flexShrink: 0,
+  },
+  floatName: { fontSize: '12px', fontWeight: 700, color: '#0a0a0f', margin: 0 },
+  floatStars: { fontSize: '11px' },
+  floatText: { fontSize: '12px', color: '#374151', lineHeight: 1.5, margin: 0, fontStyle: 'italic' },
+
+  // Floating orders badge
+  floatOrders: {
+    position: 'absolute',
+    top: '-16px',
+    right: '-16px',
+    background: 'rgba(10,10,15,0.85)',
+    backdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: '99px',
+    padding: '8px 16px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    zIndex: 2,
+    whiteSpace: 'nowrap',
+  },
+  floatOrdersDot: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    background: '#22c55e',
+    boxShadow: '0 0 8px rgba(34,197,94,0.8)',
+    flexShrink: 0,
   },
   section: { padding: '80px 5%', background: '#ffffff' },
   sectionGray: { padding: '80px 5%', background: '#f8f9fa' },
