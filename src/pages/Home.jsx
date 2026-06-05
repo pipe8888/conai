@@ -105,7 +105,7 @@ function Home() {
   const scrambled = useTextScramble('Auriculares IA', 0)
 
   useEffect(() => {
-    supabase.from('products').select('*').eq('viral', true).limit(12).then(({ data }) => {
+    supabase.from('products').select('*').limit(12).then(({ data }) => {
       const all = data || []
       setFeatured(all.slice(0, 6))
       setDeals(all.slice(0, 4))
@@ -290,7 +290,7 @@ function Home() {
               }}>
                 <img style={s.bentoMainImg} src={star.image_url || getCategoryImg(star.category)} alt={star.name} />
                 <div style={s.bentoMainInfo}>
-                  <p style={s.bentoCat}>{star.category.toUpperCase()}</p>
+                  <p style={s.bentoCat}>{(star.category || '').toUpperCase()}</p>
                   <h3 style={s.bentoName}>{star.name}</h3>
                   <p style={s.bentoDesc}>{star.description}</p>
                   <div style={s.bentoPriceRow}>
@@ -376,7 +376,7 @@ function Home() {
                   </div>
                 </div>
                 <div style={s.prodInfo}>
-                  <p style={s.prodCat}>{prod.category.toUpperCase()}</p>
+                  <p style={s.prodCat}>{(prod.category || '').toUpperCase()}</p>
                   <p style={s.prodName}>{prod.name}</p>
                   <div style={s.prodRating}>
                     <span style={{ fontSize: '11px' }}>⭐⭐⭐⭐⭐</span>
