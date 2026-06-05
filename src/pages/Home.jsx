@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 
 const HERO = {
@@ -132,6 +133,15 @@ function Home() {
 
   return (
     <div>
+      <Helmet>
+        <title>ConAI — Gadgets con Inteligencia Artificial</title>
+        <meta name="description" content="Descubrí los mejores gadgets con IA: auriculares, wearables, dispositivos de salud y más. Envío gratis en pedidos +$50 USD." />
+        <meta property="og:title" content="ConAI — Gadgets con Inteligencia Artificial" />
+        <meta property="og:description" content="Descubrí los mejores gadgets con IA. Envío gratis en pedidos +$50 USD." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://conai.vercel.app/" />
+        <link rel="canonical" href="https://conai.vercel.app/" />
+      </Helmet>
 
       {/* HERO */}
       <section style={s.heroWrap}>

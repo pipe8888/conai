@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 
 function Contact() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
@@ -19,6 +20,13 @@ function Contact() {
 
   return (
     <div style={s.wrap}>
+      <Helmet>
+        <title>Contacto — ConAI</title>
+        <meta name="description" content="¿Tenés dudas? Contactanos y nuestro equipo responde en menos de 24 horas." />
+        <meta property="og:title" content="Contacto — ConAI" />
+        <meta property="og:description" content="¿Tenés dudas? Nuestro equipo responde en menos de 24 horas." />
+        <link rel="canonical" href="https://conai.vercel.app/contacto" />
+      </Helmet>
 
       {/* HEADER */}
       <div style={s.header}>

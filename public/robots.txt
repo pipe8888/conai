@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /checkout
+Disallow: /carrito
+
+Sitemap: https://conai.vercel.app/sitemap.xml

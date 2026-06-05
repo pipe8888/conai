@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
 
@@ -66,8 +67,22 @@ function ProductDetail() {
 
   const imgSrc = prod.image_url || getCategoryImg(prod.category)
 
+  const productDesc = prod.description
+    ? prod.description.slice(0, 155) + (prod.description.length > 155 ? '…' : '')
+    : `Comprá ${prod.name} en ConAI. Gadget con inteligencia artificial.`
+
   return (
     <div style={s.wrap}>
+      <Helmet>
+        <title>{prod.name} — ConAI</title>
+        <meta name="description" content={productDesc} />
+        <meta property="og:title" content={`${prod.name} — ConAI`} />
+        <meta property="og:description" content={productDesc} />
+        <meta property="og:image" content={imgSrc} />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={`https://conai.vercel.app/producto/${prod.id}`} />
+        <link rel="canonical" href={`https://conai.vercel.app/producto/${prod.id}`} />
+      </Helmet>
       <div style={s.inner}>
 
         <Link to="/productos" style={s.backArrow}>← Volver</Link>

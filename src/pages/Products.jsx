@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
 
@@ -168,6 +169,15 @@ function Products() {
 
   return (
     <div style={s.wrap}>
+      <Helmet>
+        <title>Catálogo de Gadgets IA — ConAI</title>
+        <meta name="description" content="Explorá nuestro catálogo completo de gadgets con inteligencia artificial. Auriculares, wearables, dispositivos de salud, hogar inteligente y más." />
+        <meta property="og:title" content="Catálogo de Gadgets IA — ConAI" />
+        <meta property="og:description" content="Explorá auriculares, wearables, dispositivos de salud y más gadgets con IA." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://conai.vercel.app/productos" />
+        <link rel="canonical" href="https://conai.vercel.app/productos" />
+      </Helmet>
 
       {/* BUSCADOR */}
       <div style={s.searchRow}>
