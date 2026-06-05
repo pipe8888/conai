@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
 
-const PAGE_SIZE = 6
+const PAGE_SIZE = 9
 
 const CATEGORY_IMGS = {
   auricular: 'photo-1505740420928-5e560c06d30e',
@@ -68,10 +68,8 @@ function ProductCard({ prod, onAdd, addedId }) {
           alt={prod.name}
           style={{ ...s.cardImg, transform: hovered ? 'scale(1.07)' : 'scale(1)' }}
         />
-
         {badgeLeft && <span style={badgeLeft.style}>{badgeLeft.label}</span>}
         <span style={s.badgeDiscount}>-{discountPct}%</span>
-
         <div style={{ ...s.overlay, opacity: hovered ? 1 : 0 }}>
           <span style={s.overlayBtn}>Ver detalles</span>
         </div>
@@ -81,17 +79,14 @@ function ProductCard({ prod, onAdd, addedId }) {
         <Link to={`/producto/${prod.id}`} style={{ textDecoration: 'none' }}>
           <p style={s.cardName}>{prod.name}</p>
         </Link>
-
         <div style={s.ratingRow}>
           <Stars rating={rating} />
           <span style={s.ratingCount}>{rating} ({reviewsCount})</span>
         </div>
-
         <div style={s.priceRow}>
           <span style={s.priceMain}>${prod.price} USD</span>
           <span style={s.priceOriginal}>${originalPrice}</span>
         </div>
-
         <div style={s.cardActions}>
           <button
             style={isAdded ? s.btnAddedFull : s.btnImport}
@@ -99,9 +94,7 @@ function ProductCard({ prod, onAdd, addedId }) {
           >
             {isAdded ? '✓ Agregado' : 'Agregar al carrito'}
           </button>
-          <Link to={`/producto/${prod.id}`} style={s.btnView}>
-            Ver producto
-          </Link>
+          <Link to={`/producto/${prod.id}`} style={s.btnView}>Ver producto</Link>
         </div>
       </div>
     </div>
@@ -110,42 +103,35 @@ function ProductCard({ prod, onAdd, addedId }) {
 
 function Products() {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
+  const [activeCategory, setActiveCategory] = useState(null)
   const { addToCart } = useCart()
   const sentinelRef = useRef(null)
 
   useEffect(() => {
-    setSearchQuery(searchParams.get('q') || '')
-  }, [searchParams])
-
-  useEffect(() => {
     async function fetchData() {
-      const { data: prods } = await supabase.from('products').select('*').order('id')
+      const [{ data: prods }, { data: cats }] = await Promise.all([
+        supabase.from('products').select('*').order('id'),
+        supabase.from('categories').select('*').order('id'),
+      ])
       setProducts(prods || [])
+      setCategories(cats || [])
       setLoading(false)
     }
     fetchData()
   }, [])
 
   const filtered = useMemo(() => {
-    if (!searchQuery) return products
-    const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean)
-    return products.filter(p =>
-      terms.some(t =>
-        p.name.toLowerCase().includes(t) ||
-        (p.category || '').toLowerCase().includes(t) ||
-        (p.description || '').toLowerCase().includes(t)
-      )
-    )
-  }, [searchQuery, products])
+    if (!activeCategory) return products
+    return products.filter(p => p.category === activeCategory)
+  }, [activeCategory, products])
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [searchQuery])
+  }, [activeCategory])
 
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -166,14 +152,8 @@ function Products() {
     setTimeout(() => setAddedId(null), 1800)
   }
 
-  function handleSearch(val) {
-    setSearchQuery(val)
-    setSearchParams(prev => {
-      const p = new URLSearchParams(prev)
-      if (val) p.set('q', val)
-      else p.delete('q')
-      return p
-    }, { replace: true })
+  function countForCat(slug) {
+    return products.filter(p => p.category === slug).length
   }
 
   return (
@@ -188,67 +168,81 @@ function Products() {
         <link rel="canonical" href="https://conai.vercel.app/productos" />
       </Helmet>
 
-      {/* BUSCADOR */}
-      <div style={s.searchRow}>
-        <div style={s.searchBox}>
-          <svg style={s.searchIcon} width="16" height="16" viewBox="0 0 18 18" fill="none">
-            <circle cx="8" cy="8" r="5.5" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="12.5" y1="12.5" x2="16" y2="16" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-          <input
-            style={s.searchInput}
-            type="text"
-            placeholder="Buscar productos..."
-            value={searchQuery}
-            onChange={e => handleSearch(e.target.value)}
-          />
-          {searchQuery && (
-            <button style={s.clearSearch} onClick={() => handleSearch('')} aria-label="Limpiar">✕</button>
+      <div style={s.layout}>
+        {/* SIDEBAR */}
+        <aside style={s.sidebar}>
+          <p style={s.sidebarTitle}>Categorías</p>
+          <div style={s.catList}>
+            <button
+              style={activeCategory === null ? s.catItemActive : s.catItem}
+              onClick={() => setActiveCategory(null)}
+            >
+              <span style={s.catItemLabel}>Todos los productos</span>
+              <span style={activeCategory === null ? s.catCountActive : s.catCount}>{products.length}</span>
+            </button>
+            {categories.map(cat => {
+              const isActive = activeCategory === cat.slug
+              const count = countForCat(cat.slug)
+              return (
+                <button
+                  key={cat.id}
+                  style={isActive ? s.catItemActive : s.catItem}
+                  onClick={() => setActiveCategory(cat.slug)}
+                >
+                  <span style={s.catEmoji}>{cat.emoji}</span>
+                  <span style={s.catItemLabel}>{cat.name.replace(/ IA$/i, '')}</span>
+                  <span style={isActive ? s.catCountActive : s.catCount}>{count}</span>
+                </button>
+              )
+            })}
+          </div>
+        </aside>
+
+        {/* MAIN */}
+        <div style={s.main}>
+          <div style={s.mainHeader}>
+            <p style={s.counter}>
+              {loading ? '' : `${filtered.length} producto${filtered.length !== 1 ? 's' : ''}`}
+            </p>
+          </div>
+
+          {loading ? (
+            <div style={s.grid}>
+              {[...Array(9)].map((_, i) => (
+                <div key={i} style={s.skeleton}>
+                  <div style={s.skeletonImg} />
+                  <div style={s.skeletonBody}>
+                    <div style={s.skeletonLine} />
+                    <div style={{ ...s.skeletonLine, width: '60%' }} />
+                    <div style={{ ...s.skeletonLine, width: '40%', marginTop: '8px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={s.grid}>
+              {filtered.slice(0, visibleCount).map(prod => (
+                <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} />
+              ))}
+            </div>
+          )}
+
+          {!loading && visibleCount < filtered.length && (
+            <div ref={sentinelRef} style={s.sentinel}>
+              <span style={s.sentinelDot} />
+              <span style={{ ...s.sentinelDot, animationDelay: '0.2s' }} />
+              <span style={{ ...s.sentinelDot, animationDelay: '0.4s' }} />
+            </div>
+          )}
+
+          {!loading && filtered.length === 0 && (
+            <div style={s.empty}>
+              <p style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</p>
+              <p style={{ color: '#9ca3af', fontSize: '14px' }}>No se encontraron productos</p>
+            </div>
           )}
         </div>
       </div>
-
-      {/* CONTADOR */}
-      {!loading && (
-        <p style={s.counter}>{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
-      )}
-
-      {/* GRID */}
-      {loading ? (
-        <div style={s.grid}>
-          {[...Array(6)].map((_, i) => (
-            <div key={i} style={s.skeleton}>
-              <div style={s.skeletonImg} />
-              <div style={s.skeletonBody}>
-                <div style={s.skeletonLine} />
-                <div style={{ ...s.skeletonLine, width: '60%' }} />
-                <div style={{ ...s.skeletonLine, width: '40%', marginTop: '8px' }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div style={s.grid}>
-          {filtered.slice(0, visibleCount).map(prod => (
-            <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} />
-          ))}
-        </div>
-      )}
-
-      {!loading && visibleCount < filtered.length && (
-        <div ref={sentinelRef} style={s.sentinel}>
-          <span style={s.sentinelDot} />
-          <span style={{ ...s.sentinelDot, animationDelay: '0.2s' }} />
-          <span style={{ ...s.sentinelDot, animationDelay: '0.4s' }} />
-        </div>
-      )}
-
-      {!loading && filtered.length === 0 && (
-        <div style={s.empty}>
-          <p style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</p>
-          <p style={{ color: '#9ca3af', fontSize: '14px' }}>No se encontraron productos</p>
-        </div>
-      )}
     </div>
   )
 }
@@ -256,50 +250,59 @@ function Products() {
 const s = {
   wrap: { padding: '88px 5% 80px', background: '#f9fafb', minHeight: '100vh' },
 
-  searchRow: { display: 'flex', gap: '10px', marginBottom: '14px' },
-  searchBox: { flex: 1, position: 'relative', display: 'flex', alignItems: 'center' },
-  searchIcon: { position: 'absolute', left: '14px', pointerEvents: 'none' },
-  searchInput: { width: '100%', height: '40px', paddingLeft: '40px', paddingRight: '36px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', fontSize: '14px', color: '#0a0a0f', outline: 'none' },
-  clearSearch: { position: 'absolute', right: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#9ca3af', padding: '4px', lineHeight: 1 },
+  layout: { display: 'flex', gap: '28px', alignItems: 'flex-start' },
 
-  counter: { fontSize: '13px', color: '#6b7280', marginBottom: '16px' },
+  sidebar: {
+    width: '200px',
+    flexShrink: 0,
+    position: 'sticky',
+    top: '88px',
+    background: '#fff',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    padding: '20px 12px',
+  },
+  sidebarTitle: { fontSize: '11px', fontWeight: 700, color: '#9ca3af', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '12px', paddingLeft: '10px' },
+  catList: { display: 'flex', flexDirection: 'column', gap: '2px' },
+  catItem: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', borderRadius: '8px', border: 'none', background: 'transparent', cursor: 'pointer', width: '100%', textAlign: 'left' },
+  catItemActive: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', cursor: 'pointer', width: '100%', textAlign: 'left' },
+  catEmoji: { fontSize: '15px', flexShrink: 0 },
+  catItemLabel: { fontSize: '13px', fontWeight: 500, color: 'inherit', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  catCount: { fontSize: '11px', color: '#9ca3af', background: '#f3f4f6', padding: '1px 6px', borderRadius: '99px', flexShrink: 0 },
+  catCountActive: { fontSize: '11px', color: '#fff', background: 'rgba(255,255,255,0.25)', padding: '1px 6px', borderRadius: '99px', flexShrink: 0 },
 
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '16px' },
+  main: { flex: 1, minWidth: 0 },
+  mainHeader: { marginBottom: '14px' },
+  counter: { fontSize: '13px', color: '#6b7280' },
 
-  // Card
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' },
+
   card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', display: 'flex', flexDirection: 'column' },
   cardImgWrap: { display: 'block', position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', background: '#f3f4f6', textDecoration: 'none' },
   cardImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.35s ease' },
 
-  // Badges
   badgeBestseller: { position: 'absolute', top: '10px', left: '10px', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 9px', borderRadius: '4px', zIndex: 1, letterSpacing: '0.3px' },
   badgeNew: { position: 'absolute', top: '10px', left: '10px', background: '#16a34a', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 9px', borderRadius: '4px', zIndex: 1, letterSpacing: '0.3px' },
   badgeDiscount: { position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px', zIndex: 1 },
 
-  // Hover overlay
   overlay: { position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.22s ease', zIndex: 2 },
   overlayBtn: { background: '#fff', color: '#111827', fontSize: '12px', fontWeight: 600, padding: '9px 22px', borderRadius: '99px', letterSpacing: '0.3px', whiteSpace: 'nowrap' },
 
-  // Body
   cardBody: { padding: '13px', display: 'flex', flexDirection: 'column', gap: '5px', flex: 1 },
   cardName: { fontSize: '13px', color: '#374151', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 },
 
-  // Rating
   ratingRow: { display: 'flex', alignItems: 'center', gap: '5px' },
   ratingCount: { fontSize: '11px', color: '#9ca3af' },
 
-  // Price
   priceRow: { display: 'flex', alignItems: 'baseline', gap: '7px', marginTop: '2px' },
   priceMain: { fontSize: '15px', fontWeight: 700, color: '#111827' },
   priceOriginal: { fontSize: '12px', color: '#9ca3af', textDecoration: 'line-through' },
 
-  // Actions
   cardActions: { display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' },
   btnImport: { height: '36px', background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: 600, color: '#fff', cursor: 'pointer' },
   btnAddedFull: { height: '36px', background: '#16a34a', border: '1px solid #16a34a', borderRadius: '6px', fontSize: '13px', fontWeight: 600, color: '#fff', cursor: 'pointer' },
   btnView: { height: '34px', background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px', fontWeight: 400, color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' },
 
-  // Skeleton
   skeleton: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' },
   skeletonImg: { width: '100%', aspectRatio: '1 / 1', background: 'linear-gradient(90deg, #f3f4f6 25%, #e9eaec 50%, #f3f4f6 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s ease-in-out infinite' },
   skeletonBody: { padding: '13px', display: 'flex', flexDirection: 'column', gap: '8px' },
