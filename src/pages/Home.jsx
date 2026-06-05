@@ -145,38 +145,49 @@ function Home() {
 
       {/* HERO */}
       <section style={s.heroWrap}>
-        <img src="https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1600&q=85" alt="Auriculares IA" style={s.heroBg} />
-        <div style={s.heroOverlay} />
-        <div style={s.heroContent} className="slide-content-next">
-          <span style={s.slideBadge}>{HERO.badge}</span>
-          <h1 style={s.heroTitle}>
-            {scrambledTitle}<br />
-            <span style={{ ...s.gradient, ...blurStyle }}>{HERO.sub}</span>
-          </h1>
-          <div style={s.priceRow}>
-            <span style={s.priceOld}>{HERO.originalPrice}</span>
-            <span style={s.priceBig}>{HERO.price}</span>
-            <span style={s.discountBadge}>{HERO.discount}</span>
-          </div>
-          <div style={s.countdown}>
-            <span style={s.countdownLabel}>⚡ Oferta termina en:</span>
-            <div style={s.countdownBlocks}>
-              {[{ v: hh, u: 'hrs' }, { v: mm, u: 'min' }, { v: ss, u: 'seg' }].map(({ v, u }) => (
-                <div key={u} style={s.countdownBlock}>
-                  <span style={s.countdownNum}>{v}</span>
-                  <span style={s.countdownUnit}>{u}</span>
-                </div>
+        <div style={s.heroBlobA} />
+        <div style={s.heroBlobB} />
+        <div style={s.heroInner} className="slide-content-next">
+          <div style={s.heroLeft}>
+            <span style={s.slideBadge}>{HERO.badge}</span>
+            <div style={s.socialProofRow}>
+              ⭐ <strong style={{ color: '#fff', fontWeight: 700 }}>4.9</strong>
+              <span style={{ color: 'rgba(255,255,255,0.5)', marginLeft: '4px' }}>· 2,847 compradores</span>
+            </div>
+            <h1 style={s.heroTitle}>
+              {scrambledTitle}<br />
+              <span style={{ ...s.gradient, ...blurStyle }}>{HERO.sub}</span>
+            </h1>
+            <div style={s.priceRow}>
+              <span style={s.priceOld}>{HERO.originalPrice}</span>
+              <span style={s.priceBig}>{HERO.price}</span>
+              <span style={s.discountBadge}>{HERO.discount}</span>
+            </div>
+            <div style={s.countdown}>
+              <span style={s.countdownLabel}>⚡ Oferta termina en:</span>
+              <div style={s.countdownBlocks}>
+                {[{ v: hh, u: 'hrs' }, { v: mm, u: 'min' }, { v: ss, u: 'seg' }].map(({ v, u }) => (
+                  <div key={u} style={s.countdownBlock}>
+                    <span style={s.countdownNum}>{v}</span>
+                    <span style={s.countdownUnit}>{u}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={s.heroBtns}>
+              <Link to={HERO.cta1To} style={s.btnPrimary}>{HERO.cta1Label}</Link>
+              <Link to={HERO.cta2To} style={s.btnOutline}>{HERO.cta2Label}</Link>
+            </div>
+            <div style={s.trustBar}>
+              {['🚚 Envío gratis', '↩️ 30 días devolución', '🔒 Pago seguro'].map(t => (
+                <span key={t} style={s.trustItem}>{t}</span>
               ))}
             </div>
           </div>
-          <div style={s.heroBtns}>
-            <Link to={HERO.cta1To} style={s.btnPrimary}>{HERO.cta1Label}</Link>
-            <Link to={HERO.cta2To} style={s.btnOutline}>{HERO.cta2Label}</Link>
-          </div>
-          <div style={s.trustBar}>
-            {['🚚 Envío gratis', '↩️ 30 días devolución', '🔒 Pago seguro'].map(t => (
-              <span key={t} style={s.trustItem}>{t}</span>
-            ))}
+          <div style={s.heroRight}>
+            <div style={s.heroImgGlow} />
+            <img src={HERO.img} alt="Auriculares IA" style={s.heroImg} />
+            <div style={s.discountPill}>{HERO.discount}</div>
           </div>
         </div>
       </section>
@@ -350,36 +361,75 @@ function Home() {
 const s = {
   heroWrap: {
     position: 'relative',
-    height: '620px',
+    minHeight: '660px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    background: 'linear-gradient(135deg, #060912 0%, #0a1628 55%, #0e0a1e 100%)',
     overflow: 'hidden',
+    padding: '60px 5%',
   },
-  heroBg: {
+  heroBlobA: {
     position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    objectPosition: 'center 30%',
+    width: '520px',
+    height: '520px',
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(26,111,255,0.13) 0%, transparent 70%)',
+    top: '-100px',
+    right: '12%',
+    pointerEvents: 'none',
   },
-  heroOverlay: {
+  heroBlobB: {
     position: 'absolute',
-    inset: 0,
-    background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.62) 100%)',
+    width: '300px',
+    height: '300px',
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(102,170,255,0.08) 0%, transparent 70%)',
+    bottom: '-60px',
+    left: '4%',
+    pointerEvents: 'none',
   },
-  heroContent: {
+  heroInner: {
     position: 'relative',
     zIndex: 1,
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    textAlign: 'center',
-    gap: '20px',
-    padding: '0 24px',
-    maxWidth: '680px',
+    gap: '48px',
+    maxWidth: '1100px',
     width: '100%',
+    margin: '0 auto',
+    flexWrap: 'wrap',
+  },
+  heroLeft: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '20px',
+    flex: '1 1 380px',
+    minWidth: 0,
+  },
+  heroRight: {
+    position: 'relative',
+    flex: '0 0 360px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroImgGlow: {
+    position: 'absolute',
+    width: '320px',
+    height: '320px',
+    borderRadius: '50%',
+    background: 'rgba(26,111,255,0.14)',
+    boxShadow: '0 0 120px 60px rgba(26,111,255,0.14)',
+    pointerEvents: 'none',
+  },
+  socialProofRow: {
+    fontSize: '14px',
+    color: 'rgba(255,255,255,0.85)',
+    fontWeight: 500,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
   },
   slideBadge: {
     display: 'inline-flex',
@@ -400,7 +450,7 @@ const s = {
     letterSpacing: '-2px',
     color: '#ffffff',
     margin: 0,
-    fontFamily: 'monospace',
+    fontFamily: 'inherit',
   },
   gradient: {
     background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
@@ -444,7 +494,6 @@ const s = {
     borderRadius: '14px',
     padding: '14px 20px',
     backdropFilter: 'blur(8px)',
-    alignSelf: 'flex-start',
   },
   countdownLabel: { fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.08em', textTransform: 'uppercase' },
   countdownBlocks: { display: 'flex', alignItems: 'center', gap: '6px' },
