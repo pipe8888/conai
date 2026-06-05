@@ -628,7 +628,7 @@ const s = {
   sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '48px' },
 
   // Ofertas del día
-  dealsGrid: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  dealsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '12px' },
   dealCard: {
     display: 'flex',
     alignItems: 'center',
