@@ -1,8 +1,9 @@
 import { useCart } from '../context/CartContext'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Cart() {
   const { items, total, count, removeFromCart, clearCart } = useCart()
+  const navigate = useNavigate()
 
   if (items.length === 0) return (
     <div style={s.empty}>
@@ -84,7 +85,7 @@ function Cart() {
             <p style={s.marginValue}>${(total * 0.74).toFixed(2)} USD</p>
           </div>
 
-          <button style={s.checkoutBtn}>
+          <button style={s.checkoutBtn} onClick={() => navigate('/checkout')}>
             Proceder al pago →
           </button>
 
