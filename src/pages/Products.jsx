@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
@@ -107,9 +107,14 @@ function Products() {
   const [loading, setLoading] = useState(true)
   const [addedId, setAddedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [activeCategory, setActiveCategory] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('cat') || null)
   const { addToCart } = useCart()
   const sentinelRef = useRef(null)
+
+  useEffect(() => {
+    setActiveCategory(searchParams.get('cat') || null)
+  }, [searchParams])
 
   useEffect(() => {
     async function fetchData() {
@@ -175,7 +180,7 @@ function Products() {
           <div style={s.catList}>
             <button
               style={activeCategory === null ? s.catItemActive : s.catItem}
-              onClick={() => setActiveCategory(null)}
+              onClick={() => setSearchParams({}, { replace: true })}
             >
               <span style={s.catItemLabel}>Todos los productos</span>
               <span style={activeCategory === null ? s.catCountActive : s.catCount}>{products.length}</span>
@@ -187,7 +192,7 @@ function Products() {
                 <button
                   key={cat.id}
                   style={isActive ? s.catItemActive : s.catItem}
-                  onClick={() => setActiveCategory(cat.slug)}
+                  onClick={() => setSearchParams({ cat: cat.slug }, { replace: true })}
                 >
                   <span style={s.catEmoji}>{cat.emoji}</span>
                   <span style={s.catItemLabel}>{cat.name.replace(/ IA$/i, '')}</span>
