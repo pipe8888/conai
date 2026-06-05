@@ -1,5 +1,6 @@
 import { useCart } from '../context/CartContext'
 import { Link, useNavigate } from 'react-router-dom'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 function TrustItem({ icon, text }) {
   const icons = {
@@ -35,6 +36,7 @@ function TrustItem({ icon, text }) {
 function Cart() {
   const { items, total, count, removeFromCart, clearCart, updateQuantity } = useCart()
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
 
   if (items.length === 0) return (
     <div style={s.empty}>
@@ -57,7 +59,7 @@ function Cart() {
         <p style={s.sub}>{count} {count === 1 ? 'artículo' : 'artículos'}</p>
       </div>
 
-      <div style={s.layout}>
+      <div style={{ ...s.layout, gridTemplateColumns: isMobile ? '1fr' : '1fr 360px' }}>
 
         {/* LISTA DE PRODUCTOS */}
         <div style={s.itemsList}>
@@ -101,7 +103,7 @@ function Cart() {
         </div>
 
         {/* RESUMEN */}
-        <div style={s.summary}>
+        <div style={{ ...s.summary, position: isMobile ? 'static' : 'sticky', top: isMobile ? 'auto' : '80px' }}>
           <h2 style={s.summaryTitle}>Resumen del pedido</h2>
 
           <div style={s.summaryRows}>
@@ -198,7 +200,6 @@ const s = {
   },
   summary: {
     background: '#f9fafb', borderRadius: '20px', padding: '28px',
-    position: 'sticky', top: '80px',
   },
   summaryTitle: { fontSize: '17px', fontWeight: 700, color: '#0a0a0f', marginBottom: '20px' },
   summaryRows: { display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' },

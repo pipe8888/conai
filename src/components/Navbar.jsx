@@ -51,7 +51,12 @@ function Navbar() {
   return (
     <>
       <div style={s.progressBar(progress)} />
-      <nav style={{ ...s.nav, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+      <div style={{ ...s.trustBar, transform: visible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}>
+        {['🚚 Envío gratis +$50', '↩️ Devolución 30 días', '🔒 Pago 100% seguro', '💬 Soporte 24h'].map(t => (
+          <span key={t} style={s.trustBarItem}>{t}</span>
+        ))}
+      </div>
+      <nav style={{ ...s.nav, top: '36px', transform: visible ? 'translateY(0)' : 'translateY(-200%)', transition: 'transform 0.3s ease' }}>
 
         {/* IZQUIERDA: logo + barra de búsqueda fija */}
         <div style={s.left}>
@@ -134,6 +139,16 @@ const s = {
     transition: 'width 0.1s linear',
     pointerEvents: 'none',
   }),
+  trustBar: {
+    position: 'fixed', top: 0, left: 0, right: 0, zIndex: 101,
+    background: '#0a0a0f', height: '36px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '28px',
+    padding: '0 5%', overflowX: 'auto',
+  },
+  trustBarItem: {
+    fontSize: '11.5px', color: 'rgba(255,255,255,0.85)',
+    fontWeight: 500, whiteSpace: 'nowrap', letterSpacing: '0.01em',
+  },
   nav: {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
     background: '#ffffff',

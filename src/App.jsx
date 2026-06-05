@@ -3,6 +3,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import AdminRoute from './components/AdminRoute'
+import SocialProofPopup from './components/SocialProofPopup'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
@@ -19,7 +20,7 @@ function App() {
     <HelmetProvider>
       <BrowserRouter>
         <Navbar />
-        <main style={{ paddingTop: '64px' }}>
+        <main style={{ paddingTop: '100px' }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/productos" element={<Products />} />
@@ -34,6 +35,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
+        <SocialProofPopup />
       </BrowserRouter>
     </HelmetProvider>
   )

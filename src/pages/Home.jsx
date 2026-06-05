@@ -159,8 +159,15 @@ function Home() {
             <span style={s.discountBadge}>{HERO.discount}</span>
           </div>
           <div style={s.countdown}>
-            <span style={s.countdownLabel}>⏱ Termina en:</span>
-            <span style={s.countdownTime}>{hh}:{mm}:{ss}</span>
+            <span style={s.countdownLabel}>⚡ Oferta termina en:</span>
+            <div style={s.countdownBlocks}>
+              {[{ v: hh, u: 'hrs' }, { v: mm, u: 'min' }, { v: ss, u: 'seg' }].map(({ v, u }) => (
+                <div key={u} style={s.countdownBlock}>
+                  <span style={s.countdownNum}>{v}</span>
+                  <span style={s.countdownUnit}>{u}</span>
+                </div>
+              ))}
+            </div>
           </div>
           <div style={s.heroBtns}>
             <Link to={HERO.cta1To} style={s.btnPrimary}>{HERO.cta1Label}</Link>
@@ -430,22 +437,23 @@ const s = {
   },
   countdown: {
     display: 'inline-flex',
-    alignItems: 'center',
-    gap: '10px',
-    background: 'rgba(255,255,255,0.1)',
-    border: '1px solid rgba(255,255,255,0.2)',
-    borderRadius: '12px',
-    padding: '10px 18px',
+    flexDirection: 'column',
+    gap: '8px',
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.18)',
+    borderRadius: '14px',
+    padding: '14px 20px',
     backdropFilter: 'blur(8px)',
+    alignSelf: 'flex-start',
   },
-  countdownLabel: { fontSize: '13px', color: 'rgba(255,255,255,0.75)' },
-  countdownTime: {
-    fontSize: '22px',
-    fontWeight: 800,
-    color: '#ef4444',
-    fontVariantNumeric: 'tabular-nums',
-    letterSpacing: '0.04em',
+  countdownLabel: { fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.08em', textTransform: 'uppercase' },
+  countdownBlocks: { display: 'flex', alignItems: 'center', gap: '6px' },
+  countdownBlock: {
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
+    background: 'rgba(0,0,0,0.35)', borderRadius: '8px', padding: '6px 12px', minWidth: '52px',
   },
+  countdownNum: { fontSize: '26px', fontWeight: 800, color: '#fff', fontVariantNumeric: 'tabular-nums', lineHeight: 1 },
+  countdownUnit: { fontSize: '10px', color: 'rgba(255,255,255,0.5)', fontWeight: 500, marginTop: '3px', textTransform: 'uppercase' },
   socialProof: { fontSize: '14px', color: '#374151', fontWeight: 600, margin: 0 },
   heroBtns: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
   btnPrimary: {

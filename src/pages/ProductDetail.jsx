@@ -331,7 +331,10 @@ function ProductDetail() {
         {/* RELACIONADOS */}
         {related.length > 0 && (
           <div style={s.section}>
-            <h2 style={s.sectionTitle}>También te puede interesar</h2>
+            <div style={s.relHeader}>
+              <h2 style={{ ...s.sectionTitle, marginBottom: 0 }}>Otros también compraron</h2>
+              <span style={s.relBadge}>Basado en compras recientes</span>
+            </div>
             <div style={s.relGrid}>
               {related.map(r => {
                 const rOrig     = r.original_price || Math.round(r.price * (1.28 + (r.id % 7) * 0.04))
@@ -480,6 +483,8 @@ const s = {
   faqA: { fontSize: '14px', color: '#6b7280', lineHeight: 1.75, padding: '0 0 18px', margin: 0 },
 
   // Relacionados
+  relHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px', flexWrap: 'wrap' },
+  relBadge: { fontSize: '11px', fontWeight: 600, color: '#6366f1', background: 'rgba(99,102,241,0.08)', padding: '4px 10px', borderRadius: '99px', letterSpacing: '0.04em' },
   relGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' },
   relCard: { textDecoration: 'none', display: 'block' },
   relImgBox: { position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', background: '#f4f5f7', borderRadius: '10px', marginBottom: '10px' },

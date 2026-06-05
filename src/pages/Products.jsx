@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../context/CartContext'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const PAGE_SIZE = 9
 
@@ -38,6 +39,62 @@ const HIGHLIGHT_TAGS = [
     return Math.round((1 - p.price / orig) * 100) >= 20
   }},
 ]
+
+function QuickViewModal({ prod, onClose, onAdd, addedId }) {
+  const imgSrc = prod.image_url || getCategoryImg(prod.category)
+  const originalPrice = prod.original_price || Math.round(prod.price * (1.28 + (prod.id % 7) * 0.04))
+  const discountPct   = Math.round((1 - prod.price / originalPrice) * 100)
+  const rating        = prod.rating || parseFloat((4.1 + (prod.id % 9) * 0.1).toFixed(1))
+  const reviewsCount  = prod.reviews_count || ((89 + prod.id * 43) % 420 + 67)
+  const stockLeft     = prod.stock || (3 + prod.id % 7)
+  const isAdded = addedId === prod.id
+
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <>
+      <div onClick={onClose} style={s.qvOverlay} />
+      <div style={s.qvModal}>
+        <button onClick={onClose} style={s.qvClose}>✕</button>
+        <div style={s.qvBody}>
+          <div style={s.qvImgWrap}>
+            <img src={imgSrc} alt={prod.name} style={s.qvImg} />
+            <span style={s.qvDiscount}>-{discountPct}%</span>
+          </div>
+          <div style={s.qvInfo}>
+            <p style={s.qvCat}>{(prod.category || '').toUpperCase()}</p>
+            <h2 style={s.qvName}>{prod.name}</h2>
+            <div style={s.qvRating}>
+              {[1,2,3,4,5].map(i => (
+                <span key={i} style={{ color: i <= Math.round(rating) ? '#f59e0b' : '#e5e7eb', fontSize: '14px' }}>★</span>
+              ))}
+              <span style={s.qvRatingText}>{rating} ({reviewsCount})</span>
+            </div>
+            <div style={s.qvPriceRow}>
+              <span style={s.qvPrice}>${prod.price} USD</span>
+              <span style={s.qvPriceOrig}>${originalPrice}</span>
+            </div>
+            {prod.description && (
+              <p style={s.qvDesc}>{prod.description.slice(0, 120)}…</p>
+            )}
+            <p style={s.qvStock}>⚡ Solo quedan <strong>{stockLeft}</strong> unidades</p>
+            <button
+              style={isAdded ? s.qvBtnAdded : s.qvBtn}
+              onClick={e => onAdd(e, prod)}
+            >
+              {isAdded ? '✓ Agregado al carrito' : 'Agregar al carrito'}
+            </button>
+            <Link to={`/producto/${prod.id}`} style={s.qvLink}>Ver página completa →</Link>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
 
 function Stars({ rating }) {
   const filled = Math.round(rating)
@@ -79,7 +136,7 @@ function SidebarSection({ title, children }) {
   )
 }
 
-function ProductCard({ prod, onAdd, addedId }) {
+function ProductCard({ prod, onAdd, addedId, onQuickView }) {
   const [hovered, setHovered] = useState(false)
   const imgSrc = prod.image_url || getCategoryImg(prod.category)
   const isAdded = addedId === prod.id
@@ -115,7 +172,12 @@ function ProductCard({ prod, onAdd, addedId }) {
         {badgeLeft && <span style={badgeLeft.style}>{badgeLeft.label}</span>}
         <span style={s.badgeDiscount}>-{discountPct}%</span>
         <div style={{ ...s.overlay, opacity: hovered ? 1 : 0 }}>
-          <span style={s.overlayBtn}>Ver detalles</span>
+          <button
+            style={s.overlayBtn}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); onQuickView(prod) }}
+          >
+            Vista rápida
+          </button>
         </div>
       </Link>
 
@@ -158,8 +220,11 @@ function Products() {
   })
   const [selPrices, setSelPrices] = useState([])
   const [selTags, setSelTags] = useState([])
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [quickView, setQuickView] = useState(null)
   const { addToCart } = useCart()
   const sentinelRef = useRef(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const cat = searchParams.get('cat')
@@ -228,6 +293,49 @@ function Products() {
     return products.filter(p => p.category === slug).length
   }
 
+  const sidebarContent = (
+    <>
+      {hasFilters && (
+        <button onClick={() => { clearAll(); setDrawerOpen(false) }} style={s.clearBtn}>
+          ✕ Limpiar filtros
+        </button>
+      )}
+      <SidebarSection title="Categorías">
+        {categories.map(cat => (
+          <CheckItem
+            key={cat.id}
+            checked={selCats.includes(cat.slug)}
+            label={cat.name.replace(/ IA$/i, '')}
+            count={countCat(cat.slug)}
+            onChange={() => toggle(setSelCats, cat.slug)}
+          />
+        ))}
+      </SidebarSection>
+      <div style={s.divider} />
+      <SidebarSection title="Precio">
+        {PRICE_RANGES.map(r => (
+          <CheckItem
+            key={r.key}
+            checked={selPrices.includes(r.key)}
+            label={r.label}
+            onChange={() => toggle(setSelPrices, r.key)}
+          />
+        ))}
+      </SidebarSection>
+      <div style={s.divider} />
+      <SidebarSection title="Destacados">
+        {HIGHLIGHT_TAGS.map(t => (
+          <CheckItem
+            key={t.key}
+            checked={selTags.includes(t.key)}
+            label={t.label}
+            onChange={() => toggle(setSelTags, t.key)}
+          />
+        ))}
+      </SidebarSection>
+    </>
+  )
+
   return (
     <div style={s.wrap}>
       <Helmet>
@@ -240,55 +348,54 @@ function Products() {
         <link rel="canonical" href="https://conai.vercel.app/productos" />
       </Helmet>
 
-      <div style={s.layout}>
-        {/* SIDEBAR */}
-        <aside style={s.sidebar}>
+      {/* QUICK VIEW MODAL */}
+      {quickView && (
+        <QuickViewModal
+          prod={quickView}
+          onClose={() => setQuickView(null)}
+          onAdd={handleAdd}
+          addedId={addedId}
+        />
+      )}
 
-          {hasFilters && (
-            <button onClick={clearAll} style={s.clearBtn}>
-              ✕ Limpiar filtros
+      {/* DRAWER MÓVIL */}
+      {isMobile && drawerOpen && (
+        <>
+          <div
+            onClick={() => setDrawerOpen(false)}
+            style={s.drawerOverlay}
+          />
+          <div style={s.drawer} className="drawer-slide-in">
+            <div style={s.drawerHeader}>
+              <span style={s.drawerTitle}>Filtros</span>
+              <button onClick={() => setDrawerOpen(false)} style={s.drawerClose}>✕</button>
+            </div>
+            {sidebarContent}
+            <button
+              onClick={() => setDrawerOpen(false)}
+              style={s.drawerApply}
+            >
+              Ver {filtered.length} resultado{filtered.length !== 1 ? 's' : ''}
             </button>
-          )}
+          </div>
+        </>
+      )}
 
-          <SidebarSection title="Categorías">
-            {categories.map(cat => (
-              <CheckItem
-                key={cat.id}
-                checked={selCats.includes(cat.slug)}
-                label={cat.name.replace(/ IA$/i, '')}
-                count={countCat(cat.slug)}
-                onChange={() => toggle(setSelCats, cat.slug)}
-              />
-            ))}
-          </SidebarSection>
+      {/* BOTÓN FLOTANTE FILTROS EN MÓVIL */}
+      {isMobile && (
+        <button onClick={() => setDrawerOpen(true)} style={s.fabFilter}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <line x1="1" y1="3" x2="13" y2="3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+            <line x1="1" y1="7" x2="13" y2="7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+            <line x1="1" y1="11" x2="13" y2="11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+          Filtros{hasFilters ? ` (${selCats.length + selPrices.length + selTags.length})` : ''}
+        </button>
+      )}
 
-          <div style={s.divider} />
-
-          <SidebarSection title="Precio">
-            {PRICE_RANGES.map(r => (
-              <CheckItem
-                key={r.key}
-                checked={selPrices.includes(r.key)}
-                label={r.label}
-                onChange={() => toggle(setSelPrices, r.key)}
-              />
-            ))}
-          </SidebarSection>
-
-          <div style={s.divider} />
-
-          <SidebarSection title="Destacados">
-            {HIGHLIGHT_TAGS.map(t => (
-              <CheckItem
-                key={t.key}
-                checked={selTags.includes(t.key)}
-                label={t.label}
-                onChange={() => toggle(setSelTags, t.key)}
-              />
-            ))}
-          </SidebarSection>
-
-        </aside>
+      <div style={{ ...s.layout, flexDirection: isMobile ? 'column' : 'row' }}>
+        {/* SIDEBAR — solo en desktop */}
+        {!isMobile && <aside style={s.sidebar}>{sidebarContent}</aside>}
 
         {/* MAIN */}
         <div style={s.main}>
@@ -312,7 +419,7 @@ function Products() {
           ) : (
             <div style={s.grid}>
               {filtered.slice(0, visibleCount).map(prod => (
-                <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} />
+                <ProductCard key={prod.id} prod={prod} onAdd={handleAdd} addedId={addedId} onQuickView={setQuickView} />
               ))}
             </div>
           )}
@@ -408,7 +515,7 @@ const s = {
   badgeDiscount: { position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px', zIndex: 1 },
 
   overlay: { position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.22s ease', zIndex: 2 },
-  overlayBtn: { background: '#fff', color: '#111827', fontSize: '12px', fontWeight: 600, padding: '9px 22px', borderRadius: '99px', letterSpacing: '0.3px', whiteSpace: 'nowrap' },
+  overlayBtn: { background: '#fff', color: '#111827', border: 'none', fontSize: '12px', fontWeight: 600, padding: '9px 22px', borderRadius: '99px', letterSpacing: '0.3px', whiteSpace: 'nowrap', cursor: 'pointer' },
 
   cardBody: { padding: '13px', display: 'flex', flexDirection: 'column', gap: '5px', flex: 1 },
   cardName: { fontSize: '13px', color: '#374151', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 },
@@ -434,6 +541,98 @@ const s = {
   sentinelDot: { width: '6px', height: '6px', borderRadius: '50%', background: '#d1d5db', animation: 'pulse 1.2s ease-in-out infinite' },
 
   empty: { textAlign: 'center', padding: '80px 0' },
+
+  qvOverlay: {
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 400,
+  },
+  qvModal: {
+    position: 'fixed', top: '50%', left: '50%', zIndex: 401,
+    transform: 'translate(-50%, -50%)',
+    background: '#fff', borderRadius: '20px',
+    width: 'min(780px, 92vw)', maxHeight: '88vh', overflowY: 'auto',
+    boxShadow: '0 24px 60px rgba(0,0,0,0.2)',
+  },
+  qvClose: {
+    position: 'absolute', top: '14px', right: '16px',
+    background: '#f3f4f6', border: 'none', borderRadius: '99px',
+    width: '32px', height: '32px', cursor: 'pointer',
+    fontSize: '14px', color: '#6b7280', zIndex: 1,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  qvBody: {
+    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0',
+  },
+  qvImgWrap: {
+    position: 'relative', aspectRatio: '1/1',
+    background: '#f4f5f7', borderRadius: '20px 0 0 20px', overflow: 'hidden',
+  },
+  qvImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
+  qvDiscount: {
+    position: 'absolute', top: '12px', right: '12px',
+    background: '#ef4444', color: '#fff', fontSize: '11px', fontWeight: 700,
+    padding: '3px 8px', borderRadius: '4px',
+  },
+  qvInfo: {
+    padding: '28px 28px 28px 24px',
+    display: 'flex', flexDirection: 'column', gap: '12px',
+  },
+  qvCat: { fontSize: '10px', fontWeight: 700, color: '#6366f1', letterSpacing: '0.1em', margin: 0 },
+  qvName: { fontSize: '20px', fontWeight: 800, color: '#0a0a0f', lineHeight: 1.2, margin: 0 },
+  qvRating: { display: 'flex', alignItems: 'center', gap: '5px' },
+  qvRatingText: { fontSize: '12px', color: '#9ca3af' },
+  qvPriceRow: { display: 'flex', alignItems: 'baseline', gap: '10px' },
+  qvPrice: { fontSize: '24px', fontWeight: 800, color: '#0a0a0f' },
+  qvPriceOrig: { fontSize: '14px', color: '#9ca3af', textDecoration: 'line-through' },
+  qvDesc: { fontSize: '13px', color: '#6b7280', lineHeight: 1.6, margin: 0 },
+  qvStock: { fontSize: '12px', color: '#b91c1c', background: '#fef2f2', borderRadius: '6px', padding: '6px 10px', margin: 0 },
+  qvBtn: {
+    width: '100%', background: '#0a0a0f', color: '#fff', border: 'none',
+    padding: '14px', borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+  },
+  qvBtnAdded: {
+    width: '100%', background: '#16a34a', color: '#fff', border: 'none',
+    padding: '14px', borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+  },
+  qvLink: {
+    textAlign: 'center', fontSize: '13px', color: '#6b7280',
+    textDecoration: 'none', display: 'block',
+  },
+
+  drawerOverlay: {
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+    zIndex: 300,
+  },
+  drawer: {
+    position: 'fixed', top: 0, left: 0, bottom: 0,
+    width: '280px', background: '#fff', zIndex: 301,
+    padding: '20px 16px', overflowY: 'auto',
+    display: 'flex', flexDirection: 'column', gap: '0',
+  },
+  drawerHeader: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    marginBottom: '20px',
+  },
+  drawerTitle: { fontSize: '16px', fontWeight: 700, color: '#0a0a0f' },
+  drawerClose: {
+    background: 'transparent', border: 'none', cursor: 'pointer',
+    fontSize: '18px', color: '#6b7280', padding: '4px',
+  },
+  drawerApply: {
+    marginTop: '24px', width: '100%',
+    background: '#0a0a0f', color: '#fff', border: 'none',
+    padding: '14px', borderRadius: '10px',
+    fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+  },
+  fabFilter: {
+    position: 'fixed', bottom: '24px', left: '50%',
+    transform: 'translateX(-50%)',
+    background: '#0a0a0f', color: '#fff',
+    border: 'none', borderRadius: '99px',
+    padding: '11px 20px', fontSize: '13px', fontWeight: 600,
+    cursor: 'pointer', zIndex: 200,
+    display: 'flex', alignItems: 'center', gap: '7px',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+  },
 }
 
 export default Products
