@@ -116,7 +116,6 @@ function Home() {
   const [featRef, featVisible] = useReveal()
   const [bentoRef, bentoVisible] = useReveal()
   const [testiRef, testiVisible] = useReveal()
-  const [howRef, howVisible] = useReveal()
 
   const scrambledTitle = useTextScramble(HERO.title, 0)
   const blurStyle = useBlurIn(0)
@@ -202,32 +201,6 @@ function Home() {
             <img src={HERO.img} alt="Auriculares IA" style={s.heroImg} />
             <div style={s.discountPill}>{HERO.discount}</div>
           </div>
-        </div>
-      </section>
-
-      {/* CÓMO FUNCIONA */}
-      <section style={s.section}>
-        <p style={s.label}>Simple y rápido</p>
-        <h2 style={s.title}>¿Cómo <span style={s.gradient}>funciona</span>?</h2>
-        <p style={s.sub}>En tres pasos tienes tu gadget IA en casa.</p>
-        <div ref={howRef} style={s.howGrid}>
-          {[
-            { num: '01', icon: '🔍', title: 'Elige tu gadget', desc: 'Explora el catálogo, filtra por categoría o pregúntale al asistente IA. Encuentra el gadget ideal para ti.' },
-            { num: '02', icon: '🔒', title: 'Paga con seguridad', desc: 'Checkout en segundos con encriptación SSL. Aceptamos tarjetas y medios de pago locales de toda Latinoamérica.' },
-            { num: '03', icon: '📦', title: 'Recibe en casa', desc: 'Despacho en 24-48h con seguimiento en tiempo real. ¿No quedas satisfecho? 30 días de devolución sin preguntas.' },
-          ].map(({ num, icon, title, desc }, i) => (
-            <div key={num} style={{
-              ...s.howCard,
-              opacity: howVisible ? 1 : 0,
-              transform: howVisible ? 'translateY(0)' : 'translateY(28px)',
-              transition: `opacity 0.55s ease ${i * 0.12}s, transform 0.55s ease ${i * 0.12}s`,
-            }}>
-              <div style={s.howNum}>{num}</div>
-              <div style={s.howIcon}>{icon}</div>
-              <p style={s.howTitle}>{title}</p>
-              <p style={s.howDesc}>{desc}</p>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -666,33 +639,6 @@ const s = {
   label: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' },
   title: { fontSize: 'clamp(26px,4vw,42px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.2, marginBottom: '14px', color: '#0a0a0f' },
   sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '48px' },
-
-  // Cómo funciona
-  howGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' },
-  howCard: {
-    position: 'relative',
-    background: '#f8f9fa',
-    border: '1px solid #e5e7eb',
-    borderRadius: '20px',
-    padding: '36px 28px 32px',
-    overflow: 'hidden',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-  },
-  howNum: {
-    position: 'absolute',
-    top: '-6px',
-    right: '14px',
-    fontSize: '96px',
-    fontWeight: 900,
-    color: 'rgba(26,111,255,0.07)',
-    lineHeight: 1,
-    userSelect: 'none',
-    pointerEvents: 'none',
-    letterSpacing: '-4px',
-  },
-  howIcon: { fontSize: '38px', marginBottom: '18px', display: 'block' },
-  howTitle: { fontSize: '17px', fontWeight: 700, color: '#0a0a0f', marginBottom: '10px', margin: '0 0 10px 0' },
-  howDesc: { fontSize: '14px', color: '#6b7280', lineHeight: 1.65, margin: 0 },
 
   // Categorías accent
   accentGrid: {
