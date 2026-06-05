@@ -4,19 +4,16 @@ import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 
 const HERO = {
-  badge: '⚡ SOLO HOY — STOCK LIMITADO',
   title: 'Auriculares IA',
   sub: 'que se adaptan a ti',
-  img: 'https://images.unsplash.com/photo-1614680376739-414d95ff43df?w=700&q=85',
+  img: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=700&q=85',
   originalPrice: '$89',
   price: '$49',
   discount: '-45%',
-  cta1Label: 'Conseguir por $49 →',
+  cta1Label: 'Comprar ahora →',
   cta1To: '/productos?cat=auriculares',
   cta2Label: 'Ver todo el catálogo',
   cta2To: '/productos',
-  stock: 7,
-  stockMax: 30,
 }
 
 
@@ -145,25 +142,13 @@ function Home() {
 
       {/* HERO */}
       <section style={s.heroWrap}>
-        <div style={s.heroBlobA} />
-        <div style={s.heroBlobB} />
-        <div style={s.heroInner} className="slide-content-next">
+        <div style={s.heroInner}>
 
           {/* LEFT */}
           <div style={s.heroLeft}>
-            <span style={s.slideBadge}>{HERO.badge}</span>
-
-            {/* Avatares + estrellas */}
-            <div style={s.avatarRow}>
-              {['AV','BM','CL','DR','ES'].map((initials, i) => (
-                <div key={initials} style={{ ...s.avatarCircle, marginLeft: i === 0 ? 0 : '-10px', zIndex: 5 - i }}>
-                  {initials}
-                </div>
-              ))}
-              <div style={s.avatarLabel}>
-                <span style={s.avatarStars}>⭐⭐⭐⭐⭐</span>
-                <span style={s.avatarCount}>+2,847 compradores felices</span>
-              </div>
+            <div style={s.heroChipRow}>
+              <span style={s.heroChip}>Auriculares IA</span>
+              <span style={s.heroBestChip}>⭐ Más vendido</span>
             </div>
 
             <h1 style={s.heroTitle}>
@@ -171,69 +156,41 @@ function Home() {
               <span style={{ ...s.gradient, ...blurStyle }}>{HERO.sub}</span>
             </h1>
 
+            <p style={s.heroFeatures}>IA adaptativa al entorno &nbsp;·&nbsp; 30h de batería &nbsp;·&nbsp; Cancelación activa de ruido</p>
+
+            <div style={s.heroRatingRow}>
+              <span style={s.heroStars}>⭐⭐⭐⭐⭐</span>
+              <span style={s.heroRatingNum}>4.9</span>
+              <span style={s.heroRatingCount}>2,847 reseñas verificadas</span>
+            </div>
+
+            <div style={s.heroDivider} />
+
             <div style={s.priceRow}>
               <span style={s.priceOld}>{HERO.originalPrice}</span>
-              <span style={s.priceBig}>{HERO.price}</span>
+              <span style={s.heroPriceDark}>{HERO.price}</span>
               <span style={s.discountBadge}>{HERO.discount}</span>
             </div>
 
-            {/* Stock bar */}
-            <div style={s.stockWrap}>
-              <div style={s.stockTop}>
-                <span style={s.stockLabel}>🔥 ¡Casi agotado!</span>
-                <span style={s.stockCount}>Solo {HERO.stock} unidades</span>
-              </div>
-              <div style={s.stockBar}>
-                <div style={{ ...s.stockFill, width: `${Math.round((HERO.stock / HERO.stockMax) * 100)}%` }} />
-              </div>
-            </div>
-
-            <div style={s.countdown}>
-              <span style={s.countdownLabel}>⚡ Oferta termina en:</span>
-              <div style={s.countdownBlocks}>
-                {[{ v: hh, u: 'hrs' }, { v: mm, u: 'min' }, { v: ss, u: 'seg' }].map(({ v, u }) => (
-                  <div key={u} style={s.countdownBlock}>
-                    <span style={s.countdownNum}>{v}</span>
-                    <span style={s.countdownUnit}>{u}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div style={s.heroBtns}>
-              <Link to={HERO.cta1To} style={s.btnPrimary}>{HERO.cta1Label}</Link>
-              <Link to={HERO.cta2To} style={s.btnOutline}>{HERO.cta2Label}</Link>
+              <Link to={HERO.cta1To} style={s.heroBtnDark}>{HERO.cta1Label}</Link>
+              <Link to={HERO.cta2To} style={s.heroBtnGhost}>{HERO.cta2Label}</Link>
             </div>
 
-            <div style={s.trustBar}>
-              {['🚚 Envío gratis', '↩️ 30 días devolución', '🔒 Pago seguro'].map(t => (
-                <span key={t} style={s.trustItem}>{t}</span>
+            <div style={s.heroTrustRow}>
+              {['🚚 Envío gratis', '↩️ 30 días', '🔒 Pago seguro'].map((t, i) => (
+                <span key={t} style={s.heroTrustItem}>
+                  {i > 0 && <span style={s.heroTrustSep}>·</span>}
+                  {t}
+                </span>
               ))}
             </div>
           </div>
 
           {/* RIGHT */}
           <div style={s.heroRight}>
-            <div style={s.heroImgGlow} />
-            <img src={HERO.img} alt="Auriculares IA" style={s.heroImg} className="slide-image-next" />
-            <div style={s.discountPill}>{HERO.discount}</div>
-
-            {/* Tarjeta flotante de reseña */}
-            <div style={s.floatReview}>
-              <div style={s.floatReviewTop}>
-                <div style={s.floatAvatar}>MG</div>
-                <div>
-                  <p style={s.floatName}>María G. — Santiago</p>
-                  <span style={s.floatStars}>⭐⭐⭐⭐⭐</span>
-                </div>
-              </div>
-              <p style={s.floatText}>"Sonido increíble, llegó en 3 días. 100% recomendado."</p>
-            </div>
-
-            {/* Badge de pedidos recientes */}
-            <div style={s.floatOrders}>
-              <span style={s.floatOrdersDot} />
-              12 personas lo compraron hoy
+            <div style={s.heroImgCard}>
+              <img src={HERO.img} alt="Auriculares IA" style={s.heroImg} />
             </div>
           </div>
 
@@ -462,13 +419,12 @@ function Home() {
 
 const s = {
   heroWrap: {
-    position: 'relative',
-    minHeight: '660px',
+    background: '#f5f5f7',
+    minHeight: '680px',
     display: 'flex',
     alignItems: 'center',
-    background: 'linear-gradient(135deg, #060912 0%, #0a1628 55%, #0e0a1e 100%)',
+    padding: '80px 5%',
     overflow: 'hidden',
-    padding: '60px 5%',
   },
   heroBlobA: {
     position: 'absolute',
@@ -491,11 +447,9 @@ const s = {
     pointerEvents: 'none',
   },
   heroInner: {
-    position: 'relative',
-    zIndex: 1,
     display: 'flex',
     alignItems: 'center',
-    gap: '48px',
+    gap: '64px',
     maxWidth: '1100px',
     width: '100%',
     margin: '0 auto',
@@ -505,55 +459,97 @@ const s = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-    gap: '20px',
-    flex: '1 1 380px',
+    gap: '24px',
+    flex: '1 1 400px',
     minWidth: 0,
   },
   heroRight: {
-    position: 'relative',
-    flex: '0 0 360px',
+    flex: '0 0 420px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroImgGlow: {
-    position: 'absolute',
-    width: '320px',
-    height: '320px',
-    borderRadius: '50%',
-    background: 'rgba(26,111,255,0.14)',
-    boxShadow: '0 0 120px 60px rgba(26,111,255,0.14)',
-    pointerEvents: 'none',
+  heroImgCard: {
+    borderRadius: '28px',
+    overflow: 'hidden',
+    width: '100%',
+    aspectRatio: '4/5',
+    boxShadow: '0 24px 64px rgba(0,0,0,0.1)',
+    background: '#e8e8ed',
   },
-  socialProofRow: {
-    fontSize: '14px',
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: 500,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  slideBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    borderRadius: '99px',
-    padding: '6px 16px',
-    fontSize: '13px',
+  heroChipRow: { display: 'flex', alignItems: 'center', gap: '10px' },
+  heroChip: {
+    fontSize: '12px',
     fontWeight: 700,
-    background: 'rgba(239,68,68,0.18)',
-    color: '#fca5a5',
-    border: '1px solid rgba(239,68,68,0.35)',
+    color: '#1A6FFF',
+    background: 'rgba(26,111,255,0.1)',
+    padding: '6px 14px',
+    borderRadius: '99px',
+    letterSpacing: '0.04em',
+  },
+  heroBestChip: {
+    fontSize: '12px',
+    fontWeight: 700,
+    color: '#0a0a0f',
+    background: '#ffffff',
+    border: '1px solid #e5e7eb',
+    padding: '6px 14px',
+    borderRadius: '99px',
   },
   heroTitle: {
-    fontSize: 'clamp(36px,5.5vw,68px)',
+    fontSize: 'clamp(38px, 5vw, 70px)',
     fontWeight: 800,
-    lineHeight: 1.1,
-    letterSpacing: '-2px',
-    color: '#ffffff',
+    lineHeight: 1.05,
+    letterSpacing: '-2.5px',
+    color: '#0a0a0f',
     margin: 0,
     fontFamily: 'inherit',
   },
+  heroFeatures: {
+    fontSize: '15px',
+    color: '#6b7280',
+    fontWeight: 500,
+    margin: 0,
+    lineHeight: 1.6,
+  },
+  heroRatingRow: { display: 'flex', alignItems: 'center', gap: '8px' },
+  heroStars: { fontSize: '16px', letterSpacing: '1px' },
+  heroRatingNum: { fontSize: '16px', fontWeight: 800, color: '#0a0a0f' },
+  heroRatingCount: { fontSize: '14px', color: '#6b7280', fontWeight: 500 },
+  heroDivider: { width: '100%', height: '1px', background: '#e5e7eb' },
+  heroPriceDark: {
+    fontSize: '48px',
+    fontWeight: 800,
+    color: '#0a0a0f',
+    lineHeight: 1,
+  },
+  heroBtnDark: {
+    background: '#0a0a0f',
+    color: '#ffffff',
+    padding: '16px 36px',
+    borderRadius: '99px',
+    fontSize: '15px',
+    fontWeight: 700,
+    textDecoration: 'none',
+    display: 'inline-block',
+    letterSpacing: '-0.2px',
+  },
+  heroBtnGhost: {
+    background: 'transparent',
+    color: '#0a0a0f',
+    border: '1.5px solid #0a0a0f',
+    padding: '15px 32px',
+    borderRadius: '99px',
+    fontSize: '15px',
+    fontWeight: 600,
+    textDecoration: 'none',
+    display: 'inline-block',
+  },
+  heroTrustRow: { display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' },
+  heroTrustItem: { fontSize: '13px', color: '#6b7280', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' },
+  heroTrustSep: { color: '#d1d5db' },
+  socialProofRow: { fontSize: '14px', color: 'rgba(255,255,255,0.85)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' },
+  slideBadge: { display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '99px', padding: '6px 16px', fontSize: '13px', fontWeight: 700, background: 'rgba(239,68,68,0.18)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.35)' },
   gradient: {
     background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
     WebkitBackgroundClip: 'text',
@@ -567,7 +563,7 @@ const s = {
   },
   priceOld: {
     fontSize: '20px',
-    color: 'rgba(255,255,255,0.5)',
+    color: '#9ca3af',
     textDecoration: 'line-through',
     fontWeight: 500,
   },
@@ -632,13 +628,9 @@ const s = {
     backdropFilter: 'blur(8px)',
   },
   heroImg: {
-    width: '380px',
-    height: '380px',
-    borderRadius: '36px',
+    width: '100%',
+    height: '100%',
     objectFit: 'cover',
-    position: 'relative',
-    zIndex: 1,
-    boxShadow: '0 32px 80px rgba(26,111,255,0.18), 0 8px 24px rgba(0,0,0,0.12)',
     display: 'block',
   },
   discountPill: {
@@ -659,16 +651,8 @@ const s = {
     boxShadow: '0 4px 20px rgba(239,68,68,0.45)',
     letterSpacing: '-0.5px',
   },
-  trustBar: {
-    display: 'flex',
-    gap: '20px',
-    flexWrap: 'wrap',
-  },
-  trustItem: {
-    fontSize: '12px',
-    color: 'rgba(255,255,255,0.65)',
-    fontWeight: 500,
-  },
+  trustBar: { display: 'flex', gap: '20px', flexWrap: 'wrap' },
+  trustItem: { fontSize: '12px', color: '#6b7280', fontWeight: 500 },
 
   // Avatar row
   avatarRow: { display: 'flex', alignItems: 'center', gap: '12px' },
