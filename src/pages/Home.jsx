@@ -379,10 +379,10 @@ function Home() {
           <h2 style={{ ...s.title, color: '#fff' }}>De la tienda a tus manos<br /><span style={s.gradient}>en 4 pasos</span></h2>
           <div style={s.stepsRow}>
             {[
-              { n: '01', icon: '🔍', t: 'Explorás', d: 'Navegás el catálogo IA y encontrás el gadget ideal para vos.' },
-              { n: '02', icon: '🛒', t: 'Comprás', d: 'Pago seguro con SSL. Visa, Mastercard, PayPal y más.' },
+              { n: '01', icon: '🔍', t: 'Exploras', d: 'Navega el catálogo IA y encuentra el gadget ideal para ti.' },
+              { n: '02', icon: '🛒', t: 'Compras', d: 'Pago seguro con SSL. Visa, Mastercard, PayPal y más.' },
               { n: '03', icon: '📦', t: 'Despachamos', d: 'En 24h hábiles tu pedido sale con número de seguimiento.' },
-              { n: '04', icon: '🚀', t: 'Activás la IA', d: 'Lo recibís, lo activás y el gadget empieza a aprender de vos.' },
+              { n: '04', icon: '🚀', t: 'Activa la IA', d: 'Lo recibes, lo activas y el gadget empieza a aprender de ti.' },
             ].map((step, i) => (
               <div key={i} style={s.stepOuter}>
                 <div style={s.stepItem}>

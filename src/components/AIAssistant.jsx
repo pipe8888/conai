@@ -74,7 +74,7 @@ export default function AIAssistant() {
       { from: 'user', text },
       {
         from: 'bot',
-        text: cat ? `Perfecto, tenés opciones en ${CAT_LABELS[cat]} 🎯` : 'No encontré una categoría exacta, pero podés explorar todo.',
+        text: cat ? `Perfecto, tienes opciones en ${CAT_LABELS[cat]} 🎯` : 'No encontré una categoría exacta, pero puedes explorar todo.',
         action: cat ? { label: `Ver ${CAT_LABELS[cat]}`, cat } : { label: 'Ver todo el catálogo', cat: null },
       },
     ])
