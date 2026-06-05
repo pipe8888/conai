@@ -366,11 +366,21 @@ function ProductDetail() {
 
       {/* STICKY BAR */}
       <div style={{ ...s.stickyBar, transform: stickyVisible ? 'translateY(0)' : 'translateY(110%)' }}>
-        <div>
-          <p style={s.stickyName}>{prod.name.length > 30 ? prod.name.slice(0, 30) + '…' : prod.name}</p>
-          <p style={s.stickyPrice}>${prod.price} USD</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 }}>
+            {prod.emoji || '📦'}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <p style={s.stickyName}>{prod.name.length > 28 ? prod.name.slice(0, 28) + '…' : prod.name}</p>
+            <p style={s.stickyPrice}>${prod.price} USD</p>
+          </div>
         </div>
-        <button onClick={handleBuyNow} style={s.stickyBtn}>Comprar ahora</button>
+        <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
+          <button onClick={handleAdd} style={added ? s.stickyBtnAdded : s.stickyBtnOutline}>
+            {added ? '✓ Agregado' : 'Agregar'}
+          </button>
+          <button onClick={handleBuyNow} style={s.stickyBtn}>Comprar ahora</button>
+        </div>
       </div>
     </div>
   )
@@ -497,7 +507,9 @@ const s = {
   stickyBar: { position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #e5e7eb', padding: '12px 5%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', zIndex: 200, transition: 'transform 0.3s ease', boxShadow: '0 -4px 24px rgba(0,0,0,0.09)' },
   stickyName: { fontSize: '13px', fontWeight: 600, color: '#0a0a0f', margin: '0 0 2px', lineHeight: 1.3 },
   stickyPrice: { fontSize: '16px', fontWeight: 800, color: '#1A6FFF', margin: 0 },
-  stickyBtn: { background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', color: '#fff', border: 'none', padding: '12px 26px', borderRadius: '8px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
+  stickyBtn: { background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)', color: '#fff', border: 'none', padding: '12px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
+  stickyBtnOutline: { background: 'transparent', color: '#0a0a0f', border: '1.5px solid #d1d5db', padding: '11px 18px', borderRadius: '8px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' },
+  stickyBtnAdded: { background: '#16a34a', color: '#fff', border: 'none', padding: '12px 18px', borderRadius: '8px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
 }
 
 export default ProductDetail
