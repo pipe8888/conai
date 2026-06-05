@@ -24,6 +24,23 @@ function cartReducer(state, action) {
         total: parseFloat((state.total - item.price * item.quantity).toFixed(2)),
       }
     }
+    case 'UPDATE': {
+      const item = state.items.find(i => i.id === action.payload.id)
+      if (!item) return state
+      if (action.payload.qty <= 0) {
+        return {
+          items: state.items.filter(i => i.id !== action.payload.id),
+          count: state.count - item.quantity,
+          total: parseFloat((state.total - item.price * item.quantity).toFixed(2)),
+        }
+      }
+      const diff = action.payload.qty - item.quantity
+      return {
+        items: state.items.map(i => i.id === action.payload.id ? { ...i, quantity: action.payload.qty } : i),
+        count: state.count + diff,
+        total: parseFloat((state.total + item.price * diff).toFixed(2)),
+      }
+    }
     case 'CLEAR':
       return { items: [], count: 0, total: 0 }
     default:
@@ -36,10 +53,11 @@ export function CartProvider({ children }) {
 
   const addToCart = (product) => dispatch({ type: 'ADD', payload: product })
   const removeFromCart = (id) => dispatch({ type: 'REMOVE', payload: id })
+  const updateQuantity = (id, qty) => dispatch({ type: 'UPDATE', payload: { id, qty } })
   const clearCart = () => dispatch({ type: 'CLEAR' })
 
   return (
-    <CartContext.Provider value={{ ...state, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ ...state, addToCart, removeFromCart, updateQuantity, clearCart }}>
       {children}
     </CartContext.Provider>
   )
