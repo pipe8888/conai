@@ -99,6 +99,8 @@ function useReveal() {
 
 function Home() {
   const [featured, setFeatured] = useState([])
+  const [trending, setTrending] = useState([])
+  const [deals, setDeals] = useState([])
   const [time, setTime] = useState(2 * 3600 + 34 * 60 + 18)
 
   const [dealsRef, dealsVisible] = useReveal()
@@ -112,8 +114,11 @@ function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const { data: viral } = await supabase.from('products').select('*').eq('viral', true).limit(6)
-      setFeatured(viral || [])
+      const { data: viral } = await supabase.from('products').select('*').eq('viral', true).limit(12)
+      const all = viral || []
+      setTrending(all.slice(0, 4))
+      setFeatured(all.slice(0, 6))
+      setDeals(all.slice(2, 6))
     }
     fetchData()
   }, [])
@@ -196,34 +201,29 @@ function Home() {
         <h2 style={s.title}>Lo que todos <span style={s.gradient}>están comprando</span></h2>
         <p style={s.sub}>Gadgets IA seleccionados — los más buscados de esta semana.</p>
         <div ref={bentoRef} className="scroll-track" style={s.scrollTrack}>
-          {[
-            { img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con IA adaptativa',             price: '$79',  badge: 'MÁS VENDIDO',  badgeColor: '#f59e0b', delay: 0    },
-            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',        name: 'SmartWatch Pro con sensor IA',              price: '$129', badge: 'NUEVO',         badgeColor: '#22c55e', delay: 0.06 },
-            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',       name: 'FitBand 360 — monitoreo 24/7',              price: '$49',  badge: '−40%',          badgeColor: '#1A6FFF', delay: 0.12 },
-            { img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',         name: 'SoundMax AI — cancelación activa de ruido', price: '$159', badge: 'OFERTA FLASH',  badgeColor: '#ef4444', delay: 0.18 },
-          ].map(({ img, cat, name, price, badge, badgeColor, delay }, i) => (
+          {trending.map((prod, i) => (
             <Link
-              key={i}
-              to="/productos"
+              key={prod.id}
+              to={`/producto/${prod.id}`}
               className="card-hover"
               style={{
                 ...s.appleCard,
                 opacity: bentoVisible ? 1 : 0,
                 transform: bentoVisible ? 'translateY(0)' : 'translateY(16px)',
-                transition: `opacity 0.45s ease ${delay}s, transform 0.45s ease ${delay}s`,
+                transition: `opacity 0.45s ease ${i * 0.06}s, transform 0.45s ease ${i * 0.06}s`,
               }}
             >
               <div style={s.appleCardTop}>
-                <span style={s.appleChip}>{cat}</span>
-                <span style={{ ...s.appleBadge, background: badgeColor }}>{badge}</span>
+                <span style={s.appleChip}>{prod.category.toUpperCase()}</span>
+                <span style={{ ...s.appleBadge, background: '#f59e0b' }}>TRENDING</span>
               </div>
               <div style={s.appleImgWrap}>
-                <img src={`https://images.unsplash.com/${img}?w=400&q=80`} alt={name} style={s.appleImg} />
+                <img src={prod.image_url || getCategoryImg(prod.category)} alt={prod.name} style={s.appleImg} />
               </div>
               <div style={s.appleInfo}>
-                <p style={s.appleName}>{name}</p>
+                <p style={s.appleName}>{prod.name}</p>
                 <div style={s.appleBottom}>
-                  <span style={s.applePrice}>{price}</span>
+                  <span style={s.applePrice}>${prod.price}</span>
                   <span style={s.appleCta}>Ver →</span>
                 </div>
               </div>
@@ -282,32 +282,24 @@ function Home() {
         <h2 style={s.title}>Ofertas <span style={s.gradient}>del día</span></h2>
         <p style={s.sub}>Descuentos limitados en los gadgets más populares.</p>
         <div ref={dealsRef} className="scroll-track" style={s.scrollTrack}>
-          {[
-            { img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',       name: 'SoundMax AI — cancelación activa de ruido',    orig: '$159', price: '$89', pct: '−44%', pctColor: '#ef4444', delay: 0    },
-            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',       name: 'SmartWatch Pro con monitoreo de salud IA',      orig: '$129', price: '$79', pct: '−38%', pctColor: '#f59e0b', delay: 0.06 },
-            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',      name: 'FitBand 360 — monitoreo 24/7 con IA',           orig: '$85',  price: '$49', pct: '−42%', pctColor: '#1A6FFF', delay: 0.12 },
-            { img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con sonido adaptativo',              orig: '$89',  price: '$49', pct: '−45%', pctColor: '#22c55e', delay: 0.18 },
-          ].map(({ img, cat, name, orig, price, pct, pctColor, delay }, i) => (
-            <Link key={i} to="/productos" className="card-hover" style={{
+          {deals.map((prod, i) => (
+            <Link key={prod.id} to={`/producto/${prod.id}`} className="card-hover" style={{
               ...s.appleCard,
               opacity: dealsVisible ? 1 : 0,
               transform: dealsVisible ? 'translateY(0)' : 'translateY(16px)',
-              transition: `opacity 0.45s ease ${delay}s, transform 0.45s ease ${delay}s`,
+              transition: `opacity 0.45s ease ${i * 0.06}s, transform 0.45s ease ${i * 0.06}s`,
             }}>
               <div style={s.appleCardTop}>
-                <span style={s.appleChip}>{cat}</span>
-                <span style={{ ...s.appleBadge, background: pctColor }}>{pct}</span>
+                <span style={s.appleChip}>{prod.category.toUpperCase()}</span>
+                <span style={{ ...s.appleBadge, background: '#ef4444' }}>OFERTA</span>
               </div>
               <div style={s.appleImgWrap}>
-                <img src={`https://images.unsplash.com/${img}?w=400&q=80`} alt={name} style={s.appleImg} />
+                <img src={prod.image_url || getCategoryImg(prod.category)} alt={prod.name} style={s.appleImg} />
               </div>
               <div style={s.appleInfo}>
-                <p style={s.appleName}>{name}</p>
+                <p style={s.appleName}>{prod.name}</p>
                 <div style={s.appleBottom}>
-                  <div>
-                    <span style={s.appleOrig}>{orig}&nbsp;&nbsp;</span>
-                    <span style={s.applePrice}>{price}</span>
-                  </div>
+                  <span style={s.applePrice}>${prod.price}</span>
                   <span style={s.appleCta}>Ver →</span>
                 </div>
               </div>
