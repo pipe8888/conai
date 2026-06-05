@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import AdminRoute from './components/AdminRoute'
 import SocialProofPopup from './components/SocialProofPopup'
 import CartDrawer from './components/CartDrawer'
+import AIAssistant from './components/AIAssistant'
 import Home from './pages/Home'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
@@ -38,6 +39,7 @@ function App() {
         <Footer />
         <SocialProofPopup />
         <CartDrawer />
+        <AIAssistant />
       </BrowserRouter>
     </HelmetProvider>
   )

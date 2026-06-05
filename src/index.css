@@ -93,6 +93,19 @@ body {
   transform: scale(1.04);
 }
 
+@keyframes fabPulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(26,111,255,0.45); }
+  50%       { box-shadow: 0 4px 32px rgba(26,111,255,0.75), 0 0 0 8px rgba(26,111,255,0.12); }
+}
+.ai-fab {
+  animation: fabPulse 2.5s ease-in-out infinite;
+}
+.ai-fab:hover {
+  transform: scale(1.08) !important;
+  animation: none !important;
+  box-shadow: 0 6px 28px rgba(26,111,255,0.6) !important;
+}
+
 @keyframes shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }

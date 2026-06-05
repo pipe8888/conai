@@ -4,19 +4,19 @@ import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 
 const HERO = {
-  badge: '🔥 OFERTA DEL DÍA',
+  badge: '⚡ SOLO HOY — STOCK LIMITADO',
   badgeBg: 'rgba(239,68,68,0.1)',
   badgeColor: '#ef4444',
   badgeBorder: 'rgba(239,68,68,0.25)',
   title: 'Auriculares IA',
-  sub: 'que leen tu mente',
+  sub: 'que evolucionan con vos',
   img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=700&q=85',
   originalPrice: '$89',
   price: '$49',
   discount: '-45%',
-  cta1Label: '🛒 Consíguelo ya',
-  cta1To: '/productos',
-  cta2Label: 'Ver detalles',
+  cta1Label: 'Conseguir por $49 →',
+  cta1To: '/productos?cat=auriculares',
+  cta2Label: 'Ver todo el catálogo',
   cta2To: '/productos',
   accentRgb: '26,111,255',
   accentGlow: 'rgba(26,111,255,0.3)',
@@ -312,7 +312,7 @@ function Home() {
             { icon: '🤖', t: '100% Productos IA', d: 'Cada producto está seleccionado por su integración real con inteligencia artificial.' },
             { icon: '🚚', t: 'Envío Rápido', d: 'Despacho en 24-48h con proveedores verificados y seguimiento en tiempo real.' },
             { icon: '🔒', t: 'Compra Segura', d: 'Pago 100% seguro con encriptación SSL y garantía de devolución de 30 días.' },
-            { icon: '🌟', t: 'Soporte 24/7', d: 'Nuestro equipo está disponible todo el día para ayudarte.' },
+            { icon: '🌟', t: 'Soporte 24/7', d: 'Asistente IA + chat en vivo disponibles en todo momento.' },
           ].map((f, i) => (
             <div key={i}
               className="card-hover"
