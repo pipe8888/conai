@@ -372,6 +372,46 @@ function Home() {
         </div>
       </section>
 
+      {/* INFOGRAFÍA — Cómo funciona */}
+      <section style={s.infoSection}>
+        <div style={s.infoWrap}>
+          <p style={{ ...s.label, color: '#66AAFF' }}>Simple y rápido</p>
+          <h2 style={{ ...s.title, color: '#fff' }}>De la tienda a tus manos<br /><span style={s.gradient}>en 4 pasos</span></h2>
+          <div style={s.stepsRow}>
+            {[
+              { n: '01', icon: '🔍', t: 'Explorás', d: 'Navegás el catálogo IA y encontrás el gadget ideal para vos.' },
+              { n: '02', icon: '🛒', t: 'Comprás', d: 'Pago seguro con SSL. Visa, Mastercard, PayPal y más.' },
+              { n: '03', icon: '📦', t: 'Despachamos', d: 'En 24h hábiles tu pedido sale con número de seguimiento.' },
+              { n: '04', icon: '🚀', t: 'Activás la IA', d: 'Lo recibís, lo activás y el gadget empieza a aprender de vos.' },
+            ].map((step, i) => (
+              <div key={i} style={s.stepOuter}>
+                <div style={s.stepItem}>
+                  <div style={s.stepNum}>{step.n}</div>
+                  <div style={s.stepIcon}>{step.icon}</div>
+                  <p style={s.stepTitle}>{step.t}</p>
+                  <p style={s.stepDesc}>{step.d}</p>
+                </div>
+                {i < 3 && <div style={s.stepConnector}><div style={s.stepLine} /><span style={s.stepArrow}>→</span></div>}
+              </div>
+            ))}
+          </div>
+
+          <div style={s.infoStats}>
+            {[
+              { val: '$420B', label: 'Mercado IA gadgets 2025' },
+              { val: '73%', label: 'Mejoran su productividad' },
+              { val: '2.3×', label: 'Mayor satisfacción vs normal' },
+              { val: '89%', label: 'Recompraría en ConAI' },
+            ].map(({ val, label }, i) => (
+              <div key={i} style={s.infoStat}>
+                <span style={s.infoStatVal}>{val}</span>
+                <span style={s.infoStatLabel}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA FINAL */}
       <section style={s.ctaWrap}>
         <div style={s.heroBlobA} />
@@ -497,10 +537,10 @@ const s = {
     borderRadius: '99px',
   },
   heroTitle: {
-    fontSize: 'clamp(38px, 5vw, 70px)',
-    fontWeight: 800,
-    lineHeight: 1.05,
-    letterSpacing: '-2.5px',
+    fontSize: 'clamp(44px, 6vw, 84px)',
+    fontWeight: 900,
+    lineHeight: 0.96,
+    letterSpacing: '-3.5px',
     color: '#0a0a0f',
     margin: 0,
     fontFamily: 'inherit',
@@ -750,9 +790,9 @@ const s = {
   },
   section: { padding: '80px 5%', background: '#ffffff' },
   sectionGray: { padding: '80px 5%', background: '#f8f9fa' },
-  label: { fontSize: '12px', color: '#1A6FFF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' },
-  title: { fontSize: 'clamp(26px,4vw,42px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.2, marginBottom: '14px', color: '#0a0a0f' },
-  sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '48px' },
+  label: { fontSize: '11px', color: '#1A6FFF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '12px' },
+  title: { fontSize: 'clamp(30px,4.5vw,54px)', fontWeight: 900, letterSpacing: '-2px', lineHeight: 1.08, marginBottom: '14px', color: '#0a0a0f' },
+  sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.65, marginBottom: '48px' },
 
   // Apple/Linear shared
   scrollTrack: {
@@ -849,6 +889,94 @@ const s = {
   },
   testiName: { fontSize: '14px', fontWeight: 700, color: '#0a0a0f', margin: 0 },
   testiCity: { fontSize: '12px', color: '#9ca3af', margin: 0 },
+
+  // Infografía
+  infoSection: { padding: '80px 5%', background: '#050508', overflow: 'hidden' },
+  infoWrap: { maxWidth: '1100px', margin: '0 auto' },
+  stepsRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 0,
+    marginTop: '56px',
+    marginBottom: '72px',
+    flexWrap: 'wrap',
+  },
+  stepOuter: { display: 'flex', alignItems: 'center', flex: '1 1 180px', minWidth: 0 },
+  stepItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    flex: 1,
+    padding: '0 8px',
+  },
+  stepNum: {
+    fontSize: '11px',
+    fontWeight: 800,
+    letterSpacing: '0.14em',
+    color: '#1A6FFF',
+    marginBottom: '14px',
+  },
+  stepIcon: {
+    fontSize: '40px',
+    marginBottom: '16px',
+    background: 'rgba(26,111,255,0.1)',
+    border: '1px solid rgba(26,111,255,0.2)',
+    borderRadius: '20px',
+    width: '80px',
+    height: '80px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepTitle: {
+    fontSize: '17px',
+    fontWeight: 800,
+    color: '#fff',
+    letterSpacing: '-0.3px',
+    marginBottom: '8px',
+    margin: '0 0 8px 0',
+  },
+  stepDesc: { fontSize: '13px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, margin: 0, maxWidth: '160px' },
+  stepConnector: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '0 4px',
+    flexShrink: 0,
+    marginTop: '-36px',
+  },
+  stepLine: { width: '32px', height: '1px', background: 'rgba(26,111,255,0.3)' },
+  stepArrow: { fontSize: '14px', color: 'rgba(26,111,255,0.5)', lineHeight: 1 },
+  infoStats: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4,1fr)',
+    gap: '1px',
+    background: 'rgba(255,255,255,0.06)',
+    borderRadius: '20px',
+    overflow: 'hidden',
+    border: '1px solid rgba(255,255,255,0.06)',
+  },
+  infoStat: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '32px 20px',
+    background: 'rgba(255,255,255,0.02)',
+    gap: '8px',
+    textAlign: 'center',
+  },
+  infoStatVal: {
+    fontSize: 'clamp(28px,3.5vw,44px)',
+    fontWeight: 900,
+    letterSpacing: '-2px',
+    lineHeight: 1,
+    background: 'linear-gradient(135deg, #1A6FFF, #66AAFF)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+  },
+  infoStatLabel: { fontSize: '13px', color: 'rgba(255,255,255,0.4)', fontWeight: 500, lineHeight: 1.4 },
 
   // Trending section bg
   sectionBento: { padding: '80px 5%', background: '#f8f9fa' },
