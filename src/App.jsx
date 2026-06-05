@@ -45,7 +45,6 @@ function App() {
           </Routes>
         </main>
         <Footer />
-        <SocialProofPopup />
         <CartDrawer />
         <AIAssistant />
       </BrowserRouter>
