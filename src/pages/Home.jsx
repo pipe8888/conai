@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
 
@@ -22,14 +22,6 @@ const HERO = {
   accentGlow: 'rgba(26,111,255,0.3)',
 }
 
-const CAT_ACCENTS = [
-  { bg: 'rgba(239,68,68,0.07)',  border: 'rgba(239,68,68,0.15)',  text: '#ef4444' },
-  { bg: 'rgba(245,158,11,0.07)', border: 'rgba(245,158,11,0.15)', text: '#d97706' },
-  { bg: 'rgba(34,197,94,0.07)',  border: 'rgba(34,197,94,0.15)',  text: '#16a34a' },
-  { bg: 'rgba(26,111,255,0.07)', border: 'rgba(26,111,255,0.15)', text: '#1A6FFF' },
-  { bg: 'rgba(139,92,246,0.07)', border: 'rgba(139,92,246,0.15)', text: '#7c3aed' },
-  { bg: 'rgba(20,184,166,0.07)', border: 'rgba(20,184,166,0.15)', text: '#0d9488' },
-]
 
 const CATEGORY_IMGS = {
   auricular: 'photo-1505740420928-5e560c06d30e',
@@ -107,11 +99,9 @@ function useReveal() {
 
 function Home() {
   const [featured, setFeatured] = useState([])
-  const [categories, setCategories] = useState([])
   const [time, setTime] = useState(2 * 3600 + 34 * 60 + 18)
-  const navigate = useNavigate()
 
-  const [catsRef, catsVisible] = useReveal()
+  const [dealsRef, dealsVisible] = useReveal()
   const [prodsRef, prodsVisible] = useReveal()
   const [featRef, featVisible] = useReveal()
   const [bentoRef, bentoVisible] = useReveal()
@@ -122,12 +112,8 @@ function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const [{ data: viral }, { data: cats }] = await Promise.all([
-        supabase.from('products').select('*').eq('viral', true).limit(6),
-        supabase.from('categories').select('*').order('id'),
-      ])
+      const { data: viral } = await supabase.from('products').select('*').eq('viral', true).limit(6)
       setFeatured(viral || [])
-      setCategories(cats || [])
     }
     fetchData()
   }, [])
@@ -285,38 +271,39 @@ function Home() {
         </div>
       </section>
 
-      {/* CATEGORÍAS */}
+      {/* OFERTAS */}
       <section style={s.sectionGray}>
-        <p style={s.label}>Explora por categoría</p>
-        <h2 style={s.title}>Todo con <span style={s.gradient}>Inteligencia Artificial</span></h2>
-        <p style={s.sub}>Selecciona tu categoría y descubre los gadgets más innovadores.</p>
-        <div ref={catsRef} style={s.accentGrid}>
-          {categories.map((cat, i) => {
-            const accent = CAT_ACCENTS[i % CAT_ACCENTS.length]
-            return (
-              <div
-                key={cat.id}
-                onClick={() => navigate(`/productos?cat=${cat.slug}`)}
-                className="card-hover"
-                style={{
-                  ...s.accentCard,
-                  background: accent.bg,
-                  border: `1px solid ${accent.border}`,
-                  cursor: 'pointer',
-                  opacity: catsVisible ? 1 : 0,
-                  transform: catsVisible ? 'translateY(0)' : 'translateY(28px)',
-                  transition: `opacity 0.55s ease ${i * 0.07}s, transform 0.55s ease ${i * 0.07}s`,
-                }}
-              >
-                <div style={{ ...s.accentEmoji, background: accent.border }}>{cat.emoji}</div>
-                <div style={s.accentMeta}>
-                  <p style={s.accentName}>{cat.name}</p>
-                  <p style={s.accentCount}>{cat.count} productos</p>
-                </div>
-                <span style={{ ...s.accentArrow, color: accent.text }}>→</span>
+        <p style={s.label}>Solo por hoy</p>
+        <h2 style={s.title}>Ofertas <span style={s.gradient}>del día</span></h2>
+        <p style={s.sub}>Descuentos limitados en los gadgets más populares.</p>
+        <div ref={dealsRef} style={s.dealsGrid}>
+          {[
+            { img: 'photo-1505740420928-5e560c06d30e', cat: 'AUDIO IA',       name: 'SoundMax AI — cancelación activa de ruido',    orig: '$159', price: '$89', pct: '−44%', pctColor: '#ef4444', delay: 0    },
+            { img: 'photo-1523275335684-37898b6baf30', cat: 'WEARABLES',       name: 'SmartWatch Pro con monitoreo de salud IA',      orig: '$129', price: '$79', pct: '−38%', pctColor: '#f59e0b', delay: 0.07 },
+            { img: 'photo-1576243345690-4e4b79b05b30', cat: 'FITNESS IA',      name: 'FitBand 360 — monitoreo 24/7 con IA',           orig: '$85',  price: '$49', pct: '−42%', pctColor: '#1A6FFF', delay: 0.14 },
+            { img: 'photo-1590658268037-6bf12165a8df', cat: 'AURICULARES IA',  name: 'ProBuds X1 con sonido adaptativo',              orig: '$89',  price: '$49', pct: '−45%', pctColor: '#22c55e', delay: 0.21 },
+          ].map(({ img, cat, name, orig, price, pct, pctColor, delay }, i) => (
+            <Link key={i} to="/productos" className="card-hover" style={{
+              ...s.dealCard,
+              opacity: dealsVisible ? 1 : 0,
+              transform: dealsVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: `opacity 0.5s ease ${delay}s, transform 0.5s ease ${delay}s`,
+            }}>
+              <div style={s.dealImgWrap}>
+                <img src={`https://images.unsplash.com/${img}?w=300&q=80`} alt={name} style={s.dealImg} />
               </div>
-            )
-          })}
+              <div style={s.dealInfo}>
+                <p style={s.dealCat}>{cat}</p>
+                <p style={s.dealName}>{name}</p>
+                <div style={s.dealPriceRow}>
+                  <span style={s.dealOrig}>{orig}</span>
+                  <span style={s.dealPrice}>{price}</span>
+                  <span style={{ ...s.dealPct, background: pctColor }}>{pct}</span>
+                </div>
+              </div>
+              <span style={s.dealCta}>Ver →</span>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -640,33 +627,36 @@ const s = {
   title: { fontSize: 'clamp(26px,4vw,42px)', fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.2, marginBottom: '14px', color: '#0a0a0f' },
   sub: { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.6, marginBottom: '48px' },
 
-  // Categorías accent
-  accentGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-    gap: '12px',
-  },
-  accentCard: {
+  // Ofertas del día
+  dealsGrid: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  dealCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: '20px',
+    background: '#ffffff',
+    border: '1px solid #e5e7eb',
     borderRadius: '16px',
-    padding: '18px 20px',
+    padding: '16px 20px',
+    textDecoration: 'none',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
   },
-  accentEmoji: {
-    width: '52px',
-    height: '52px',
-    borderRadius: '14px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '26px',
+  dealImgWrap: {
+    width: '110px',
+    height: '110px',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    background: '#f0f2f5',
     flexShrink: 0,
   },
-  accentMeta: { flex: 1, minWidth: 0 },
-  accentName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', margin: '0 0 3px 0' },
-  accentCount: { fontSize: '12px', color: '#9ca3af', margin: 0 },
-  accentArrow: { fontSize: '18px', fontWeight: 700, flexShrink: 0 },
+  dealImg: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
+  dealInfo: { flex: 1, minWidth: 0 },
+  dealCat: { fontSize: '10px', color: '#1A6FFF', fontWeight: 600, letterSpacing: '0.1em', marginBottom: '5px' },
+  dealName: { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', lineHeight: 1.3, marginBottom: '10px' },
+  dealPriceRow: { display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' },
+  dealOrig: { fontSize: '14px', color: '#9ca3af', textDecoration: 'line-through', fontWeight: 500 },
+  dealPrice: { fontSize: '22px', fontWeight: 800, color: '#e63946' },
+  dealPct: { fontSize: '11px', fontWeight: 800, color: '#fff', padding: '3px 10px', borderRadius: '99px' },
+  dealCta: { fontSize: '14px', fontWeight: 700, color: '#1A6FFF', flexShrink: 0, paddingLeft: '12px' },
 
   // Productos
   prodsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '16px' },
