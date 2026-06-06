@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase'
@@ -21,15 +21,17 @@ function getCategoryImg(cat) {
 }
 
 function useReveal() {
-  const ref = useRef(null)
   const [visible, setVisible] = useState(false)
-  useEffect(() => {
+  const obsRef = useRef(null)
+  const ref = useCallback(node => {
+    if (obsRef.current) { obsRef.current.disconnect(); obsRef.current = null }
+    if (!node) return
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setVisible(true) },
       { threshold: 0.1 }
     )
-    if (ref.current) obs.observe(ref.current)
-    return () => obs.disconnect()
+    obs.observe(node)
+    obsRef.current = obs
   }, [])
   return [ref, visible]
 }
