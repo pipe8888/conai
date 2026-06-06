@@ -63,6 +63,20 @@ const FAQS = [
 const BADGE_LABELS  = ['🔥 HOT', '⭐ Bestseller', '✨ Nuevo', '🔥 HOT', '⭐ Bestseller', '✨ Nuevo']
 const BADGE_COLORS  = ['#ef4444', '#f59e0b', '#8b5cf6', '#ef4444', '#f59e0b', '#8b5cf6']
 
+const COMPARE = [
+  { name: 'Auriculares IA Pro X1', img: 'photo-1505740420928-5e560c06d30e', price: '$49', orig: '$89',  to: '/productos?cat=auriculares', popular: false, ia: true,  ruido: true,  salud: false, bat: true,  water: false, app: true },
+  { name: 'SmartWatch Pro IA',     img: 'photo-1523275335684-37898b6baf30', price: '$89', orig: '$129', to: '/productos?cat=wearables',   popular: true,  ia: true,  ruido: false, salud: true,  bat: true,  water: true,  app: true },
+  { name: 'Monitor Salud IA',      img: 'photo-1559757148-5c350d0d3c56',   price: '$65', orig: '$99',  to: '/productos?cat=salud',        popular: false, ia: true,  ruido: false, salud: true,  bat: false, water: true,  app: true },
+]
+const COMPARE_ROWS = [
+  { label: 'Inteligencia artificial', key: 'ia' },
+  { label: 'Cancelación de ruido',    key: 'ruido' },
+  { label: 'Monitoreo de salud',      key: 'salud' },
+  { label: 'Batería 30+ horas',       key: 'bat' },
+  { label: 'Resistente al agua',      key: 'water' },
+  { label: 'App móvil',               key: 'app' },
+]
+
 export default function Home() {
   const [featured,  setFeatured]  = useState([])
   const [deals,     setDeals]     = useState([])
@@ -214,6 +228,28 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* ── CÓMO FUNCIONA ── */}
+      <section style={{ ...s.sec, borderTop: '1px solid #f0f0f0' }}>
+        <div style={s.secInner}>
+          <p style={{ ...s.secLabel, textAlign: 'center' }}>Simple y rápido</p>
+          <h2 style={{ ...s.secH2, textAlign: 'center', marginBottom: '56px' }}>¿Cómo <em style={s.secEm}>funciona</em>?</h2>
+          <div style={s.howGrid}>
+            {[
+              { num: '01', icon: '🔍', title: 'Elige tu gadget',     desc: 'Usa el quiz IA o explora por categoría. En segundos encuentras el producto perfecto para tu estilo de vida.' },
+              { num: '02', icon: '🛒', title: 'Compra seguro',        desc: 'Paga con tarjeta, PayPal o transferencia. Encriptación SSL 256-bit y tu dinero protegido en todo momento.' },
+              { num: '03', icon: '🚀', title: 'Recíbelo en casa',     desc: 'Despachamos en 24h con número de seguimiento. Llega en 2-5 días a cualquier país de Latinoamérica.' },
+            ].map(({ num, icon, title, desc }, i) => (
+              <div key={num} style={{ ...s.howCard, borderRight: i < 2 ? '1px dashed #e5e7eb' : 'none' }}>
+                <div style={s.howNum}>{num}</div>
+                <div style={s.howIcon}>{icon}</div>
+                <div style={s.howTitle}>{title}</div>
+                <p style={s.howDesc}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── CATEGORIES PILLS ── */}
       <section style={s.sec}>
@@ -377,6 +413,46 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* ── COMPARADOR ── */}
+      <section style={s.secGray}>
+        <div style={s.secInner}>
+          <p style={s.secLabel}>Encuentra tu favorito</p>
+          <h2 style={s.secH2}>Compara y <em style={s.secEm}>elige</em></h2>
+          <p style={s.secSub}>Los 3 gadgets más populares, lado a lado.</p>
+          <div style={s.compGrid}>
+            {COMPARE.map((prod, i) => (
+              <div key={i} style={{
+                ...s.compCard,
+                borderColor: prod.popular ? '#1A6FFF' : '#e5e7eb',
+                background: prod.popular ? 'linear-gradient(180deg,rgba(26,111,255,0.04) 0%,#fff 30%)' : '#fff',
+                position: 'relative',
+              }}>
+                {prod.popular && <div style={s.compBadge}>⭐ MÁS POPULAR</div>}
+                <img style={s.compImg} src={`https://images.unsplash.com/${prod.img}?w=400&q=80`} alt={prod.name} />
+                <div style={s.compName}>{prod.name}</div>
+                <div style={s.compPriceRow}>
+                  <span style={s.compOrig}>{prod.orig}</span>
+                  <span style={s.compPrice}>{prod.price}</span>
+                </div>
+                <div style={s.compRows}>
+                  {COMPARE_ROWS.map(row => (
+                    <div key={row.key} style={s.compRow}>
+                      <span style={s.compRowLabel}>{row.label}</span>
+                      <span style={{ ...s.compRowVal, color: prod[row.key] ? '#22c55e' : '#d1d5db' }}>
+                        {prod[row.key] ? '✓' : '✗'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <Link to={prod.to} style={{ ...s.compBtn, background: prod.popular ? '#1A6FFF' : '#0a0a0f' }}>
+                  Ver producto →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── BUNDLE ── */}
       <section style={s.secGray}>
@@ -786,6 +862,29 @@ const s = {
   secH2:      { fontSize: 'clamp(28px,4vw,46px)', fontWeight: 900, letterSpacing: '-1.5px', lineHeight: 1.08, color: '#0a0a0f', marginBottom: '14px' },
   secEm:      { fontStyle: 'normal', background: 'linear-gradient(135deg,#1A6FFF,#66AAFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
   secSub:     { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.65, marginBottom: '48px' },
+
+  /* ── CÓMO FUNCIONA ── */
+  howGrid:  { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)' },
+  howCard:  { padding: '32px 36px', textAlign: 'center' },
+  howNum:   { fontSize: '11px', fontWeight: 800, letterSpacing: '0.12em', color: '#1A6FFF', marginBottom: '16px', textTransform: 'uppercase' },
+  howIcon:  { fontSize: '42px', marginBottom: '16px' },
+  howTitle: { fontSize: '18px', fontWeight: 800, color: '#0a0a0f', letterSpacing: '-0.3px', marginBottom: '10px' },
+  howDesc:  { fontSize: '14px', color: '#6b7280', lineHeight: 1.65, maxWidth: '240px', margin: '0 auto' },
+
+  /* ── COMPARADOR ── */
+  compGrid:     { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px', marginTop: '48px' },
+  compCard:     { borderRadius: '24px', border: '2px solid #e5e7eb', padding: '28px', display: 'flex', flexDirection: 'column', gap: '0', overflow: 'hidden' },
+  compBadge:    { position: 'absolute', top: 0, right: '24px', background: '#1A6FFF', color: '#fff', fontSize: '10px', fontWeight: 800, padding: '5px 14px', borderRadius: '0 0 10px 10px', letterSpacing: '0.06em' },
+  compImg:      { width: '100%', height: '160px', objectFit: 'cover', borderRadius: '16px', display: 'block', marginBottom: '20px' },
+  compName:     { fontSize: '16px', fontWeight: 800, color: '#0a0a0f', letterSpacing: '-0.3px', marginBottom: '8px' },
+  compPriceRow: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' },
+  compOrig:     { fontSize: '13px', color: '#9ca3af', textDecoration: 'line-through' },
+  compPrice:    { fontSize: '28px', fontWeight: 900, color: '#0a0a0f', letterSpacing: '-1px' },
+  compRows:     { display: 'flex', flexDirection: 'column', borderTop: '1px solid #f0f0f0', marginBottom: '24px', flex: 1 },
+  compRow:      { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f0f0f0', fontSize: '13px' },
+  compRowLabel: { color: '#6b7280', fontWeight: 500 },
+  compRowVal:   { fontSize: '16px', fontWeight: 700 },
+  compBtn:      { color: '#fff', padding: '12px 20px', borderRadius: '99px', fontSize: '14px', fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'block' },
 
   /* ── CATEGORIES ── */
   catPills:     { display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '40px' },

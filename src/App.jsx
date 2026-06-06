@@ -45,6 +45,7 @@ function App() {
         </main>
         <CartDrawer />
         <AIAssistant />
+        <SocialProofPopup />
       </BrowserRouter>
     </HelmetProvider>
   )
