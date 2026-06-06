@@ -68,6 +68,7 @@ export default function Home() {
   const [deals,     setDeals]     = useState([])
   const [time,      setTime]      = useState(2 * 3600 + 34 * 60 + 18)
   const [hovProd,   setHovProd]   = useState(null)
+  const [hovCat,    setHovCat]    = useState(null)
   const [hovBundle, setHovBundle] = useState(null)
   const [quizStep,  setQuizStep]  = useState(1)
   const [openFaq,   setOpenFaq]   = useState(null)
@@ -214,31 +215,36 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── CATEGORIES GRID ── */}
+      {/* ── CATEGORIES PILLS ── */}
       <section style={s.sec}>
         <div style={s.secInner}>
           <p style={s.secLabel}>Explorar por categoría</p>
           <h2 style={s.secH2}>Todo el universo<br /><em style={s.secEm}>IA</em> en un lugar</h2>
-          <div style={s.catGrid}>
+          <div style={s.catPills}>
             {[
-              { to: '/productos?cat=auriculares', img: 'photo-1505740420928-5e560c06d30e', name: 'Audio IA',    count: '24 productos', wide: true },
-              { to: '/productos?cat=wearables',   img: 'photo-1523275335684-37898b6baf30', name: 'Wearables',   count: '18 productos' },
-              { to: '/productos?cat=salud',        img: 'photo-1559757148-5c350d0d3c56',  name: 'Salud IA',    count: '12 productos' },
-              { to: '/productos?cat=robot',        img: 'photo-1485827404703-89b55fcc595e', name: 'Robots IA',  count: '9 productos' },
-              { to: '/productos?cat=hogar',        img: 'photo-1558618666-fcd25c85cd64',  name: 'Hogar IA',    count: '15 productos' },
-            ].map(({ to, img, name, count, wide }) => (
-              <Link key={name} to={to} style={{
-                ...s.catCard,
-                gridColumn: wide ? 'span 2' : 'span 1',
-                aspectRatio: wide ? '16/7' : '4/3',
-              }}>
-                <img style={s.catImg} src={`https://images.unsplash.com/${img}?w=800&q=85`} alt={name} />
-                <div style={s.catOverlay} />
-                <div style={s.catContent}>
-                  <div style={s.catName}>{name}</div>
-                  <div style={s.catCount}>{count}</div>
+              { to: '/productos?cat=auriculares', icon: '🎧', name: 'Audio IA',  count: '24 productos', color: '#1A6FFF', bg: 'rgba(26,111,255,0.1)' },
+              { to: '/productos?cat=wearables',   icon: '⌚', name: 'Wearables', count: '18 productos', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
+              { to: '/productos?cat=salud',        icon: '🧠', name: 'Salud IA',  count: '12 productos', color: '#22c55e', bg: 'rgba(34,197,94,0.1)' },
+              { to: '/productos?cat=robot',        icon: '🤖', name: 'Robots IA', count: '9 productos',  color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+              { to: '/productos?cat=hogar',        icon: '🏠', name: 'Hogar IA',  count: '15 productos', color: '#06b6d4', bg: 'rgba(6,182,212,0.1)' },
+            ].map(({ to, icon, name, count, color, bg }) => (
+              <Link
+                key={name}
+                to={to}
+                onMouseEnter={() => setHovCat(name)}
+                onMouseLeave={() => setHovCat(null)}
+                style={{
+                  ...s.catPill,
+                  borderColor: hovCat === name ? '#1A6FFF' : '#e5e7eb',
+                  boxShadow: hovCat === name ? '0 8px 24px rgba(26,111,255,0.12)' : '0 1px 4px rgba(0,0,0,0.04)',
+                }}
+              >
+                <div style={{ ...s.catPillIcon, background: bg, color }}>{icon}</div>
+                <div>
+                  <div style={s.catPillName}>{name}</div>
+                  <div style={s.catPillCount}>{count}</div>
                 </div>
-                <div style={s.catArrow}>→</div>
+                <span style={{ ...s.catPillArrow, color: hovCat === name ? '#1A6FFF' : '#d1d5db' }}>→</span>
               </Link>
             ))}
           </div>
@@ -782,14 +788,12 @@ const s = {
   secSub:     { fontSize: '16px', color: '#6b7280', maxWidth: '520px', lineHeight: 1.65, marginBottom: '48px' },
 
   /* ── CATEGORIES ── */
-  catGrid:    { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gridTemplateRows: 'auto auto', gap: '12px', marginTop: '40px' },
-  catCard:    { position: 'relative', borderRadius: '20px', overflow: 'hidden', cursor: 'pointer', display: 'block', textDecoration: 'none' },
-  catImg:     { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
-  catOverlay: { position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(5,5,8,0.75) 0%,rgba(5,5,8,0.1) 60%)' },
-  catContent: { position: 'absolute', bottom: 0, left: 0, padding: '20px' },
-  catName:    { fontSize: '18px', fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', marginBottom: '4px' },
-  catCount:   { fontSize: '12px', color: 'rgba(255,255,255,0.6)', fontWeight: 500 },
-  catArrow:   { position: 'absolute', top: '16px', right: '16px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', borderRadius: '99px', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', color: '#fff' },
+  catPills:     { display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '40px' },
+  catPill:      { display: 'flex', alignItems: 'center', gap: '14px', padding: '16px 20px', borderRadius: '16px', border: '2px solid #e5e7eb', background: '#fff', textDecoration: 'none', cursor: 'pointer', transition: 'border-color 0.2s, box-shadow 0.2s', minWidth: '210px', flex: '1 1 auto' },
+  catPillIcon:  { width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 },
+  catPillName:  { fontSize: '15px', fontWeight: 700, color: '#0a0a0f', letterSpacing: '-0.2px', marginBottom: '3px' },
+  catPillCount: { fontSize: '12px', color: '#9ca3af', fontWeight: 500 },
+  catPillArrow: { fontSize: '18px', fontWeight: 700, marginLeft: 'auto', transition: 'color 0.2s', flexShrink: 0 },
 
   /* ── BENTO ── */
   bentoGrid:     { display: 'grid', gridTemplateColumns: '1.4fr 1fr', gridTemplateRows: 'auto auto', gap: '12px', marginTop: '48px' },
