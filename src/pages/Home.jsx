@@ -68,6 +68,7 @@ export default function Home() {
   const [deals,     setDeals]     = useState([])
   const [time,      setTime]      = useState(2 * 3600 + 34 * 60 + 18)
   const [hovProd,   setHovProd]   = useState(null)
+  const [hovBundle, setHovBundle] = useState(null)
   const [quizStep,  setQuizStep]  = useState(1)
   const [openFaq,   setOpenFaq]   = useState(null)
   const [nlEmail,   setNlEmail]   = useState('')
@@ -378,7 +379,11 @@ export default function Home() {
           <h2 style={s.secH2}>Arma tu <em style={s.secEm}>setup IA</em><br />y ahorra más</h2>
           <p style={s.secSub}>Combos seleccionados para maximizar tu experiencia. Precio especial al llevarlos juntos.</p>
           <div style={s.bundleGrid}>
-            <div style={s.bundleCard}>
+            <div
+              onMouseEnter={() => setHovBundle(0)}
+              onMouseLeave={() => setHovBundle(null)}
+              style={{ ...s.bundleCard, borderColor: hovBundle === 0 ? '#1A6FFF' : '#e5e7eb' }}
+            >
               <div style={s.bundleProducts}>
                 <img style={s.bundleProdImg} src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&q=80" alt="" />
                 <span style={s.bundlePlus}>+</span>
@@ -396,7 +401,11 @@ export default function Home() {
               <Link to="/productos" style={s.bundleBtn}>Agregar kit al carrito</Link>
             </div>
 
-            <div style={{ ...s.bundleCard, borderColor: '#1A6FFF', background: 'linear-gradient(135deg,rgba(26,111,255,0.03) 0%,#fff 100%)', position: 'relative' }}>
+            <div
+              onMouseEnter={() => setHovBundle(1)}
+              onMouseLeave={() => setHovBundle(null)}
+              style={{ ...s.bundleCard, borderColor: hovBundle === 1 ? '#1A6FFF' : '#e5e7eb', background: 'linear-gradient(135deg,rgba(26,111,255,0.03) 0%,#fff 100%)', position: 'relative' }}
+            >
               <div style={s.bundlePopBadge}>⭐ MÁS POPULAR</div>
               <div style={s.bundleProducts}>
                 <img style={s.bundleProdImg} src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&q=80" alt="" />
